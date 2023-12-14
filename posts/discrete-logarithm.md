@@ -83,7 +83,7 @@ In this case we define the abstract function `map_to_group_ord: G → Zₘ`.
 For example:
 
 - `G` is an elliptic curve and `a` a point: `map_to_group_ord(a) = a.x mod m`
-- `G` is `Zp*` and `a` a scalar: `map_to_group_ord(a) = a mod m`
+- `G` is `Zₚ*` and `a` a scalar: `map_to_group_ord(a) = a mod m`
 
 ### Discrete Logarithm Problem
 
