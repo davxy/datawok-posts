@@ -76,7 +76,7 @@ to find the value `x` such that `gˣ mod p = y`. Note that here we are talking
 about discrete logarithm (with exponentiation computed in modular arithmetic).
 
 This one-way function is used by some well known cryptographic schemes:
-- *Elgamal* encryption and digital signature
+- *ElGamal* encryption and digital signature
 - *Diffie-Hellman* secret sharing
 
 ### Integer Factorization
