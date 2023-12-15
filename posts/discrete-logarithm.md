@@ -16,41 +16,42 @@ cryptographic protocols derived from it and the most important attacks.
 
 ## Discrete Logarithm
 
-Given `g` a generator for a cyclic group `G` with order `m`, the **modular
-exponentiation** function is defined as a mapping from `Zₘ` to `G`.
+Given `g` a generator for a cyclic group `G` with order `n`, the **modular
+exponentiation** function is defined as a mapping from `Zₙ` to `G`.
 
-    exp: Zₘ → G,    exp(i) = gⁱ
+    exp: Zₙ → G,    exp(i) = gⁱ
 
 Where `gⁱ` represents the application of the group operation `i` times on `g`.
 
-For example, if `G = Zₙ*` and the operation is the product then `gⁱ = ∏ₖ g mod n`,
-for `k = 1..i` and `i ∈ Zₘ`
+For example, if `G = Zₚ*` and the operation is the product then `gⁱ = ∏ₖ g mod p`,
+for `k = 1..i` and `i ∈ Zₙ`
 
 When applied to a generator of a cyclic group, `exp` is injective and surjective
 (by definition of generator), we can thus define the inverse function.
 
 The **discrete logarithm** function is defined as:
 
-    ind: G → Zₘ,    ind(gⁱ) = i
+    ind: G → Zₙ,    ind(gⁱ) = i
 
 Discrete logarithm is not a monotonic function, and currently we don't know any
 efficient algorithm to compute it.
 
-**Proposition**. Given `x, y ∈ G` and a generator `g` of order `m`:
+**Proposition**. Given `x, y ∈ G` and a generator `g` of order `n`:
 
-    ind(x·y) = (ind(x) + ind(y)) mod m
+    ind(x·y) = (ind(x) + ind(y)) mod n
 
 This can be easily proven by considering that the group is cyclic and `g`
-has a cycle period `m` (i.e. `gⁱ = g^(i + k·m) ∀ k ∈ Z`).
+has a cycle with period `n` (i.e. `gⁱ = g^(i + k·n) ∀ k ∈ Z`).
 
-For example, if `G = Zₙ*` and `m = φ(n)`
+For example, if `G = Zₚ*` and `n = φ(p)`
 
-    ind(x) ≡ A (mod n), ind(y) ≡ B (mod n)
+    ind(x) ≡ A (mod m), ind(y) ≡ B (mod p)
 
-    → x = gᴬ mod n , y = gᴮ mod n
-    → x·y ≡ gᴬ·gᴮ ≡ gᴬ⁺ᴮ ≡ g^[(A + B) mod φ(n)] (mod n)
-    → ind(x·y) = (A + B) mod φ(n)
-    → ind(x·y) = (ind(x) + ind(y)) mod φ(n)
+    → x = gᴬ mod p , y = gᴮ mod p
+    → x·y ≡ gᴬ·gᴮ ≡ gᴬ⁺ᴮ ≡ g^[(A + B) mod φ(p)] (mod p)
+    → ind(x·y) = (A + B) mod φ(p)
+
+    → ind(x·y) = (ind(x) + ind(y)) mod φ(p)
 
 ### Notation
 
@@ -75,15 +76,14 @@ will not be specified, and exponential notation is used.
 
 Where we have to manipulate a message `m` we assume the existence of a bijective
 mapping from the *message domain* `M` to the group domain `G`. For example, we
-need to interpret `m` as a number in `Zₙ*` or as a point in an elliptic curve.
+may need to interpret `m` as a number in `Zₚ*` or as a point in an elliptic curve.
 
-We may require to map the output of an operation in `G` to a value in `m = |G|`.
-In this case we define the abstract function `map_to_group_ord: G → Zₘ`.
+We also may need to map the output of an operation in `G` to a value in `n = |G|`.
+In this case we define the abstract function `map_to_group_ord: G → Zₙ`.
 
 For example:
-
-- `G` is an elliptic curve and `a` a point: `map_to_group_ord(a) = a.x mod m`
-- `G` is `Zₚ*` and `a` a scalar: `map_to_group_ord(a) = a mod m`
+- `G` is an elliptic curve and `a` a point: `map_to_group_ord(a) = a.x mod n`
+- `G` is `Zₚ*` and `a` a scalar: `map_to_group_ord(a) = a mod n`
 
 ### Discrete Logarithm Problem
 
@@ -96,52 +96,49 @@ hardness of solving the discrete logarithm problem and the lack of efficient
 solution techniques.
 
 
-## Elgamal Scheme
+## ElGamal Cipher
 
-Parameters:
+Setup:
 - `G`: cyclic group with order `n`
-- `g ∈ G`: a generator for `G`
+- `g ∈ G`: generator for `G`
 - `x ∈ Zₙ`: secret key
 - `y ∈ G`: public key such that `y = gˣ`
 
-Note that as a general rule we never choose as secret key `1` or `n` since
+Note that as a general rule we never choose as secret key `0` or `1` since
 these are trivially identifiable (by definition of generator):
 
-    g¹ = g  and  gⁿ = 1 
-
-### Cipher
+    g⁰ = 1 and g¹ = g
 
 **Encryption**
 
-Given a message `m ∈ G`, pick a random `k ∈ Zₙ`
+Given a message `m ∈ G`, pick a random `k ∈ Zₙ*`.
 
     E = gᵏ     (ephemeral key)
-    M = bᵏ     (masking key)
+    M = yᵏ     (masking key)
     c = M·m    (encrypted message)
 
-The complete ciphertext is the tuple `(E, c)`.
+The ciphertext is the tuple `(E, c)`.
 
 **Decryption**
 
     M = Eˣ     (recovery of M using secret key)
     m = M⁻¹·c
 
-Because, by definition of generator, `gⁿ = 1` then `∀ x ∈ Z, gⁿ⁻ˣ·gˣ = 1` which
-implies `g⁻ˣ = gⁿ⁻ˣ`.
-For example if `G = Zp*`: `n = p-1` and thus `g⁻ˣ ≡ gᵖ⁻¹⁻ˣ (mod p)`.
+To simplify a bit the decryption, we can first observe that if `(k,n) = 1`,
+then `E = gᵏ` is another generator. Now, because, by definition of generator
+`E⁰ = Eⁿ = 1` then `∀ x ∈ Z`, `Eⁿ⁻ˣ⁺ˣ = Eⁿ⁻ˣ·Eˣ = 1` which implies `E⁻ˣ = Eⁿ⁻ˣ`.
 
-ElGamal is a **probabilistic encryption scheme**, which means that given the
-random parameter `k` the ciphertext is random as well.
-
-#### Malleability
+### Malleability
 
 Given the ciphertext `(E, c = M·m)` the corresponding plaintext can be
-predictably multiplied by a factor `z` by multiplying `c` by the same factor
-`z`.
+predictably multiplied by a factor `z` by multiplying `c` by `z`.
 
     c' = z·c  →  m' = M⁻¹·c' = M⁻¹·z·c = M⁻¹·z·M·m = z·m
 
-### Signature
+
+## ElGamal Signature
+
+The scheme parameters are the same as the *ElGamal* cipher.
 
 Given the message `m`, the secret key `x` and public key `y = gˣ`, pick a random
 scalar `k` which is relatively prime with the group order `n`.
@@ -164,32 +161,26 @@ Check if
 
     Rˢ = gᵏˢ = g^[k·(m - x·r)·k⁻¹] = g^(m - x·r)
     yʳ = gˣʳ
-    → Rˢ·bʳ = g^(m - x·r + x·r) = gᵐ
+    → Rˢ·yʳ = g^(m - x·r + x·r) = gᵐ
 
-#### Security
-
-The verifier can't disclose the secret `x` as he first needs to recover `k`,
+The verifier can't discover the secret `x` as he first needs to recover `k`,
 which imply finding the discrete logarithm for `r`.
 
-The signer can't forge signatures without knowing the secret `x`.
+The signer can't forge valid signatures without knowing the secret `x`.
 
-#### Existential forgery
+### Existential forgery
 
-1. One-parameter forgery. Select `e ∈ Zₙ`. Set `R = gᵉ·b` and `s = -r`.
-   Then the tuple `(r, s)` is a valid signature for the message `m = e·s`
+Select `e ∈ Zₙ` and `v ∈ Zₙ*`.
 
-2. Two-parameters forgery. Select `e ∈ Zₙ` and `v ∈ Zₙ*`.
-   Set `R = gᵉ·bᵛ` and `s = -r·v⁻¹`. Then the tuple `(r, s)` is a valid
-   signature for the message `m = e·s`.
+Set `R = gᵉ·yᵛ` and `s = -r·v⁻¹`. Then the tuple `(r, s)` is a valid
+signature for the message `m = e·s`.
 
-One-parameter forgery is a special case with `v = 1`.
+This vulnerability is easily addressed by replacing `m` with `H(m)` in the
+signature and verification procedures. With `H` a cryptographic hash function.
 
-This vulnerability is addressed by replacing `m` with `H(m)` in the signature
-and verification procedures. With `H` a cryptographic hash function.
+### Reusing random secret
 
-#### Reusing random secret
-
-If the same value `k` used to sign different messages then the secret key `x`
+If the same value `k` is used to sign different messages then the secret key `x`
 can be easily recovered.
 
     s₁ = (m₁ - x·r)·k⁻¹ mod n
@@ -198,20 +189,20 @@ can be easily recovered.
     →  k = (m₁ - m₂)·(s₁ - s₂)⁻¹ mod n
     →  x = (m₁ - s₁·k)·r⁻¹ mod n
 
-The only requirement is that `s₁ - s₂` is coprime with group order `n`.  
+The only requirement is that both `s₁ - s₂` and `r` are in `Zₙ*`.
 
 
 ## Digital Signature Standard
 
 Also known as **DSA** (Digital Signature Algorithm), is a slightly modified
-version of ElGamal signature to address some of its weakness.
+version of *ElGamal* signature to address some of its weakness.
 
-Parameters:
-- `G`: cyclic group with prime order `n`
+Setup:
+- `G`: cyclic group with **prime** order `n`
 - `g ∈ G`: a generator for `G`
-- `x ∈ Zₙ*`: secret key
+- `x ∈ Zₙ`: secret key
 - `y ∈ G`: public key such that `y = gˣ`
-- `H`: a cryptographic hash function with `N` bits output and such that `n < 2ᴺ`.
+- `H`: a cryptographic hash such that `H(m) ∈ Zₙ`, for any message `m`
 
 Given a message `m`, we pick a random scalar `k ∈ Zₙ*`.
 
@@ -239,15 +230,16 @@ The signature is the couple `(r, s)`.
 
     u + x·w ≡ H(m)·s⁻¹ + x·r·s⁻¹ ≡ s⁻¹·(H(m) + x·r) ≡ s⁻¹·s·k ≡ k (mod n)
 
-    → gᵘ·bʷ = gᵏ
+    → gᵘ·yʷ = r
 
-Note that DSA is also more efficient than ElGamal signatures:
-- DSA uses smaller exponents that ElGamal and still provide the same security. 
-  It works with a group with prime order which in general provides the same
-  security as one bigger group with non-prime order (as for ElGamal).
-- DSA signatures are shorter as both `r` and `s` are in `Zₙ`.
+DSA is more efficient than ElGamal signatures as:
+- It uses smaller exponents and still provides the same security. It works with
+  a group with prime order which in general provides the same security as one
+  bigger group with non-prime order (see [Pohlig-Hellman] attack).
+- It produces signatures that are shorter as both `r` and `s` are in `Zₙ`.
   In ElGamal we send the full `R ∈ G` as we need it for verification.
-- On verification, only two exponentiation in `G` are performed, three with ElGamal.
+- On verification, only two exponentiation in `G` are performed, in contrast to
+  three with ElGamal.
 
 ### Reusing random secret
 
@@ -268,33 +260,33 @@ can be easily recovered.
 A kind of interactive **zero-knowledge** proof used to prove knowledge of some
 secret without revealing it.
 
-In particular, in this context, it is used to prove the knowledge of the
-discrete logarithm of a value with respect to a public generator.
+In particular, in this context, it is used to prove knowledge of the discrete
+logarithm of a value with respect to a public generator.
 
-If `A` wants to prove to `B` the knowledge of the discrete logarithm `x` of some
-public value `y = gˣ`.
-
-Parameters:
+Setup:
 - `G`: cyclic group with prime order `n`
 - `g ∈ G`: a generator for `G`
 - `x ∈ Zₙ*`: secret scalar
 - `y ∈ G`: public group element such that `y = gˣ`
 
+
+`P` wants to prove to `V` the knowledge of the discrete logarithm of `y`.
+
 Protocol:
-1. Commitment: `A` chooses a random secret scalar `k`, computes `r = gᵏ`,
-   and sends it to `B`.
-2. Challenge: `B` chooses a random value `c` and sends it to `A`.
-3. Proof: `A` computes `s = k + c·x mod n` and sends it to `B`.
-4. Verification: `B` checks whether `gˢ = r·yᶜ`.
+1. *Commitment*: `P` chooses a random secret scalar `k ∈ Zₙ*`, computes `r = gᵏ`,
+   and sends it to `V`.
+2. *Challenge*: `V` chooses a random value `c` and sends it to `P`.
+3. *Response*: `P` computes `s = k + c·x mod n` and sends it to `V`.
+4. *Verification*: `V` checks whether `gˢ = r·yᶜ`.
 
 Verification Proof:
 
     gˢ = g^(k + c·x) = gᵏ·gˣᶜ = r·yᶜ
 
 Security:
-- To extract the secret `x`, `B` must compute `x = (s - k)·c⁻¹ mod n`.
+- To extract the secret `x`, `V` must compute `x = (s - k)·c⁻¹ mod n`.
   To do so, he must know the value of `k`, discrete log of `r`.
-- `A` can't cheat as well. The only way to cheat is if he's able to know the
+- `P` can't cheat as well. The only way to cheat is if he's able to know the
   value of `c` before committing the value `k`. In that case he can compute
   `r = gˢ·x⁻ᶜ` for an arbitrary value `s`.
 
@@ -302,9 +294,9 @@ Security:
 
 The protocol can be made non-interactive by modifying the challenge step.
 
-In this case the challenge value is obtained from a technique known as
+The challenge value is obtained from a technique known as
 **[Fiat-Shamir Heuristic](https://en.wikipedia.org/wiki/Fiat-Shamir_heuristic)**.
-In practice is computed as the output of a cryptographic hash function.
+In practice, is computed as the output of a cryptographic hash function.
 
     c = H(y || r)
 
@@ -330,20 +322,20 @@ can be easily recovered.
 `P` wants to prove to `V` that two public values `y₁ = gˣ` and `y₂ = hˣ` have
 the same discrete logarithm with respect to the two generators `g` and `h`.
 
-Parameters:
+Setup:
 - `G₁` and `G₂`: two groups with same prime order `n`
 - `g ∈ G₁` and `h ∈ G₂`: generators of `G₁` and `G₂` respectively
 - `x ∈ Zₙ*`: secret scalar
-- `y₁, y₂ ∈ G`: public group element such that `y = gˣ`
+- `y₁, y₂ ∈ G`: public group element such that `y₁ = gˣ` and `y₂ = hˣ`
 
 Protocol:
-- Commitment: `P` chooses a random secret scalar `k` and sends to `V` the couple
+- *Commitment*: `P` chooses a random secret scalar `k` and sends to `V` the couple
   `r₁ = gᵏ` and `r₂ = hᵏ`.
-- Challenge: `V` chooses a random scalar `c` and sends it to `P`.
-- Proof: `P` computes `s = k - c·x mod n` and sends it to `V`.
-- Verification: `V` checks if `r₁ = gˢ·y₁ᶜ` and `r₂ = hˢ·y₂ᶜ mod p`.
+- *Challenge*: `V` chooses a random scalar `c` and sends it to `P`.
+- *Response*: `P` computes `s = k + c·x mod n` and sends it to `V`.
+- *Verification*: `V` checks if `gˢ = r₁·y₁ᶜ` and `hˢ = r₂·y₂ᶜ`.
 
-Note that the verification for the individual values is equal to the Schnorr
+Note that the verification for the individual values is equal to the *Schnorr*
 protocol, as a consequence `P` also prove knowledge of the secret and not just
 equality.
 
@@ -351,17 +343,19 @@ The verification and security proofs are quite similar to the Schnorr protocol.
 
 ### Non-Interactive Chaum-Pedersen DLEQ Protocol
 
-In this protocol the challenge `c` is computed as:
+The idea is basically the same used for the *Schnorr* signature.
+
+The challenge `c` is computed as:
 
     c = H(y₁ || y₂ || r₁ || r₂).
 
 
 ## Diffie-Hellman Key Exchange Protocol
 
-The protocol is used to securely generate a shared secret between two
-parties `A` and `B`.
+The protocol is used to generate a shared secret between two parties `A` and
+`B`.
 
-Parameters:
+Setup:
 - `G`: cyclic group with order `n`
 - `g ∈ G`: a generator for `G`
 - `a ∈ Zₙ*`: `A` secret key
@@ -370,8 +364,8 @@ Parameters:
 - `yᵦ ∈ G`: `B`'s public key `yᵦ = gᵇ`
 
 Protocol:
-- `A` generates a secret `a ∈ Zₙ*` and sends to `B` the public `yₐ = gᵃ`
-- `B` generates a secret `b ∈ Zₙ*` and sends to `A` the public `yᵦ = gᵇ`
+- `A` generates `a ∈ Zₙ` and sends to `B` the public `yₐ = gᵃ`
+- `B` generates `b ∈ Zₙ*` and sends to `A` the public `yᵦ = gᵇ`
 - `A` computes `k = yᵦᵃ`
 - `B` computes `k = yₐᵇ`
 
@@ -385,8 +379,8 @@ instance with both `A` and `B`. When communicates with `A` he impersonates `B`
 and when it communicates with `B` he impersonates `A`.
 
 The popular defense is to introduce some form of *data-origin authentication*.
-For example by signing the ephemeral public keys with a key trusted by both the
-entities (i.e. some form of authority as done by *PKI*).
+For example by signing the public keys with a key trusted by both the entities
+(i.e. some form of authority as done by *PKI*).
 
 
 ## Attacks to DLP
@@ -457,7 +451,8 @@ For example, to achieve at least `128` bits of security we require `n ≥ 2^256`
 ### Pollard's Rho Algorithm
 
 Probabilistic algorithm based on the [birthday paradox](/posts/birthday-paradox),
-which asserts that to have a probability `p` of finding a collision by extracting elements from a uniform random distribution we need to extract
+which asserts that to have a probability `p` of finding a collision by
+extracting elements from a uniform random distribution we need to extract
 
     n(p) = ≈ √(2·n·ln(1/(1-p)))
 
