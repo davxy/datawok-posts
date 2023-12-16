@@ -1,7 +1,9 @@
 +++
 title = "Birthday Paradox"
 date = "2023-03-29"
+modified = "2023-12-15"
 tags = ["cryptography","probability"]
+toc = true
 +++
 
 The birthday paradox is a surprising statistical phenomenon that shows how even
@@ -28,21 +30,21 @@ The probability of the Birthday Paradox is computed by considering the number
 of possible pairs of people in a group and the probability that any of these
 people will have **different** birthdays.
 
-To calculate the probability that any two people in a group of n will have
-a different birthdays, we can use the formula:
+To calculate the probability that any two people in a group of `n` will have
+different birthdays, we can use the formula:
 
-    P(different birthdays) = 365/365 ⋅ 364/365 ⋅ ... ⋅ (365-n+1)/365
-                           = 365! / [(365-n)!⋅365^n]
+    p(different birthdays) = 365/365 ⋅ 364/365 ⋅ ... ⋅ (365-n+1)/365
+                           = 365! / [(365-n)!⋅365ⁿ]
     
 To find the probability that at least two people in the group will have
-the same birthday, we can take 1 minus the probability that they have different
-birthdays
+the same birthday, we can take 1 minus the probability that they all have
+different birthdays
 
-    P(same birthday) = 1 - P(different birthdays)
+    p(same birthday) = 1 - p(different birthdays)
 
-Some results
+Some results:
 
-  |  n |  P(n) |
+  |  n |  p(n) |
   |----|-------|
   | 10 | 0.117 |
   | 20 | 0.411 |
@@ -50,144 +52,135 @@ Some results
   | 40 | 0.891 |
   | 70 | 0.999 |
 
-## Generalized Birthday Problem
 
-Given a year of 'd' days we want to determine the minimal number 'n' such that
-the probability of a birthday coincidence is at least 50%.
+## Generalized Problem
+
+Given a year of `d` days we want to determine the smaller number `n` such that
+the probability of a birthday coincidence is at least `50%`.
 
 In other words n is the minimal integer such that:
 
-    1 - (1-1/d)⋅(1-2/d)..(1-(n-1)/d) ≥ 0.5
+    1 - (1-1/d)⋅(1-2/d)..(1-(n-1)/d) ≥ 1/2
 
-Note that the classical birthday problem is an instance of the GBP with n=365
-and gives as a result n=23.
+Which is equivalent to:
 
-Obviously n is a function of d, thus we're going to express it as n(d).
+    (1-1/d)⋅(1-2/d)..(1-(n-1)/d) ≤ 1/2
 
-As an approximate result n(d) is
+As an approximation, `∏ (1 - i/d) ≈ 1/2` for:
 
-  n(d) = ⌈√(2d⋅ln(2))⌉
+    n ≈ ⌈√(2·d·ln(2))⌉
+
+This approximation is derived using the *Taylor* expansion of the exponential
+function and is valid for large `d`.
+
+*Proof*
+
+    ∏ (1 - i/d) ≈ exp[ ln( ∏ (1 - i/d) ) ] = exp[ ∑ ln(1 - i/d) ]
+
+Taylor expansion for `ln(1 - x)` around `x = 0` which is `ln(1-x) ≈ -x`.
+
+    ∑ ln(1- i/d) = -∑ i/d = -n·(n-1)/(2·d)
+
+    → ∏ (1 - i/d) ≈ exp[ -n·(n-1)/(2·d) ]
+
+Equate to `1/2` which is the target value
+
+    exp[ -n·(n-1)/(2·d) ] ≈ 1/2
+    → -n·(n-1)/(2·d) ≈ ln(1/2) = -ln(2)
+    → n²-n ≈ 2·d·ln(2)
+
+For large enough `n` we can omit the subtraction
+
+    → n² ≈ 2·d·ln(2)
+    → n ≈ √(2·d·ln(2))
+    
+∎
+
+Note that the classical birthday problem is an instance of this problem with
+`d = 365` and gives as a result `n = 23`.
 
 ### Collision Probability
 
-Given n random integers drawn from a discrete uniform distribution with range
-[1,d], we look for the probability p(n; d) that at least two numbers are the same.
+Given `n` items drawn from a set of `d` elements, we look for the probability
+`p(n)` that at least two numbers are equal.
 
-The generic results can be derived using the same arguments given above
+The generic formula is derived using the same argument given in the previous
+section:
 
-    p(n; d) = 1 - (1-1/d)⋅(1-2/d)..(1-(n-1)/d)
+    p(n) = 1 - (1-1/d)⋅(1-2/d)..(1-(n-1)/d)
 
-Conversely if n(p; d) denotes the number of random integers drawn from [1,d]
-to obtain a probability p that at least two numbers are the same, then
+Conversely, `n(p)` denotes the number of items drawn from a set of `d` elements
+to obtain a probability `p` that at least two numbers are the same, then:
 
-    n(p; d) ≈ √(2d⋅ln(1/(1-p)))
+    n(p) ≈ √(2·d·ln(1/(1-p)))
 
-When applied to hash functions this is the expected number of N-bit hashes
-that can be generated before getting a collision. This is not 2^N, but rather
-only 2^(N/2).
+The proof of this formula is similar to the one given in the previous section
+for `p = 1/2`.
 
-This is exploited by birthday attacks.
+When applied to hash functions this is the expected number of `N`-bit hashes
+that can be generated before getting a collision with probability `p`.
 
-### n(p; d) Formula Approximation
+Surprisingly, for `p = 1/2` this is not `O(2ᴺ)`, but rather only `O(√(2ᴺ))`.
 
-We define H(i,j) as a Bernulli's random variable representing the extraction
-of two values i and j from the set [1,d].
-
-    H(i,j) = 1 if i = j
-             0 otherwise
-
-The total number of possible collisions is ∑ H(i,j) over all the different
-couples (i,j), noting that (i,j) = (j,i).
-
-The number of possible couples is n!/((n-2)!2!) = n·(n-1)/2
-
-The probability of a collision for a fixed value y is:
-
-    Pr(Cy) = ∑ Pr(i = y)·Pr(j = y | i = y) = ∑ 1/d·1/d = 1/d
-
-Expected value of a collision:
-
-    σ = 1/d + ... +
-    E[C] = ∑ E[Ci] = ∑ 1/d
-        
-   (1/d is the expected value of the Bernulli's variable)
-
-========================
-TODO: NOT NOT NOT CLEAR
-========================
-
-    The sums is aver all the possible couples, i.e. n·(n-1)/2
-
-    E[C] = n(n-1)/2 · 1/d ≈ n^2 / 2 · 1/d
-
-We want to determine the condition such that the expected number of collisions
-are more than one:
-
-    E[C] ≥ 1  →  n^2 ≥ 2d  →  n ≥ √(2d)
-
-probability not collision: 1-1/k = (k-1)/k
+There are a number of attacks to crypto systems which leverages this fact.
 
 
 ## Attack
 
-A collision can be particularly dangerous if the hash is used as a primitive
-for a digital signature.
+The birthday paradox can be particularly insidious if the hash is used as a
+primitive building block for a more complex scheme which heavily relies on the
+collision resistance property of some hash function.
 
-If the attacker discovers a collision, i.e. m and m' such that H(m) = H(m'), he
-can submit m to the victim in order to have it signed, thus obtaining sign(H(m)).
+For example, if an attacker discovers two messages `m₁` and `m₂` such that
+`H(m₁) = H(m₂)`, he can submit `m₁` to the victim in order to have it signed,
+thus obtaining a signature for `H(m₁)`, but this is a valid signature for
+`H(m₂)` as well.
 
-Given that H(m) = H(m') then sign(H(m)) = sign(H(m')).
+If the number of possible outputs of `H` is `2ᴺ`, a technique to find a
+collision is:
+- Construct `k = 2^(N/2)` variants of a legit message `m₁`.
+- Use the same technique to construct `k` variants of a malicious message `m₂`.
+- Construct two sets of digests: `A = {H(m₁ᵢ)}`, `B = {H(m₂ᵢ)}`.
+- Search for any item in `A ∩ B`.
 
-At this point, the attacker will have a valid signature for m' as well, which
-can be used maliciously.
+The variants can be constructed with a technique which generates messages
+with changes which are not detectable from a typical renderer. For example
+insert the same number of spaces and backspaces after a word.
 
-If the number of possible outputs of H is 2^z:
+By inserting `100` spaces around the message the attacker can construct
+`2^100` different variants.
 
-Technique to find a collision:
-- constructs k=2^(z/2) variants of a legit message m which differs only for
-  some trivial changes
-- uses the same technique to construct k variants of a malicious messages m'
-- each of these messages are feed to H
-- we end up with two sets of digests: A = {H(mi)}, B = {H(mi')}
-- we search for an y in A ∩ B
-
-To construction of messages variants is quite easy, for example by inserting
-100 spaces around the message the attacker can construct k=2^100 different
-messages.
-
-The probability of a collision obviously depends on k.
+The probability of a collision obviously depends on `k`.
 
 Can be proven that
 
-    P(A ∩ B) ≥ 1/2 if k ≥ 2^(z/2)
+    Pr(A ∩ B ≠ ∅) ≥ 1/2 if k ≥ 2^(N/2)
 
-TODO: PROOF
+The number of the elements in each set corresponds to the expected number
+of elements to withdraw from a set of `2ᴺ` before observing a collision with
+probability `1/2`.
 
-### Birthday Attack Mitigations
+As `|A ∪ B| ≥ 2^(N/2)` then the probability of finding a collision is still `≈
+1/2` (**it doesn't double**). Thus, there is a good chance (`≥ 1/2`) to find a
+collision for two elements which belong to different sets.
 
-To reduce birthday attack risk we have to chose a value z that is sufficiently large.
 
-Currently, hashes like MD5 (z=128) or sha1 (z=160) are not considered secure.
+### Mitigations
 
-Another way to counter this attack is to use a MAC (i.e., a keyed hash such as
-HMAC) where the output also also depends on a secret key k.
+To reduce birthday attack risk we have to choose a value for `N` that is
+sufficiently large.
 
-In this way an attacker cannot pre-compute offline collisions, as they do not
-know the secret key.
+Hashes like MD5 (`N=128`) or sha1 (`N=160`) are not considered secure anymore.
 
----
+Another way to counter this attack is to use a MAC (a keyed hash) which bounds
+the output also to a secret key `k`.
 
-H can be viewed as an aleatory variable with values in Y, with |Y| = k = 2^m
+In this way an attacker cannot pre-compute offline a table of collisions, as
+they do not know the secret key used in the particular context.
 
-If we extract a number of elements from H, close to √k, the probability to find 
-a collision (i.e. Hi = Hj) is ≈1/2.
-
-For the pigeon-hole principle if the possible different outputs are k, then
-after k+1 extractions we're going to have a collision with probability 1.
-
-What can be proven using the birthday paradox is that that we're going to have
-a collision with probability 1/2 after √k extractions (and not k/2 as
-intuitively expected). Birthday Paradox Exploitation
+As a final note, always keep in mind that for **pigeon-hole principle** if the
+hash possible outputs are `k`, then after `k+1` extractions we're going to have
+a collision with probability `1`.
 
 
 ## References
