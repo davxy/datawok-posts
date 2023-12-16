@@ -235,7 +235,8 @@ The signature is the couple `(r, s)`.
 DSA is more efficient than ElGamal signatures as:
 - It uses smaller exponents and still provides the same security. It works with
   a group with prime order which in general provides the same security as one
-  bigger group with non-prime order (see [Pohlig-Hellman] attack).
+  bigger group with non-prime order (see [Pohlig-Hellman](#pohlig-hellman-algorithm)
+  attack).
 - It produces signatures that are shorter as both `r` and `s` are in `Zₙ`.
   In ElGamal we send the full `R ∈ G` as we need it for verification.
 - On verification, only two exponentiation in `G` are performed, in contrast to
@@ -323,7 +324,7 @@ can be easily recovered.
 the same discrete logarithm with respect to the two generators `g` and `h`.
 
 Setup:
-- `G₁` and `G₂`: two groups with same prime order `n`
+- `G₁` and `G₂`: two cyclic groups with same prime order `n`
 - `g ∈ G₁` and `h ∈ G₂`: generators of `G₁` and `G₂` respectively
 - `x ∈ Zₙ*`: secret scalar
 - `y₁, y₂ ∈ G`: public group element such that `y₁ = gˣ` and `y₂ = hˣ`
@@ -386,16 +387,16 @@ For example by signing the public keys with a key trusted by both the entities
 ## Attacks to DLP
 
 Attacks against DLP can be divided in two classes:
-- **generic**: only use group operation, they work in any cyclic group;
-- **specialized**: exploit special properties of a particular group.
+- **generic**: they work in any cyclic group, using only the group operation;
+- **specialized**: exploit special properties of a particular cyclic group.
 
-Attacks can be further divided in two more classes:
+Attacks can be further divided into two more classes:
 - running time dependent on the size of the cyclic group;
 - running time dependent on the size of the prime factors of the group order.
 
 In the attacks' analysis each step corresponds to a group operation.
 
-Given the group `G` with order `n` and a group generator `g`, let's assume we
+Given the cyclic group `G` with order `n` and a generator `g`, let's assume we
 want to compute the discrete logarithm of `y = gˣ`.
 
 ### Brute-Force Search
@@ -409,7 +410,7 @@ checking half of all the possibilities.
 This gives a complexity of `O(n)` steps.
 
 To make brute-force infeasible is thus sufficient to choose a group `G` with
-a sufficiently large order.
+a large enough order.
 
 ### Shanks' Algorithm
 
@@ -431,7 +432,8 @@ The value of `g⁻ᵐ` is known. The algorithm tries to find the solution `(x₁
 
 The idea is to search for `x₁` and `x₂` separately.
 
-In the first phase all the possible values for `g^x₂` are computed and stored.
+In the first phase all the possible values for `g^x₂` are computed and stored
+in a lookup table.
 
 This phase requires `O(√n)` steps and needs to store `O(√n)` group elements.
 
@@ -446,25 +448,23 @@ satisfies the equation (using the pre-computed `x₂` values).
 The second phase requires `O(√n)` computational steps.
 
 The implication of this attack is a reduction of complexity for the general DLP.
-For example, to achieve at least `128` bits of security we require `n ≥ 2^256`.
+For example, to achieve at least `128` bits of security we require `n ≥ 2²⁵⁶`.
 
 ### Pollard's Rho Algorithm
 
-Probabilistic algorithm based on the [birthday paradox](/posts/birthday-paradox),
-which asserts that to have a probability `p` of finding a collision by
-extracting elements from a uniform random distribution we need to extract
+This algorithm is currently the best known algorithm for computing the discrete
+logarithm for elliptic curve groups.
 
-    n(p) = ≈ √(2·n·ln(1/(1-p)))
-
-Thus, for example, with p = 0.5 we have n = √(2·ln(2)·n)
+Is based on the [birthday paradox](/posts/birthday-paradox), which asserts that
+to achieve a probability `p` of finding a collision while randomly extracting
+items from a set of `d` elements we need to extract: `n(p) ≈ √(2·d·ln(1/(1-p)))`.
+For example, with `p = 1/2` we have `n = √(2·d·ln(2))`.
 
 Pseudo-randomly generate group elements of the form `gⁱ·yʲ`. 
 
-For every element keep track of the values `i` and `j`.
+For each element keep track of the values `i` and `j`.
 
-Continue until we don't find a collision:
-
-    g^i₁·y^j₁ = g^i₂·y^j₂
+Continue until a collision is found: `g^i₁·y^j₁ = g^i₂·y^j₂`.
 
 Which leads to the relation:
 
@@ -475,89 +475,100 @@ If `gcd(j₂ - j₁, n) = 1`, then:
 
     x = (i₁ - i₂)·(j₂ - j₁)⁻¹ mod n
 
-This algorithm is currently the best known algorithm for computing the discrete
-logarithm for elliptic curve groups.
-
 A clever pseudo-random function for `i` and `j` generation is presented by
 Stinson[^1].
 
+
 ### Pohlig-Hellman Algorithm
 
-Method based on the CRT exploiting the factorization of the group order
-`n = ∏ pᵢ^eᵢ`.
+The algorithm reduces the discrete logarithm problem in a group with a composite
+order `n` to separate instances of the problem in subgroups of prime order `pᵢ`.
 
-The algorithm tries to compute the smaller discrete logarithms `xᵢ = x mod pᵢ^eᵢ`.
+For each prime-order subgroup, another algorithm is applied, like Pollard's rho,
+to solve the discrete log problem. Thus, this is essentially a pre-processing
+phase that optimizes the problem for these more efficient algorithms when the
+group order has small prime factors.
 
-Given `y = gˣ`, let `p` be a prime such that `pᵉ` is a factor of `n`. We want to
-compute the value of `r = xᵢ = x mod pᵉ` (without knowing `x` obviously).
+Given `y = gˣ` and `n = ∏ pᵢ^eᵢ`, the algorithm tries to compute the smaller
+discrete logarithms `xᵢ = x mod pᵢ^eᵢ`.
 
-Because `r < pᵉ`, then we can express `r` in radix `p` as:
+Once the values `xᵢ = x mod pᵢ^eᵢ` for all the prime factors `pᵢ` are found, the
+solution for `n` is trivially found by direct application of CRT.
 
-    r = ∑ rⱼ·pʲ , with 0 ≤ rⱼ < p  for 0 ≤ j < e
+Let `p` be a prime such that `pᵉ` is a factor of `n`. We want to compute the
+value `r = x mod pᵉ` (without knowing `x` obviously).
+
+Because `r < pᵉ`, then we can express `r` in base `p` as:
+
+    r = ∑ rⱼ·pʲ , with 0 ≤ rⱼ < p  and for 0 ≤ j < e
 
 Also, because `r = x mod pᵉ`, we can express `x` as:
 
-    x = s·pᵉ + r = s·pᵉ + ∑ rⱼ·pʲ
+    x = pᵉ·q + r = pᵉ·q + ∑ rⱼ·pʲ
 
-For some integer `s`.
+For some integer `q`.
 
-The first step is to compute `r₀` by observing that `y^(n/p) = g^(r₀·n/p)`. Proof:
+The first step is to compute `r₀` by observing that `y^(n/p) = g^(r₀·n/p)`.
+
+*Proof*:
 
     y^(n/p) = g^(x·n/p)
 
-    →  x·n/p = (s·pᵉ + ∑ rⱼ·pʲ)·n/p = (K·p + r₀)·n/p
-             = K·n + r₀·n/p
+    →  x·n/p = (pᵉ·q + ∑ rⱼ·pʲ)·n/p
+             = (τ·p + r₀)·n/p
+             = τ·n + r₀·n/p
              ≡ r₀·n/p (mod n)
 
 Using this fact we proceed by trying to find the `r₀` which satisfies the
 equation in `O(p)` steps.
 
-If `e = 1` then we're done. Otherwise, we proceed determining `rⱼ` for all the
-other `j < e`.
+If `e = 1` then `x ≡ r₀ (mod p)` and thus we're done. Otherwise, we proceed
+determining `rⱼ` for all the other exponents `j < e`.
 
-Define `y₀ = y` and `yⱼ = y·g^[-(r₀ + r₁·p + .. + rⱼ₋₁·pʲ⁻¹)]`.
+Define `y₀ = y` and `yⱼ = y·g^[-(r₀ + r₁·p + .. + rⱼ₋₁·pʲ⁻¹)] = ` 
 
-This time we'll use the generalized equation `yⱼ^(n/pʲ⁺¹) = g^(rⱼ·n/p)`. Proof:
+This time we'll use the generalized equation `yⱼ^(n/pʲ⁺¹) = g^(rⱼ·n/p)`.
+
+*Proof*:
 
     yⱼ^(n/pʲ⁺¹) = g^[(x - r₀ - r₁·p - .. - rⱼ₋₁·pʲ⁻¹)·n/pʲ⁺¹]
 
     → (x - r₀ - r₁·p - .. - rⱼ₋₁·pʲ⁻¹)·n/pʲ⁺¹
-      = (rⱼ·pʲ + Kⱼ·pʲ⁺¹)·n/pʲ⁺¹
-      = rⱼ·pʲ·n/pʲ⁺¹ + Kⱼ·n
+      = (pᵉ·q + ∑ rⱼ·pʲ - r₀ - r₁·p - .. - rⱼ₋₁·pʲ⁻¹)·n/pʲ⁺¹
+      = (τⱼ·pʲ⁺¹ + rⱼ·pʲ)·n/pʲ⁺¹
+      = τⱼ·n + rⱼ·n/p
       ≡ rⱼ·n/p (mod n)
 
-Using this fact we proceed computing each `rⱼ` in `O(p)`.
+We proceed computing each `rⱼ` in `O(p)` steps.
 
-Summarizing, each `r = xᵢ = x mod pᵉ` can be computed in `O(p)`.
+This can be improved by noting that finding `rᵢ` for `σ = g^(rᵢ·n/p)` is
+equivalent to find `rᵢ = log_[g^(n/p)](σ)` and that `g^(n/p)` has order `p`.
 
-This can be improved by noting that finding the solution `i` for `σ = g^(i·n/p)`
-is equivalent to find `i = log_[g^(n/p)](σ)`. The element `g^(n/p)` has order
-`p` therefore each element `i` can be computed using any other method we've
-already seen.
-
-Once the values`xᵢ = pᵢ^eᵢ` for all the prime factors `pᵢ` are found, the
-solution for `n` is trivially found by direct application of CRT.
+We can try to find each `rᵢ` using any other DLP attack method, thus reducing
+the complexity to find each `rᵢ` to `O(√p)`.
 
 To contrast this attack the group order must have its largest prime factor in
-the range of `2^160`. In practice, often the group in which some schemes are
-defined has prime order.
+a range that is considered safe (e.g. today something like `2¹⁶⁰`).
+
+In practice, some popular cryptographic schemes defined over the DLP work
+in a prime order group.
 
 ### Index Calculus Algorithm
 
-Efficient method for cyclic groups `Zp*` and `GF(2ᵐ)`.
+Efficient method for cyclic groups `Zₚ*` and the multiplicative group of nonzero
+elements in `GF(pᵐ), m > 1` (extension fields).
 
 The idea comes from the fact that a significant number of elements of `G` can
-be expressed as the product of elements of a small subset of `G` (e.g. for `Zp*`
-many elements can be expressed as the product of small primes).
+be expressed as the product of elements of a small subset of `G`.
 
-The attack is so powerful that to provide 80-bit security the prime of a DLP in
-`Zp*` should be at least 1024 bit long.
+The attack is so powerful that to provide `80` bit security the prime of a DLP
+in `Zₚ*` should be at least `1024` bit long!
 
 #### Pre-Computation
 
-Let `B = { pᵢ }` be a subset of (small) primes in `Zp*`.
+Let `B = { pᵢ }` be a subset of small primes in `Zₚ*`.
 
-In the first phase we find the logarithm of the `|B|` primes in `g` base.
+In the first phase we find the logarithm of the `|B|` primes for base `g`.
 
 Let `C` be the set of congruences defined using pseudo random values `xⱼ`
 and such that `g^xⱼ` has all its factors in `B` (we can use trial division):
@@ -566,15 +577,15 @@ and such that `g^xⱼ` has all its factors in `B` (we can use trial division):
 
 Define `|C|` to be slightly bigger that `|B|`.
 
-The set `C` elements can be rewritten as:
+The elements of `C` can be rewritten as:
 
     xⱼ ≡ ∑ aᵢⱼ·log_g(pᵢ) (mod p-1)
 
 We end up with `|C|` congruences in `|B|` unknowns (`{log_g(pᵢ)}`) which
 hopefully have a unique solution modulo `p-1`.
 
-This phase is carried out "offline" and an attacked can generate a big set
-of tuples `L = { log_g(pᵢ) }` for a generator `g`.
+This phase is carried out offline and an attacked can generate a big set
+of tuples `L = { (pᵢ, log_g(pᵢ)) }` for a generator `g`.
 
 #### Attack
 
@@ -591,7 +602,7 @@ Which can be rewritten as:
 
 The only unknown in this equation is `log_g(y)`, which gives us `x`.
 
-The asymptotic running times:
+Asymptotic run times:
 - pre-computation: `e^[(1 + o(1))·√(ln(p)·ln(ln(p)))]`
 - attack: `e^[(1/2 + o(1))·√(ln(p)·ln(ln(p)))]`
 
