@@ -1,11 +1,12 @@
 +++
-title = "Zero-Knowledge Proofs - v0.1.18"
+title = "Zero-Knowledge Proofs"
 date = "2023-08-06"
 modified = "2023-12-18"
-tags = ["cryptography", "zk-proof", "draft"]
+tags = ["cryptography", "zk-proof"]
 toc = true
-draft = true
 +++
+
+Version - v0.1.18
 
 ## *Abstract*
 
@@ -14,7 +15,7 @@ within the realm of cryptographic protocols.
 
 At a glance, a ZKP enables one party to demonstrate the authenticity of a
 statement to another party without revealing any details beside the correctness
-the statement itself.
+of the statement itself.
 
 ZKPs find applications in various areas, including secure authentication
 protocols, blockchain systems, and secure computation, among others.
