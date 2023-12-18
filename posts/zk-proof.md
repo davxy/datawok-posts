@@ -13,9 +13,9 @@ Version - v0.1.18
 Zero-Knowledge Proofs (ZKP) represent a fascinating and influential concept
 within the realm of cryptographic protocols. 
 
-At a glance, a ZKP enables one party to demonstrate the authenticity of a
-statement to another party without revealing any details beside the correctness
-of the statement itself.
+At a glance, a ZKP enables one party to demonstrate the correctness of a
+statement to another party without revealing any details beside the validity of
+the claim itself.
 
 ZKPs find applications in various areas, including secure authentication
 protocols, blockchain systems, and secure computation, among others.
@@ -30,148 +30,171 @@ proof down to proofs which shares zero knowledge.
 
 ## Classical Proofs
 
-In *deductive reasoning* the *inference rules* are the set of rules which
-allows reaching a *conclusion* from the assumption that other statements, called
-*premises*, are true.
+### Introduction to Deductive Reasoning
 
-In mathematics, a deductive reasoning is usually presented in the form of
-a *proof*.
+Deductive reasoning is a fundamental method of logical thinking used across
+various disciplines, from philosophy and mathematics to computer science and
+law.
+
+It involves deriving specific conclusions from a set of general premises
+or known facts. The strength of deductive reasoning lies in its ability to
+guarantee the truth of the conclusion, provided the premises are true and the
+reasoning process is logically sound.
+
+One of the earliest examples of deductive reasoning can be traced back
+to ancient Greek philosophers, particularly *Aristotle*, who formalized the
+syllogistic reasoning. A classic example of a syllogism is:
+
+1. All men are mortal (general premise).
+2. Socrates is a man (specific premise).
+3. Therefore, Socrates is mortal (conclusion).
+
+This example captures the essence of deductive reasoning: if the premises are
+true and the reasoning is valid, then the conclusion must also be true.
+
+### Deductive Reasoning in Mathematics
+
+In the realm of mathematics, deductive reasoning takes on a more structured
+form known as a mathematical proof.
+
+A **mathematical proof** is a logical argument presented in a systematic way
+to verify the truth of a mathematical *statement*. Here, deductive reasoning
+is used to derive conclusions from a set of *axioms* (self-evident truths) and
+previously established *theorems* (proven statements) by using some *inference
+rules* which can be applied in the specific context.
 
 By setting the *conclusion* as the statement we want to prove and the *premises*
-as the set of *axioms* and previously proven statements, we can define a proof
-as the ordered set of logical derivation that incrementally drives from the
-premises to the conclusion.
+as the set of *axioms* and previously proven *theorems*, we can define a proof
+as a finite length string encoding the set of logical derivation that
+incrementally drives from the premises to the conclusion.
 
-These logical assertions are derived using logical *inference rules* from a set
-of *axioms* or other previously proven statements (theorems).
+As all the proof reasoning rely on the basic properties of boolean algebra, it
+is implicit that Boolean logic axioms and theorems holds as premises for any
+reasonable proof systems which we'll analyze in the context of this document.
 
-As all the proof reasoning leverages the basic properties of boolean algebra,
-thus is made implicit that Boolean logic axioms and theorems holds as premises
-for all the reasonable proof systems.
+### Proofs Soundness
 
-A proof is **valid** if the conclusion logically follows from the premises. In
-other words, if the premises are true, the conclusion must also be always true
-based on the rules of logic.
+A proof is **valid** if the conclusion logically follows the premises,
+regardless of whether those promises are true or not.
 
 A proof is **sound** if is valid and all of its premises are true.
 
-### Simple Examples
-
-Sound proof:
+Example. Sound proof.
 
 - *Premises*:
-  - `A`, `B` and `C` are three arbitrary sets such that `A ∩ B ⊆ C`;
-  - an element `x ∈ B` is given;
+  - `A`, `B` and `C` are three sets such that `A ∩ B ⊆ C`;
+  - `x ∈ B`;
   - basic properties of set theory hold;
 - *Conclusion*: `x ∉ A \ C`.
 - *Proof*: 
   - `x ∉ A \ C  =  ¬(x ∈ A ∧ x ∉ C)  =  x ∉ A ∨ x ∈ C  =  x ∈ A → x ∈ C`
   - `A ∩ B ⊆ C ∧ x ∈ B ∧ x ∈ A  →  x ∈ C`
 
-Valid but not sound proof:
+Example. Valid but not sound proof:
 
 - *Premises*:
-  - 4 is an even number
-  - all even numbers are prime (wrong)
-- *Conclusion*: 4 is prime
+  - All prime numbers are odd (wrong premise).
+  - 2 is a prime number (as it has no divisors other 1 and itself)
+- *Conclusion*: 2 is odd
 - *Proof*: conclusion follows directly from premises.
 
-As you can see, since the conclusion follows from the premises, the proof is valid.
-But also the second premise is incorrect, thus is not sound.
+As you can see, since the conclusion can be derived from the premises, the proof
+is formally correct, but as the second premise is not incorrect it is not sound.
 
-As can be seen, the previous examples are also instances of the most classical
-version of proofs, which is a **static** sequence of logical deductions.
+The example emphasize how we can reach incorrect conclusions even though we
+constructed an apparently correct proof just because of a bad premise.
 
 ### Proof Systems
 
-A **proof system** is a systematic (algorithmic) way to construct and analyze
-a proof. It typically consists of the following components:
+A **proof system** is a formal and systematic (algorithmic) approach to
+construct and evaluate proofs.
 
-- **Statement (x)**: the assertion or claim under consideration. It is the
-proposition that one seeks to prove or disprove.
+It typically consists of the following key components:
 
-- **Proof (π)**: a set of arguments, evidence, or logical steps that, when applied
-according to the rules of the proof system, should establish the truth or
-validity of the statement.
+- **Statement (x)**: assertion under consideration. It is the proposition that
+one tries to prove or disprove.
 
-- **Prover (`P`)**: an algorithm which constructs a proof for the statement
+- **Proof (π)**: set of arguments, evidence, or logical steps that, when
+processed by the proof system, should establish the validity of the statement.
+
+- **Prover (`P`)**: algorithm to construct a proof for the given statement
 (`P(x) = π`).
 
-- **Verifier (`V`)**: an algorithm that, given both the statement and the proof,
-decides whether the proof is valid. This algorithm outputs 1 if the proof is
-correct and 0 if the proof is not correct (`V(x,π) = 0|1`).
+- **Verifier (`V`)**: algorithm that, given both the statement and the proof,
+decides whether the proof is valid. This algorithm outputs `1` if the proof is
+correct and `0` if the proof is not correct (`V(x,π) = 0|1`).
 
 Clear rules and guidelines are essentials when we need to move proof
-construction and checking from the potentially ambiguous realm of natural
-languages to the realm of formal languages (e.g. programming languages).
+construction and checking from the often ambiguous and nuanced domain of natural
+languages to the precise realm of formal languages.
 
-Though this lecture we'll mostly stick to the popular convention to refer to the
-*prover* as Peggy and the *verifier* as Victor.
+Though this discussion, we'll mostly adhere to the popular convention of
+referring to the *prover* as Peggy and the *verifier* as Victor.
 
 ### Knowledge Sharing
 
-In a *classical* proof system a proof that some assertion is true also reveals
-*why* the assertion is true. This is very intrinsically bound to how the
-proof is constructed, i.e. Peggy shares all the logical steps to allow Victor to
-independently reach the conclusion.
+In a *classical* proof system a proof that some assertion is true inherently
+reveals *why* it is true. This aspect is deeply bound with how the classical
+mathematical proof systems works: *Peggy* shares all the logical steps to allow
+*Victor* to independently reach the same conclusion.
 
 Follows that the proof provides more knowledge than just the mere fact that the
 statement is true, which is what Peggy and Victor are interested in the first
 place, regardless of the way this is proven.
 
-For example, to prove that we know the factorization of a number `n`, Peggy can
-trivially provide the list of its prime factors `{pᵢ}`. Victor can efficiently
-check if `n = ∏ᵢ pᵢ`. In the end, not only Victor is convinced about our
-statement, but he also learns the factorization of `n`.
+For instance, consider the task of proving knowledge of the factorization of
+a natural number `n`, Peggy could simply provide the list of its prime factors
+`{pᵢ}`. Victor can efficiently check if `n = ∏ᵢ pᵢ`. In the end, not only
+Victor is convinced about our statement, but he also gains knowledge the
+factorization of `n`.
 
-The information which contributes to the construction of the proof is known
-as the **witness**. If Peggy shares the witness with Victor then this would be
-a classic proof. On contrary, if the witness is kept secret then it is a `ZK`
-proof.
-
+The information which facilitates the construction of the proof is known as
+the **witness**. In a classical proof system, sharing the witness with
+the verifier equates to providing a standard proof. However, if the witness
+remains confidential, the proof is known as a Zero-Knowledge(`ZK`) proof.
 
 ### Formalization and Relationship to Complexity Theory
 
-By moving proof systems to the domain of machines, is important to find a
-non-ambiguous way to analyze the complexity, and thus the resource requirements,
-of the techniques used to prove and verify problems.
+As proof systems transition into the domain of computational machines, it
+becomes crucial to define a non-ambiguous method for analyzing their complexity,
+including the resources required for proving and verifying the problems.
 
-Find a clear relationship between proof systems and important complexity classes
-like `NP` is fundamental to understanding the tractability of proving and
-verifying problems.
+Find a clear relationship between proof systems and important complexity classes,
+such as `NP`, is essential for understanding the tractability of some problems
+in terms of proof construction and verification.
 
-In this context, a problem is often associated with a language over a specific
-alphabet. This association helps formalize and understand the problems that
-computers can solve.
+In computational theory, problems are often associated with languages over
+specific alphabets. This association helps to formalize and understand the
+range of problems that computers can solve.
 
 Many interesting problems are formulated as **decision problems**, where the
-answer is either "yes" or "no". These problems can be associated with languages
-where the strings represent instances of the problem, and membership in the
-language indicates a positive answer (yes), while non-membership indicates a
-negative answer (no).
+answer is either *true* or *false*. These problems can be associated with
+languages where strings represent instances of the problem, and membership in
+the language indicates a positive answer (*true*), while non-membership indicates
+a negative answer (*false*).
 
-For example, consider the *Subset Sum Problem*. The question here is whether
-there is a subset of integers that adds up to a target `t`. The alphabet in
-this case consists of numerical symbols (integers), and the problem can be
-represented as a language:
+Consider the *Subset Sum Problem* (SSP) as an example. The core question is
+whether there is a subset of integers that adds up to a target `t`.
 
-    L = { (S,t) | S ⊆ ℕ and ∃ X ⊆ S: the elements of X adds up to t } 
+The problem can be represented as the language:
 
-In this language representation, a pair `(S,t)` is in the language if and
-only if satisfies the language condition.
+    L = { x = (S,t) | S ⊆ ℕ and ∃ V ⊆ S: sum of elements in V equals t } 
 
-Key characteristics of proof system `(P,V)` for decisional problems:
-- **completeness**: `x ∈ L` if and only if `V(x,π) = 1`;
-- **soundness**: `x ∉ L` if and only if `V(x,π) = 1`;
-- **efficiency**: `V(x,π)` runs in polynomial time with respect to length of `x`.
+In this language, a pair `x = (S,t)` (a string) belongs to the language `L`
+if and only if satisfies the language condition, i.e. there is a subset of `S`
+which adds up to `t`.
 
-Since each problem belongs to a complexity class, once we mapped the problem to
-a language, we implicitly associated the language to the same complexity class.
+Key characteristics of proof system `(P,V)` for decision problems:
+- **Completeness**: `x ∈ L` if and only if `V(x,π) = 1`;
+- **Soundness**: `x ∉ L` if and only if `V(x,π) = 0`;
+- **Efficiency**: `V(x,π)` runs in polynomial time with respect to length of `x`.
 
-With respect to this, for example, a language `L ∈ NP` if a solution to the
+Since each problem belongs to a complexity class, once we mapped the problem
+to a language, we implicitly associated the language to the same complexity
+class. For instance, a language `L` belongs to `NP` if a solution to the
 problem associated to `L` can be verified by a deterministic *Turing* machine
-in polynomial time, even if finding the solution itself (i.e. constructing the
-proof) might be a computationally intensive task (as exponential).
+in polynomial time, even though finding the solution itself (constructing the
+proof) may be a way more computationally intensive task.
 
 ---
 
