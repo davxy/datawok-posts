@@ -38,14 +38,15 @@ Bob holds the one-way hash function output of Alice's secret.
 2. Bob performs a one-way hash function on the password.
 3. Bob compares the result with the value it previously stored.
 
-Bob doesn't store the table of everybody's valid password, thus the threat of
-someone breaking into the host and steal the passwords is mitigated.
+Bob doesn't store the table of everybody's valid password in cleartext, thus
+the threat of someone breaking into the host and steal the passwords is a bit
+mitigated.
 
 #### Dictionary attack
 
 Mallory can compile offline a list of very common passwords and apply the
 one-way function to the list. Mallory then compares the results to each of the
-hashed passwords list. If a match is found then Mallory has found the secret.
+hashed passwords list. If a match is found then Mallory found the secret.
 
 #### Salt
 

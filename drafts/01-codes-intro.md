@@ -1,8 +1,8 @@
 +++
-title = "[DRAFT] Introduction to Codes"
+title = "Introduction to Codes"
 date = "2023-11-18"
 modified = "2023-11-18"
-tags = []
+tags = ["codes", "draft"]
 draft = true
 +++
 

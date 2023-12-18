@@ -1,8 +1,8 @@
 +++
-title = "[DRAFT] Shared Key Cryptography Highlights"
+title = "Shared Key Cryptography Highlights"
 date = "2023-11-26"
 modified = "2023-11-26"
-tags = []
+tags = ["cryptography", "security", "draft"]
 draft = true
 +++
 

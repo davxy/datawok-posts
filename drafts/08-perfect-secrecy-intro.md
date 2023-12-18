@@ -1,8 +1,8 @@
 +++
-title = "[DRAFT] Introduction to Unconditional Security"
+title = "Introduction to Unconditional Security"
 date = "2023-08-30"
 modified = "2023-08-30"
-tags = ["cryptography"]
+tags = ["cryptography", "draft"]
 toc = true
 draft = true
 +++

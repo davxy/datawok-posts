@@ -1,8 +1,8 @@
 +++
-title = "[DRAFT] X.800 OSI Standard"
+title = "X.800 OSI Standard"
 date = "2023-11-18"
 modified = "2023-11-18"
-tags = []
+tags = ["standards", "security", "draft"]
 draft = true
 +++
 

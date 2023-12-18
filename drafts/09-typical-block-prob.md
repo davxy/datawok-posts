@@ -1,8 +1,8 @@
 +++
-title = "[DRAFT] Probability of Typical Blocks"
+title = "Probability of Typical Blocks"
 date = "2023-08-20"
 modified = "2023-08-20"
-tags = ["cryptography"]
+tags = ["cryptography", "draft"]
 draft = true
 +++
 

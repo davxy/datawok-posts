@@ -1,7 +1,7 @@
 +++
-title = "[DRAFT] Public Key Cryptography Introduction"
+title = "Public Key Cryptography Introduction"
 date = "2019-05-11"
-tags = ["cryptography"]
+tags = ["cryptography", "draft"]
 draft = true
 +++
 
