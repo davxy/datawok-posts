@@ -1,9 +1,10 @@
 +++
 title = "Zero-Knowledge Proofs"
 date = "2023-08-06"
-modified = "2023-12-18"
+modified = "2023-12-19"
 tags = ["cryptography", "zk-proof"]
 toc = true
+draft = true
 +++
 
 Version - v0.1.18
@@ -196,104 +197,117 @@ problem associated to `L` can be verified by a deterministic *Turing* machine
 in polynomial time, even though finding the solution itself (constructing the
 proof) may be a way more computationally intensive task.
 
----
 
 ## Interactive Proofs
 
 An **interactive proof (IP)** system extends the classical notion of proof
-system by moving from a proof conceived as a *static* sequence of symbols to an
-*interactive protocol* where Peggy incrementally convinces Victor by actively
-exchanging messages.
+system by transitioning from a proof conceived as a *static* sequence of symbols
+to an *interactive protocol* where Peggy incrementally convinces Victor by
+actively exchanging messages.
 
-The concept was first independently proposed in the mid 80s by *Shafi
-Goldwasser*, *Silvio Micali*, and *Charles Rackoff* in their seminal paper "The
-Knowledge Complexity of Interactive Proof Systems" [GMR^1], which, among other
-things, also contains the first definition of zero-knowledge proof and *Laszlo
-Babai* in its paper "Trading Group Theory for Randomness"[^BAB].
+The concept was first proposed in the mid-1980s by *Shafi Goldwasser*,
+*Silvio Micali*, and *Charles Rackoff* in their seminal paper "The Knowledge
+Complexity of Interactive Proof Systems" [GMR^1]. This paper not only
+introduced interactive proofs but also presented the first formal definition of
+zero-knowledge proofs.
 
-In `IP` systems the actual ordered sequence of exchanged messages is known as
-the protocol **transcript**. Two runs of the same protocol may have a different
-transcript, depending on if the protocol is deterministic or not.
+Is worth noting that Laszlo Babai independently contributed to the development
+of this field approximately during the same period with his paper "Trading Group
+Theory for Randomness"[^BAB].
+
+In `IP` systems, the complete ordered sequence of messages exchanged during the
+protocol is referred to as the **transcript**. Two runs of the same protocol
+can result in different transcripts. This variability depends on whether the
+protocol is deterministic or probabilistic.
 
 ### Sigma Protocols
 
-Any `IP` system with a transcript composed of three messages are called *sigma
-protocols*.
+Any `IP` system with a transcript composed of four messages is called a *sigma
+protocol*.
 
-A sigma protocol typically has the following flow:
-- *commitment*: Peggy shares the first message;
-- *challenge*: Victor sends some kind of challenge;
-- *response*: Peggy sends a response to the challenge.
-- *result* (optional)
-
-The name stems from the Greek letter `Σ` which visualizes the flow of the protocol
-in presence of a last result message from the *verifier*.
+The name of the protocol is inspired by the Greek letter `Σ`, which shape
+mirrors the sequence of the protocol's steps:
+- *Commitment*: Peggy initiates the protocol by sending the first message.
+- *Challenge*: Victor responds by issuing a challenge to Peggy.
+- *Response*: Peggy replies to the Victor's challenge.
+- *Result* (optional): Victor sends a message with the verification outcome.
 
 ![sigma-protocol](/companions/zk-proofs/sigma-protocol.png)
+
+The names of these steps were chosen to reflect their functional roles in
+the execution of typical proofs, particularly in the `ZK` context. For the
+moment the detailed mechanics and purpose of each step are left open.
 
 This type of protocols is the most widespread when comes to `ZKP`, indeed
 every protocol which will be analyzed in the `ZKP` examples section is a *sigma
 protocol*.
 
+For completeness, note that some sources describe sigma protocols with just
+three messages, excluding the optional fourth "result" step.
+
 ### Deterministic Interactive Proofs
 
-A *Deterministic IP* is an `IP` which doesn't introduce any form of randomness
-in the protocol messages. Victor asks questions and Peggy is expected to always
-reply with the same answer.
+A **deterministic** `IP` is an interactive proof which doesn't introduce any
+randomness in the protocol messages. In such a system, Victor asks questions and
+Peggy is expected to always reply with the same answers.
+
+As an example, consider the protocol where Peggy wants to prove that she
+knows that a number is the product of two primes.
+
+Using a transcript similar to the sigma protocol:
+- *Commitment*: Peggy asserts she knows the factors of a number `N`.
+- *Challenge*: Victors asks for the smaller (or the bigger) factor.
+- *Response*: Peggy sends the smaller (or the bigger) factor.
+- *Result* (optional): Victor accepts or reject.
 
 ![deterministic-ip](/companions/zk-proofs/deterministic-ip.png)
 
-At this point Victor:
-- computes `y = ⌈N / x⌉` 
-- checks if `N = x·y`
-- checks if both `x` and `y` are primes via some deterministic algorithm
-  (here Victor can't use a probabilistic algorithm as the verification result
+The verification of the proof is quite simple and fast:
+- compute `y = ⌈N / x⌉` 
+- check if `N = x·y`
+- check if both `x` and `y` are primes via some deterministic algorithm
+  (can't use a probabilistic algorithm as the verification result
    should be deterministic).
 
-**Every deterministic `IP` can be trivially mapped into a static proof and vice
-versa.**
+> **Every deterministic `IP` can be trivially mapped into a static classic proof
+and vice versa.**
 
-To map a static proof to a deterministic `IP` the two parties can just
-communicate to incrementally transfer some parts of the proof. Note that a
-static is a deterministic IP with one message. This is not very interesting.
+To convert a static proof into a deterministic `IP`, the two parties can just
+communicate to incrementally transfer one or more chunks of the proof. Note that
+a static proof is essentially a deterministic IP with a single message exchange.
+This mapping is not very interesting.
 
-To map a deterministic `IP` to a static one is sufficient for the *prover* to
-construct a single string which embeds the whole transcript that would be used
-in the `IP`. The construction is possible as the transcript is known and fixed.
-Victor checks if the set of messages in the string is consistent with
-the expected transcript.
+To convert a deterministic `IP` to a static proof is sufficient for the *prover*
+to construct a single string encapsulating the entire protocol transcript. This
+construction is feasible because of the deterministic nature of the transcript,
+where every message sent by Victor is predictable. Victor, just have to check if
+the set of messages in the transcript is consistent with the expected ones.
 
 ![deterministic-ip2](/companions/zk-proofs/deterministic-ip2.png)
 
 From this last result follows that deterministic `IP` systems are not more
-powerful than SP with respect to the set of languages that can be proved.
+powerful than static proofs with respect to the set of languages that can be
+proven.
 
-Because this kind of `IP` is not much interesting, we leave the formal
+Due to the limited interest in deterministic `IP`s, we will save formal
 definitions for the next chapter.
 
 ### Probabilistic Interactive Proofs
 
-Introduction of randomness to the protocol, in some cases, allows proving the
-assertion more efficiently or proving en entire novel class of languages which
-can't be proven using deterministic proof systems.
+The introduction of randomness into the protocol can, in some scenarios, lead
+to more efficient proofs or enable to prove en entire new class of languages
+which can't be proven using deterministic proof systems.
 
-In the formalization described on the GMR paper:
-- Peggy is assumed to have unbounded computing power while Victor only
-  polynomial time on the size of the statement to prove;
-- both Peggy and Victor have access to a **private** random generator.
-
-Since Victor has polynomial computing power is easy to see that only a
-polynomial time number of messages can be exchanged between the two.
-
-The result is a probabilistic proof system for `NP`, where Victor is allowed to
-make an error during proof evaluation with a small probability.
-
-From now on we'll refer to *probabilistic interactive proof* systems to just
-*interactive proof* (`IP`) systems.
+As outlined in the seminal GMR paper:
+- Peggy is assumed to have unbounded computational resources, while Victor operates
+  within polynomial time constraints relative to the size of the statement to prove.
+- Given Victor's polynomial computational limitations, the number of messages
+  exchanged between the two must also be polynomial.
+- Both Peggy and Victor have access to a **private** random generator.
 
 More formally.
 
-**Definition**. An `IP` system for a language `L` is a protocol `(P,V)`
+> A probabilistic `IP` system for a language `L` is a protocol `(P,V)`
 for communication between a computationally unbounded machine `P` and a
 probabilistic polynomial time machine `V` taking an input statement `x`, a
 message history (`hᵢ`) and randomness source (`r`) to produce the next protocol
@@ -306,73 +320,82 @@ message:
   ...
 ```
 
+As a shortcut, from now on we'll refer to *probabilistic interactive proof*
+systems just as *interactive proof* (`IP`) systems.
+
 Key characteristics of an `IP` system `(P,V)` for a language `L`:
-- **completeness**: if `x ∈ L` then `V(x,π) = 1` with probability at least `1-ε`;
-- **soundness**: if `x ∉ L` then `V(x,π) = 1` with probability at most `ε`;
-- **efficiency**: the total computation time of `V(x,π)` and total communication
-  in `(P,V)` is polynomial with respect to length of `x`.
+- **Completeness**: If `x ∈ L`, then `V(x,π) = 1` with probability at least `1-ε`.
+- **Soundness**: If `x ∉ L` then `V(x,π) = 1` with probability at most `ε`.
+- **Efficiency**: Both the total computation time of `V(x,π)` and the overall
+  communication in `(P,V)` is polynomial with respect to length of `x`.
 
-The value of `ε` represents a bound to the *Validator* error probability.
+The parameter `ε` represents a cap on the *verifier*'s error probability.
 
-If for a single protocol execution `ε < 1` then we can always derive another
-protocol which executes the original protocol `k` times in a row effectively
+If for a single protocol execution `ε < 1`, then we can always derive another
+protocol which executes the original one `k` times consecutively, thus
 exponentially reducing the error probability to an arbitrary value `εᵏ`.
 
-For example, if `ε = 1/10` then by executing the protocol `5` times we reduce
-*the error probability to `ε⁵ = 1/100000`. Victor then accepts with probability
-`0.99999`.
+For instance, if `ε = 1/10`, executing the protocol `5` times would reduce the
+error probability to `ε⁵ = 1/100000`, allowing Victor to accept with a probability
+of `0.99999`.
 
-Writing a proof that can be checked without interaction, when possible, is for
-some problems a much harder task. Mostly because in some sense the *prover* has
-to answer in advance to all the possible questions from Victor.
-As we'll see later, there is an entire class of problems which cannot be proven
-via static proofs.
+Constructing a static proof for some problems can be significantly more
+challenging. This is partly because the *prover* has to answer in advance to all
+the possible questions from Victor and encapsulate all the potential Peggy's
+responses in one single message. This is not always possible given the
+polynomial nature of the verifier.
+
+As we'll see later, there is an entire class of problems which cannot be
+practically proven via static proofs.
 
 #### Proving Completeness
 
-Completeness is quite easy to prove as if Peggy knows the solution to a problem,
-she will eventually convince Victor as its responses during the repeated protocol
-executions will be always correct regardless of the number of repetitions.
+Completeness is quite easy to prove.
+
+If Peggy knows the solution to a problem, she will eventually convince Victor
+as its responses during the repeated protocol executions will be always correct
+regardless of the number of repetitions and the value of `ε`.
 
 #### Proving Soundness
 
-Soundness is a bit more difficult to prove.
+Soundness is a bit more challenging to prove.
 
-Protocol soundness is based on the existence of what is known as an
-**extractor**; a tool which allows Victor to extract key information used by
-Peggy to construct the proof.
+A proper proof of protocol soundness generally requires an **extractor**, a
+hypothetical tool tailored for the specific protocol which allows Victor to
+extract key information used by Peggy to construct the proof.
 
-If Victor is capable of rewind Peggy's execution (without her to notice) she
-will eventually re-execute the protocol exactly in the same way he already did
-(also the randomness read will be the same). From the Peggy's perspective the
-executions are statistically identical.
+Imagine Victor being capable of 'rewind' Peggy's execution without her
+knowledge. In such a case, Peggy would re-execute the protocol exactly as
+before, even using the same random values as in the previous execution.
+From Peggy's perspective, these executions would appear statistically
+indistinguishable.
 
-If under these conditions a cheating Victor is able to recover some information
-which allows him to construct a valid proof then the protocol is sound.
+If under these conditions Victor is able to recover some information which
+allows him to construct a valid proof then the protocol is sound.
 
-The intuition here is that it is statistically impossible for the *prover*,
-to disclose crucial information without actually knowing it. Should be very
-lucky making it out of thin air.
+The intuition here is that it is statistically impossible for a dishonest Peggy
+to disclose crucial information without actually possessing it. Should would
+require an extraordinary stroke of luck to fabricate this information out of
+thin air.
 
-Note that the extractor is a tool which must not exist in any real execution
-environment for the protocol. For example, if the environment is the real world,
-it could be something like a "time machine", if the environment is the digital
-world this could be the capability to capture a snapshot of the *prover* program
-state at any point in time and restart it from that snapshot (like protocol
-execution in a virtual machine).
+It is important to note that the extractor is a theoretical construct, not meant
+to be present in any real-world execution of the protocol. For example, if the
+environment is the *real world*, it could be something like a "time machine". In
+the *digital world*, it could be the capability to snapshot and restart a prover
+state at any point.
 
 ### Interactive Turing Machines
 
-Let's invest some time in formalizing a bit further the definitions of *prover*
-(`P`) and *verifier* (`V`) used in `IP` systems as *Interactive Turing Machines*
-(ITM).
+Let's invest some time formalizing a bit further the execution environment for
+the interactive proofs, i.e. the interactive proof system. 
 
-**Definition**. An ITM is a *Turing* machine with a read-only input tape, a
-read-write work tape, a read-only random tape, a read-only communication tape
-and a write-only communication tape.
+> An **Interactive Turing Machine** (`ITM`) is a *Turing* machine with a
+read-only input tape, a read-write work tape, a read-only random tape, a
+read-only communication tape and a write-only communication tape.
 
-In an interactive protocol between `P` and `V` the two machines share the same
-input tape, which generally contains the encoded assertion to be proven.
+In an `IP` system, both the *prover* (`P`) and the *verifier* (`V`) are defined
+as `ITM` who share the same input tape, which generally contains the encoded
+assertion to be proven.
 
 The read-only communication tape of one machine is defined to be the write-only
 communication tape of the other machine. This type of tape is used to exchange
@@ -382,81 +405,82 @@ protocol messages.
 
 During the proving protocol, the two machines take turns in being active.
 
-On each step of the protocol the ITM performs some internal computation
-using all the readable tapes. Then it writes the output string to the write-only
+With each protocol step, the `ITM` utilizes all its readable tapes as inputs
+for internal computations. It then writes the resulting output to the write-only
 communication tape (which corresponds to the read-only input of the other
 machine).
 
-The last message of every protocol goes from `P` to `V`, which can then accept
-or reject.
+The final message of every reasonable protocol goes from `P` to `V`, which can
+then accept or reject the proof.
 
-As previously said `P` is assumed to be computationally unbounded while `V` is
-assumed computationally bounded by polynomial time with respect to the input
-size.
+Consistent with our earlier discussions, `P` is considered to have unlimited
+computational resources, while `V` operates under a computational constraint,
+which are polynomially bounded by the size of the assertion being proved.
 
-### Interactive Proof Complexity Class
+### Interactive Proof Computational Complexity Class
 
-In this paragraph we're going to give a small insight about the complexity class
-which relates to the `IP` systems.
+In this section, we give a small insight about the complexity class associated
+with `IP` systems. This topic is highly theoretical and falls somewhat outside
+the primary focus of this document.
 
-This is a very theoretical subject and beyond the scope of this document.
-
-**Definition**. The **IP** complexity class is defined as a class of languages
-for which there exists an interactive proof system whose proofs can be verified
-in polynomial time with respect to the length of the statement to prove.
+> The `IP` complexity class is defined as a class of languages for which there
+exists an `IP` system whose proofs can be verified in polynomial time with
+respect to the length of the statement to prove.
 
     IP = { L | L has an interactive proof }
 
-The class can be further divided depending on the characteristics of the protocol:
-`IP[k]` is the class of languages which can be decided by a *k*-round interactive
-proof. 
+This class can be further divided based on the protocol's characteristics. For
+instance, `IP[k]` denotes the class of languages that can be decided by an
+interactive proof with `k` rounds.
 
-Lund, Fortnow, Karloff and Nisan [LFKN] proved that `PH ⊂ IP`, which shows
-that interactive proofs can be very powerful as they contain the union of
-all complexity classes in polynomial hierarchy. Shortly later, Shamir [SH]
-proved that in fact `IP = PSPACE`, which gave a complete characterization of
-interactive proofs.
+At the begin of 90s, Carsten Lund, Lance Fortnow, Howard Karloff and Noam Nisan
+[LFKN] proved that `PH ⊂ IP`, which shows that interactive proofs can be very
+powerful as they contain the union of all complexity classes in *polynomial
+hierarchy*, including `P`, `NP`, [`co-NP`](https://en.wikipedia.org/wiki/Co-NP).
 
-`PSPACE` includes, for example, [`co-NP`](https://en.wikipedia.org/wiki/Co-NP)
-the class of problems whose complement is in `NP`.
+Shortly later, Adi Shamir [SH] proved that in fact `IP = PSPACE`, which gave a
+complete characterization of the capabilities of interactive proofs.
 
-A natural consequence is that using an interactive proof system we are able to
-verify solutions to problems which are outside `NP`.
+As a direct outcome, employing an interactive proof system enables to verify
+solutions for problems that fall outside of `NP` and even beyond the scope of
+`PH`.
 
-In some cases, the interaction between Peggy and Victor can lead to a more
+In some cases, the interaction between Peggy and Victor can also lead to a more
 efficient verification process, allowing Victor to accept a proposed solution
-without the need for Peggy to reveal the entire solution.
+without the need for Peggy to share the entire solution (`ZK` proofs).
 
 ### Arthur-Merlin Protocols
 
-An [Arthur-Merlin](https://en.wikipedia.org/wiki/Arthur-Merlin_protocol)
-introduced by Babai [BAB85], is an `IP` system with the additional constraint
-that the *prover* (*Merlin*) and the *verifier* (*Arthur*) share the same
+An [Arthur-Merlin](https://en.wikipedia.org/wiki/Arthur-Merlin_protocol) protocol,
+initially introduced by Babai [BAB85] in 1985, is an `IP` system with the
+additional constraint that the *prover* and the *verifier* share the same
 randomness source.
 
-In this context both the actors can see the randomness (like coin tosses)
-of the other party.
+In this context, *Merlin* is the *prover*, *Arthur* is the *verifier* and both
+of them are allowed to see the randomness source of the other party.
 
 ![AM](/companions/zk-proofs/AM.png)
 
-[Goldwasser and Sipster](TODO) proved that all languages with an interactive
-proofs of arbitrary length with private randomness (`IP`) also have interactive
-proofs with public randomness (`AM`) and vice versa.
+Shafi Goldwasser and Michael Sipster [TODO] proved that all languages with an
+interactive proofs of arbitrary length with private randomness (`IP`) also have
+interactive proofs with public randomness (`AM`) and vice versa.
 
 Is worth anticipating that even though general `IP` with secret random sources
-are not more powerful with respect to the set of languages they can prove, they
-offer a feature which is fundamental in proving statements without sharing any
-knowledge (aka `ZKP`).
+are not more powerful in terms of the range of languages they can prove, this
+feature becomes crucial for proving statements without sharing any knowledge.
 
-The set of decisional problems that can be verified in polynomial time by an
-`AM` protocol with one single message is called `MA` set.
+The set of decision problems that can be verified in polynomial time using a
+single message `AM` protocol forms the `MA` set.
 
-Generic `MA` protocol steps:
-1. *Merlin* sends to *Arthur* the proof
-2. *Arthur* decides
+Steps for a generic `MA` protocol:
+- *Merlin* sends to *Arthur* the proof
+- *Arthur* decides
 
 `MA` protocols are very similar to traditional `NP` proofs with the addition
 that the *prover* can use a public randomness source to construct its proof.
+
+
+------------ RESTART HERE --------------
 
 #### AM Protocol
 
