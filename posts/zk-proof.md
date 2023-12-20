@@ -1,13 +1,13 @@
 +++
 title = "Zero-Knowledge Proofs"
 date = "2023-08-06"
-modified = "2023-12-19"
+modified = "2023-12-20"
 tags = ["cryptography", "zk-proof"]
 toc = true
 draft = true
 +++
 
-Version - v0.1.18
+Version - v0.1.20
 
 ## *Abstract*
 
@@ -28,6 +28,7 @@ fascinating question whether a proof carries with it some knowledge or not.
 In this discussion we will go from the most classic mathematical notion of
 proof down to proofs which shares zero knowledge.
 
+---
 
 ## Classical Proofs
 
@@ -86,9 +87,11 @@ Example. Sound proof.
   - `A`, `B` and `C` are three sets such that `A ∩ B ⊆ C`;
   - `x ∈ B`;
   - basic properties of set theory hold;
+
 - *Conclusion*: `x ∉ A \ C`.
+
 - *Proof*: 
-  - `x ∉ A \ C  =  ¬(x ∈ A ∧ x ∉ C)  =  x ∉ A ∨ x ∈ C  =  x ∈ A → x ∈ C`
+  - `x ∉ A \ C = ¬(x ∈ A ∧ x ∉ C) = x ∉ A ∨ x ∈ C = x ∈ A → x ∈ C`
   - `A ∩ B ⊆ C ∧ x ∈ B ∧ x ∈ A  →  x ∈ C`
 
 Example. Valid but not sound proof:
@@ -113,13 +116,13 @@ construct and evaluate proofs.
 It typically consists of the following key components:
 
 - **Statement (x)**: assertion under consideration. It is the proposition that
-one tries to prove or disprove.
+  one tries to prove or disprove.
 
 - **Proof (π)**: set of arguments, evidence, or logical steps that, when
-processed by the proof system, should establish the validity of the statement.
+  processed by the proof system, should establish the validity of the statement.
 
 - **Prover (`P`)**: algorithm to construct a proof for the given statement
-(`P(x) = π`).
+  (`P(x) = π`).
 
 - **Verifier (`V`)**: algorithm that, given both the statement and the proof,
 decides whether the proof is valid. This algorithm outputs `1` if the proof is
@@ -179,7 +182,7 @@ whether there is a subset of integers that adds up to a target `t`.
 
 The problem can be represented as the language:
 
-    L = { x = (S,t) | S ⊆ ℕ and ∃ V ⊆ S: sum of elements in V equals t } 
+    L = { x = (S,t) | S ⊆ ℕ and ∃ V ⊆ S: sum of elements in V equals t }
 
 In this language, a pair `x = (S,t)` (a string) belongs to the language `L`
 if and only if satisfies the language condition, i.e. there is a subset of `S`
@@ -197,6 +200,7 @@ problem associated to `L` can be verified by a deterministic *Turing* machine
 in polynomial time, even though finding the solution itself (constructing the
 proof) may be a way more computationally intensive task.
 
+---
 
 ## Interactive Proofs
 
@@ -207,7 +211,7 @@ actively exchanging messages.
 
 The concept was first proposed in the mid-1980s by *Shafi Goldwasser*,
 *Silvio Micali*, and *Charles Rackoff* in their seminal paper "The Knowledge
-Complexity of Interactive Proof Systems" [GMR^1]. This paper not only
+Complexity of Interactive Proof Systems" [GMR85]. This paper not only
 introduced interactive proofs but also presented the first formal definition of
 zero-knowledge proofs.
 
@@ -227,10 +231,10 @@ protocol*.
 
 The name of the protocol is inspired by the Greek letter `Σ`, which shape
 mirrors the sequence of the protocol's steps:
-- *Commitment*: Peggy initiates the protocol by sending the first message.
-- *Challenge*: Victor responds by issuing a challenge to Peggy.
-- *Response*: Peggy replies to the Victor's challenge.
-- *Result* (optional): Victor sends a message with the verification outcome.
+1. *Commitment*: Peggy initiates the protocol by sending the first message.
+2. *Challenge*: Victor responds by issuing a challenge to Peggy.
+3. *Response*: Peggy replies to the Victor's challenge.
+4. *Result* (optional): Victor sends a message with the verification outcome.
 
 ![sigma-protocol](/companions/zk-proofs/sigma-protocol.png)
 
@@ -255,10 +259,10 @@ As an example, consider the protocol where Peggy wants to prove that she
 knows that a number is the product of two primes.
 
 Using a transcript similar to the sigma protocol:
-- *Commitment*: Peggy asserts she knows the factors of a number `N`.
-- *Challenge*: Victors asks for the smaller (or the bigger) factor.
-- *Response*: Peggy sends the smaller (or the bigger) factor.
-- *Result* (optional): Victor accepts or reject.
+1. *Commitment*: Peggy asserts she knows the factors of a number `N`.
+2. *Challenge*: Victors asks for the smaller (or the bigger) factor.
+3. *Response*: Peggy sends the smaller (or the bigger) factor.
+4. *Result* (optional): Victor accepts or reject.
 
 ![deterministic-ip](/companions/zk-proofs/deterministic-ip.png)
 
@@ -294,13 +298,18 @@ definitions for the next chapter.
 
 ### Probabilistic Interactive Proofs
 
+In the probabilistic version of the proving system, the steps mirror those of
+the deterministic counterpart, but with additional elements of randomness
+introduced by either the prover, the verifier, or both.
+
 The introduction of randomness into the protocol can, in some scenarios, lead
 to more efficient proofs or enable to prove en entire new class of languages
 which can't be proven using deterministic proof systems.
 
 As outlined in the seminal GMR paper:
-- Peggy is assumed to have unbounded computational resources, while Victor operates
-  within polynomial time constraints relative to the size of the statement to prove.
+- Peggy is assumed to have unbounded computational resources, while Victor
+  operates within polynomial time constraints relative to the size of the
+  statement to prove.
 - Given Victor's polynomial computational limitations, the number of messages
   exchanged between the two must also be polynomial.
 - Both Peggy and Victor have access to a **private** random generator.
@@ -313,12 +322,10 @@ probabilistic polynomial time machine `V` taking an input statement `x`, a
 message history (`hᵢ`) and randomness source (`r`) to produce the next protocol
 message:
 
-```
-  m₁ = V(x, rᵥ, h₁={})
-  m₂ = P(x, rₚ, h₂={m₁})
-  m₃ = V(x, rᵥ, h₃={m₁,m₂})
-  ...
-```
+    m₁ = V(x, rᵥ, h₁={})
+    m₂ = P(x, rₚ, h₂={m₁})
+    m₃ = V(x, rᵥ, h₃={m₁,m₂})
+    ...
 
 As a shortcut, from now on we'll refer to *probabilistic interactive proof*
 systems just as *interactive proof* (`IP`) systems.
@@ -329,15 +336,16 @@ Key characteristics of an `IP` system `(P,V)` for a language `L`:
 - **Efficiency**: Both the total computation time of `V(x,π)` and the overall
   communication in `(P,V)` is polynomial with respect to length of `x`.
 
-The parameter `ε` represents a cap on the *verifier*'s error probability.
+The parameter `ε` represents a cap on the *verifier*'s error probability,
+an is popularly known as the **soundness error**.
 
 If for a single protocol execution `ε < 1`, then we can always derive another
 protocol which executes the original one `k` times consecutively, thus
 exponentially reducing the error probability to an arbitrary value `εᵏ`.
 
 For instance, if `ε = 1/10`, executing the protocol `5` times would reduce the
-error probability to `ε⁵ = 1/100000`, allowing Victor to accept with a probability
-of `0.99999`.
+error probability to `ε⁵ = 1/100000`, allowing Victor to accept with a
+probability of `0.99999`.
 
 Constructing a static proof for some problems can be significantly more
 challenging. This is partly because the *prover* has to answer in advance to all
@@ -381,7 +389,7 @@ thin air.
 It is important to note that the extractor is a theoretical construct, not meant
 to be present in any real-world execution of the protocol. For example, if the
 environment is the *real world*, it could be something like a "time machine". In
-the *digital world*, it could be the capability to snapshot and restart a prover
+the *digital world*, it could be the capability to snapshot and restart a *prover*
 state at any point.
 
 ### Interactive Turing Machines
@@ -433,9 +441,9 @@ This class can be further divided based on the protocol's characteristics. For
 instance, `IP[k]` denotes the class of languages that can be decided by an
 interactive proof with `k` rounds.
 
-At the begin of 90s, Carsten Lund, Lance Fortnow, Howard Karloff and Noam Nisan
-[LFKN] proved that `PH ⊂ IP`, which shows that interactive proofs can be very
-powerful as they contain the union of all complexity classes in *polynomial
+At the beginning of 90s, Carsten Lund, Lance Fortnow, Howard Karloff and Noam
+Nisan [LFKN] proved that `PH ⊂ IP`, which shows that interactive proofs can be
+very powerful as they contain the union of all complexity classes in *polynomial
 hierarchy*, including `P`, `NP`, [`co-NP`](https://en.wikipedia.org/wiki/Co-NP).
 
 Shortly later, Adi Shamir [SH] proved that in fact `IP = PSPACE`, which gave a
@@ -461,378 +469,381 @@ of them are allowed to see the randomness source of the other party.
 
 ![AM](/companions/zk-proofs/AM.png)
 
-Shafi Goldwasser and Michael Sipster [TODO] proved that all languages with an
-interactive proofs of arbitrary length with private randomness (`IP`) also have
-interactive proofs with public randomness (`AM`) and vice versa.
+The fundamental attributes of an `AM` proof system `(P,V)` for a language `L`,
+such as *completeness*, *soundness*, and *efficiency*, align with those of
+general `IP` systems.
 
-Is worth anticipating that even though general `IP` with secret random sources
-are not more powerful in terms of the range of languages they can prove, this
-feature becomes crucial for proving statements without sharing any knowledge.
+#### MA Protocol
 
 The set of decision problems that can be verified in polynomial time using a
 single message `AM` protocol forms the `MA` set.
 
 Steps for a generic `MA` protocol:
-- *Merlin* sends to *Arthur* the proof
-- *Arthur* decides
+1. *Merlin* sends to *Arthur* the proof
+2. *Arthur* decides
 
 `MA` protocols are very similar to traditional `NP` proofs with the addition
 that the *prover* can use a public randomness source to construct its proof.
 
-
------------- RESTART HERE --------------
-
 #### AM Protocol
 
-The set of decisional problems that can be decided in polynomial time by an `AM`
+The set of decision problems that can be decided in polynomial time by an `AM`
 protocol with `k` messages is called `AM[k]`.
 
-For all `k > 1`, `AM[k] = AM[2]`. This result is due to the fact that *Merlin*
-can observe *Arthur* randomness source during the whole protocol execution, and
-thus this doesn't affect *Merlin* messages.
+For all `k ≥ 2`, `AM[k]` is equivalent to `AM[2]`. This result is due to the
+fact that *Merlin* can observe *Arthur* randomness source during the whole
+protocol execution, and thus it doesn't affect *Merlin* messages.
 
-`MA` is strictly contained in `AM`, since `AM[2]` contains `MA` and `AM[2]`
+`MA` is strictly contained in `AM`, since `AM[2]` contains `MA` but `AM[2]`
 cannot be reduced to `MA`
 
-Goldwasser and Sipser [GS] proved that for any generic `IP` protocol and for any `k`
-`AM[k] ⊂ IP[k] ⊂ AM[k + 2]`. And because `AM[k + 2] = AM[k] = AM[2]` follows that
-`IP[k] = AM[2]`.
+Shafi Goldwasser and Michael Sipster [GS] proved that for any language with
+an interactive proof protocol with private randomness (`IP`) also have an
+interactive proof with public randomness (`AP`). In particular, for any `k`
+`AM[k] ⊂ IP[k] ⊂ AM[k + 2]`. And because `AM[k + 2] = AM[k] = AM[2]` follows
+that `IP[k] = AM[2]`.
 
-In other words, for every language `L` with a `k`-round `IP` system, `L` has a
-`k = 2` round *public-coin* `IP` system.
+In short, any language with a `k`-round *private coin* `IP` system has a
+`k = 2` round *public-coin* `AM` system.
 
-The key characteristics of an `AM` proof system `(P,V)` for a language `L` are
-the same as for a generic `IP` systems with respect to *completeness*,
-**soundness* and efficiency* properties.
+Said that, is worth anticipating that even though general `IP` with secret
+random sources are not more powerful in terms of the range of languages they can
+prove, the secrecy of the randomness becomes crucial for proving statements
+without sharing any knowledge.
 
 ### Examples
 
 #### Tetrachromacy
 
-Tetrachromacy is a condition that allows some individuals to perceive a broader
+Tetrachromacy is a condition enabling some individuals to perceive a broader
 spectrum of colors than the typical trichromat, who has three types of cone
-cells in their eyes for color vision. Tetrachromats have an additional type of
-cone cell, enabling them to perceive a wider range of colors.
+cells for color vision. Tetrachromats have an additional cone cell type,
+allowing them to see a wider range of colors.
 
-Peggy wants to prove to Victor that she is tetrachromat by showing that she's
-able to distinguish between the two marbles which are equal to Victor but 
-different for her.
+In this scenario, Peggy claims to be tetrachromat and wants to prove it to
+Victor by showing that she's able to distinguish between two marbles who
+appear identical to Victor.
 
 Protocol:
-- Peggy puts the two marbles in from of Victor and turns her back.
-- Victor tosses a coin and, depending on the result may swap the position of
-  the marbles.
-- Peggy tells Victor if the marbles were swapped.
+1. Peggy places the two marbles in from of Victor and turns her back.
+2. Victor flips a coin. Based on the outcome, he may swap the position of the
+   marbles.
+3. Peggy, facing the marbles again, tells Victor whether their positions were
+   swapped.
 
-The probability for Peggy to cheat (aka *soundness error*) is `ε = 1/2`.
+The likelihood of Peggy falsely claiming to distinguish the marbles and being
+able to cheat (soundness error) is `ε = 1/2`. By repeating this protocol `k`
+times, the probability of Peggy cheating reduces to `1/2ᵏ`.
 
-We can lower this probability arbitrarily by repeating the protocol `k` times,
-the probability to cheat becomes `1/2ᵏ`.
-
-Note that in this proof a malicious Victor may put another, apparently equal,
+Note that in this protocol a malicious Victor may put another, apparently equal,
 marble in front of the *prover* and infer if that is equal or not to the other.
 
 #### Quadratic Non-Residuosity Problem
 
-`y ∈ Zₘ*` is a quadratic residue if `∃x ∈ Zₘ*` such that `x² ≡ y (mod m)`.
-Otherwise, `y` is called a quadratic non-residue modulo `m`.
+A number `y ∈ Zₘ*` is a quadratic residue if there exists an `x ∈ Zₘ*` such that
+`x² ≡ y (mod m)`. If no such `x` exists, `y` is a quadratic non-residue modulo `m`.
 
 We define the languages:
 
-    QR  = { y | y ∈ Zₘ* is a quadratic residue }
-    QNR = { y | y ∈ Zₘ* is a quadratic non-residue }
+    QR  = { y | y ∈ Zₘ* and is a quadratic residue }
+    QNR = { y | y ∈ Zₘ* and is a quadratic non-residue }
 
-It is considered to be a hard problem to tell if `y ∈ QR` (or `QNR` by
-exclusion) without knowing the factorization of `y`.
+It is considered to be a hard problem to tell if `y ∈ QR` or `y ∈ QNR` without
+knowing the factorization of `y`.
 
-Notice that both `QR` and `QNR` problems belong to `NP`, and thus they have
+Notice that both `QR` and `QNR` languages belong to `NP`, and thus they have
 a classic proof system: Peggy just needs to send to Victor the factorization of
 `y` without any further interaction.
 
-If instead the *prover* wants to prove that `y ∈ QNR` without sharing the
-factorization of `y` this is actually possible only via an `IP` system.
+If instead the *prover* wants to prove that `y ∈ QR` or that `y ∈ QNR` without
+sharing the factorization of `y` this is actually possible only via an `IP`
+system.
 
-The protocol is based on the simple fact that if `y ∈ QNR` then `y·k² ∈ QNR` for
-any `k ∈ Zₘ*`.
+A protocol to show that `y ∈ QNR` is based on the fact that if `y ∈ QNR` then
+`y·k² ∈ QNR` for any `k ∈ Zₘ*`.
 
 Protocol:
-- Victor chooses a random number `r ∈ Zₘ*`, and flips a coin. If the coin result
-  is 'heads' then `t = r² mod m` else `t = y·r² mod m`. He sends `t` to Peggy.
-- Peggy, which has unrestricted computing power, finds if `t` is a quadratic
-  residue (i.e. if `t = r² mod m`) and tells Victor what was his coin toss
-  result.
+1. Victor selects a random number `r ∈ Zₘ*` and flips a coin. If the coin
+   shows 'heads' he sets `t = r² mod m` else `t = y·r² mod m`. He sends `t`
+   to Peggy.
+2. Peggy, which has unrestricted computing power, finds if `t` is a quadratic
+   residue (i.e. if `t = r² mod m`) and tells Victor what was his coin toss
+   result.
 
-If `y ∉ QNR` then `y ∈ QR` and thus `t ∈ QR` as well. In this case Peggy has no
-way to recover the coin toss results Victor. In fact Peggy has `ε = 1/2`
-probability of guessing correctly.
+If `y ∉ QNR` then `y ∈ QR` and thus, regardless of the coin toss result,
+`t ∈ QR` as well. In this case Peggy has no way to recover the coin toss
+results. In fact Peggy has `ε = 1/2` probability of guessing correctly.
 
 As usual, the soundness error probability can be arbitrarily reduced by
 performing multiple protocol runs.
 
-Unfortunately, this protocol also shares some extra information. If `y ∈ QNR` a
-malicious Victor can send to Peggy any number `k` and learn from the response if
-`k ∈ QR` or not.
+Note that in this protocol Peggy also reveals some extra information.
+If `y ∈ QNR` a malicious Victor can send to Peggy any number `k` and learn from
+the response if `k ∈ QR` or not.
+
+As we'll see in the next sections we can prove both `y ∈ QR` or `y ∈ NQR`
+without sharing any information using an interactive zero knowledge proof.
 
 ---
 
 ## Zero Knowledge Proofs
 
 Now that we defined the interactive class of proof system is finally time to
-better discuss the core topic of this lecture: *how much knowledge should be
-communicated to prove a statement?*
+better discuss the core topic of this lecture: *the quantity of knowledge
+required to validate a statement*.
 
-The first serious approach to the problem was first proposed in the 80s by
-*Goldwasser*, *Micali*, and *Rackoff* in their GMR85[^1] paper (yes, the same
-paper which introduced the `IP` systems).
+The concept of Zero-Knowledge Proofs (ZKP) was first rigorously defined in the
+1980s by *Shafi Goldwasser*, *Silvio Micali*, and Rackoff in their seminal paper
+GMR85 (notably, the same paper that introduced Interactive Proof systems).
 
 Before the GMR paper, most of the effort on `IP` systems area focused on
 the *soundness* of the protocols. That is, the sole conceived weakness was a
 malicious Peggy attempting to trick Victor into approving a false statement.
-What *Goldwasser*, *Micali* and *Rackoff* did was to turn the problem into: what
-if instead Victor is malicious?
+What *Goldwasser*, *Micali* and *Rackoff* did was to turn the problem into: *what
+if instead Victor is malicious?*
 
-The specific concern they raised was about *information leakage*. Concretely,
+The specific concern they raised was about **information leakage**. Concretely,
 how much extra information is Victor going to learn during the execution of the
 protocol beyond the mere fact that the statement is true.
 
-Obviously, in the context of `ZKP` protocols is assumed that Peggy knows some
-*secret information* which she doesn't want to share with Victor.
+In the realm of `ZKP`, the primary goal of Peggy is thus to convince Victor that
+a certain fact is true, without revealing *any* additional information.
 
-The primary goal of Peggy in a *zero-knowledge proof* (`ZKP`) system is to
-convince Victor that a certain fact is true, without revealing *any* additional
-information.
-
-Very naively, we may think that *any* additional information only consists of
-specific details about *how* and *why* the proven statement is true, but the
-requirement is much stronger as it includes **any** information that Victor is
-not already capable of computing by himself and this also includes facts not
-directly related to the proof.
+Naively, it might seem that *any* additional information in a proof only
+pertains to the specific details regarding the how and why the statement
+being proven is true. However, the criterion in `ZKP` is more stringent. It
+encompasses any piece of information that Victor cannot independently compute,
+extending even to facts that are not directly related to the proof itself.
 
 More formally.
 
-**Definition**. A proof system for a language `L` is **zero-knowledge** iff
-`∀x ∈ L`, the *prover* shares with the *verifier* just that `x ∈ L` (i.e. one
-bit of information).
+> **Definition**. A proof system for a language `L` is considered
+**zero-knowledge** if, for all `x ∈ L`, Peggy reveals to Victor only the fact
+that `x ∈ L` (i.e., a single bit of information).
 
-The definition applies even when Victor is not honest and tries to trick (with
-its polynomial time limits) Peggy.
+This definition holds true even when Victor is not honest, bounded by his
+polynomial-time capabilities.
 
-Key characteristics of a `ZKP` system `(P,V)` for a language `L`:
-- **completeness**: if `x ∈ L` then `V(x,π) = 1` with high probability;
-- **soundness**: if `x ∉ L` then `V(x,π) = 1` with negligible probability.
-- **efficiency**: the total computation time of `V(x,π)` and total communication
+Key attributes of a `ZKP` system `(P,V)` for a language `L`:
+- **Completeness**: If `x ∈ L` then `V(x,π) = 1` with high probability.
+- **Soundness**: If `x ∉ L` then `V(x,π) = 1` with negligible probability.
+- **Efficiency**: The total computation time of `V(x,π)` and total communication
   in `(P,V)` is polynomial with respect to length of `x`.
-- **zero-knowledgeness**: The proof does not reveal any additional information
+- **Zero-Knowledgeness**: The proof does not reveal any additional information
   other than the fact that the statement is true.
 
 Of most importance is the following theorem found in the [GMW] paper:
 
-**Theorem (GMW)**. For any problem in `NP` there exist a `ZKP` system.
+> **Theorem**. For any problem in `NP` there exist a `ZKP` system.
 
-The theorem is the sweet consequence of the existence of a `ZKP` system for a
-well known `NP` (TODO: link to the example).
+The theorem is the sweet consequence of the existence of a `ZKP` system for
+the [graph three coloring](#graph-three-coloring) problem, which is known
+to be `NP` complete.
 
 ### Proving *Zero-Knowledgeness*
 
-The proof is based on the existance of what is known as a **simulator** and the
-idea is quite similar to the one used to prove [*soundness*](#proving-soundness)
-via the *extractor*.
+The proof is based on the existence of a **simulator** and the idea is quite
+similar to the one used to prove [*soundness*](#proving-soundness) with the
+*extractor*.
 
-A *simulator* is a tool which allows Peggy to convince any *verifier* that a
-statement is true, and thus about the knowledge of some key information, when in
-reality she doesn't possess any knowledge.
+A *simulator* is a hypothetical tool which allows Peggy to convince Victor that
+a statement is true, and thus about the knowledge of some key information, when
+in reality she doesn't possess any knowledge.
 
-The key intuition here is: if regardless of how many rounds the protocol is
-executed, Peggy is **always** capable of convincing Victor without knowing any
-key information then the protocol doesn't leak any information to Victor as he
-is not able to distinguish if Peggy posses any knowledge via the protocol.
+The key intuition here is that if Peggy can consistently convince Victor of the
+statement's truth across multiple protocol rounds without any actual knowledge,
+then the protocol itself can't reveal any information to Victor. In essence,
+Victor cannot discern whether Peggy truly holds any knowledge based on the
+protocol's execution.
 
-As for the *extractor* the implementation of a *simulator* is based on rewinding
-the Victor's execution in order to gain some advantage without him noticing.
+Similarly to the *extractor*, the implementation of the *simulator* is based
+on rewinding Victor's execution in order to gain some advantage without him
+noticing.
 
-From Victor's perspective, the *simulator* is statistically indistinguishable
-from any real execution of the protocol.
+From Victor's perspective, the outputs produced by the *simulator* are
+statistically indistinguishable from any genuine protocol execution.
+
+### Probability Distributions Distinguishability 
+
+(TODO: completely review)
+
+The core idea is to define when two random variables are considered
+**indistinguishable** to a particular observer. In the context of interactive
+proofs, these observers are usually computationally bounded (polynomial time)
+verifiers.
+
+This concept is crucial for `ZK` proofs, where a prover tries to convince a
+verifier of a statement's validity without revealing any other information.
+The indistinguishability of random variables ensures that whatever the verifier
+observes during this process doesn't give them any knowledge beyond the fact
+that the statement is true.
+
+Consider the family of random variables `U = { U(x) }` where the parameter `x`
+belongs to a language `L ⊆ {0,1}*`. Each random variable in this family takes
+values in `{0,1}*`
+
+Given two such families of random variables, `U` and `V`, imagine a scenario
+where a value `s` is sampled from either `U(x)` or `V(x)`. A judge should
+decide if `s ∈ U(x)` or `s ∈ V(x)`.
+
+The concept of **replaceability** comes into play when the judge's decision
+becomes effectively random as the length of `x` increases. In such cases, `U(x)`
+is said to be replaceable with `V(x)`.
+
+The judge's decision-making process is influenced by two crucial factors:
+- The *size* of the sample `s`.
+- The *time* available for making the decision.
+
+Based on these parameters, two families of random variables `U` and `V` can be
+classified as:
+- **Equal**: if the verdict is random regardless of the decision time the sample
+  size.
+- **Statistically indistinguishable**: if the verdict becomes random when given
+  infinite time and samples with polynomial size with respect to `|x|`.
+- **Computationally indistinguishable**: if the verdict becomes random when both
+  time and samples size are polynomially bounded by `|x|`.
+
+To ensure that no additional information is leaked, it's crucial that whatever
+the verifier observes during the interaction is indistinguishable from what
+they would observe in a simulation that doesn't involve the actual witness (the
+secret information proving the statement's truth). In other words, the verifier
+cannot distinguish between the real interaction and a simulated one.
+
+A ZK proof often involves a simulation argument, where it is shown that for
+every possible interaction in the actual proof system, there is a corresponding
+(probabilistically similar) interaction that could be generated by a
+simulator without access to the secret.
+
+If these two sets of interactions are indistinguishable from each other, then
+the proof system is zero-knowledge.
+
+In practice, given the verifier (judge) polynomial bounds, practical `ZK` proofs
+are often concerned with computational indistinguishability
+
+In an interactive `ZK` proof, the prover and verifier exchange messages. The
+indistinguishability concept ensures that, through these exchanges, the verifier
+learns nothing more than the fact that the statement is true. Each step of the
+interaction is designed such that it doesn't leak any extra information.
+
+This concept is also widely used in generic cryptographic applications.
+When constructing secure cryptographic protocols, taking into account 
+indistinguishability property ensures that different protocol paths or choices
+do not reveal additional information to potential adversaries.
+
+In general, indistinguishability property ensures that, while Victor (the judge)
+become convinced that I know the witness he doesn't learn any additional
+information as the proof presented by the Peggy is indistinguishable from
+random data.
+
+### Additional Takeaways
+
+Any `ZK` protocol must be run in an environment which preclude the feasibility
+of constructing either an *extractor* or a *simulator*. The existence of these
+tools fundamentally compromise the proof's *soundness* and *zero-knowledgeness*.
+
+If Victor is able to construct an *extractor* then it will be able to
+extract knowledge from the proof, and thus undermine *zero-knowledgeness.
+Conversely, if Peggy is able to construct a *simulator* she will be able to
+forge valid proofs without any knowledge, and thus undermine *soundness*.
+
+Since re-playing a protocol breaks the fundamental properties, we can't use
+a recording of the protocol execution to convince a third party about the
+authenticity of a proof. Such a party has no way to tell if the recorded
+execution is genuine or if the protocol steps were *edited* (which in practice
+is a way of rewinding the execution).
+
+Follows that in the context of a `ZKP` system Peggy is able to convince only the
+verifier who actively participates by executing the protocol interactively and
+in real-time.
+
+This limitation is often regarded as a feature of some ZKP systems and indeed
+reflects the pure definition found in the original paper.
 
 ### Commitment Protocols
 
-The only cryptographic tool used in the `ZKP` systems proposed in this paper
-is a **commitment protocol**
+TODO: Maintain this paragraph?
 
-A commitment protocol allows one party, the sender, to commit to a value to
-another party, the receiver, with the latter not learning anything meaningful
-about the value.
+In all the `ZKP` protocols discussed in this paper, the only overarching
+cryptographic required tool is a **commitment protocol**.
 
-Such a protocol consists of two phases.
+This protocol consists of two phases:
 
-The first is the commit phase, following which the sender is bound to some value v, while the
-receiver cannot determine anything useful about v. In particular, this means that the receiver
-cannot distinguish between the case v = b and v = b0 for all b and b0 . This property is called
-hiding. Later on, the two parties may perform a decommit or reveal phase, after which the receiver
-obtains v and is assured that it is the original value; in other words, once the commit phase has
-ended, there is a unique value that the receiver will accept in the reveal phase. This property is
-called binding.
-
-In the digital world, commitments can be based on any one-way function and are fairly efficient
-to implement. Both the computational complexity and the communication complexity of such
-protocols are reasonable and in fact one can amortize the work if there are several simultaneous
-commitments.
+1. **Commit Phase**. During this phase, the sender commits to a certain value
+   `v` without revealing its details to the receiver. Crucially, the receiver
+   should not be able to determine anything useful about `v`.
+2. **Reveal Phase**. Later on, the two parties may perform a reveal phase,
+   where the receiver learns the value of `v`. There should only one value of
+   `v` which is compatible with the committed value.
 
 A very simple commitment scheme example for a value `x` is to generate some
 random salt and share the value `c = Hash(salt || x)`. To open the commitment
 the value of `x` and the salt is revealed. This is secure under the assumption
 that the hash function is secure.
 
-### Additional Takeaways
+Both the computational complexity and the communication complexity of such
+protocols are reasonable and in fact one can amortize the work if there are
+several simultaneous commitments.
 
-The protocol must run in an environment where the construction of both an
-*extractor* or *simulator* is not possible. Allowing the construction of these
-tools clearly breaks the proof *soundness* and *zero-knowledgeness*.
-
-That is, if Victor is able to construct an *extractor* then it will be able to
-extract knowledge from the proof, and thus voids *zero-knowledgeness.
-If instead Peggy is able to construct a *simulator* then she will be able to
-generate valid proofs without any knowledge, and thus voids *soundness*.
-
-An important consequence is given that a re-played protocol breaks
-*zero-knowledgeness* and *soundness* properties, that we can't use a recording
-of the protocol execution to convince a third party about the authenticity of
-a proof.
-
-The third party has no way to tell if the recorded execution is genuine or if
-the protocol steps were *edited* (which in practice is a way of rewinding the
-execution).
-
-Peggy is able to convince only Victor who actively participates by executing the
-protocol interactively and in real-time.
-
-This is often a feature of ZKP systems. Indeed, the pure definition of
-interactive ZKP system Peggy wants to convince just Victor and not any third
-party.
-
-### Distinguishability for probability distributions
-
-Consider the family of random variables `U = { U(x) }` where the parameter `x`
-is from a language `L ⊆ {0,1}*`. All random variables take values in `{0,1}*`
-
-Let `U` and `V` be two families of random variables. 
-
-We sample a value `s` either from `U(x)` or `V(x)` and a judge should decide if
-`s ∈ U(x)` or if `s ∈ V(x)`.
-
-`U(x)` becomes **replaceable** with `V(x)` if the judge opinion becomes
-meaningless as `x` length increases. That is, its opinion will be random.
-
-There are two important parameters for the judge:
-- the *size* of the sample `s`;
-- the *time* he can take to decide.
-
-Two families or random variables `U` and `V` are:
-- **Equal**: if the judge verdict is meaningless regardless of the time he can
-  take and the size of the sample.
-- **Statistically indistinguishable**: if the verdict becomes meaningless if he
-  has infinite time but only samples with polynomial size with respect to `|x|`.
-- **Computationally indistinguishable**: if the verdict becomes meaningless if
-  both time and samples size values are polynomial with respect to `|x|`.
-
-For our purposes we'll consider **indistinguishable** any two families of random
-variables which are computationally indistinguishable.
-
-### Knowledge computable from a communication
-
-Informally a communication conveys knowledge if it transmits outputs of an
-infeasible computation, i.e. a computation which we cannot perform ourselves.
-
-We want to derive an upper bound (in bits) for the amount of knowledge that a
-polynomially bounded *verifier* can extract from the communcation.
-
-Any Turing machine `M` generates the ensemble `M[·] = {M[x]: x ∈ I}`. Where
-`M[x]` is the set of possible outputs of `M` for inputs `x ∈ I` taken with the
-probability distribution induced by `M`'s coin tosses.
-
-`(P,V)[·]` the ensemble associated to an interactive pair of Turing machines.
-
-**Definition**. Let `(P,V)` be an interactive pair of Turing machines and `I`
-the set of its inputs. Let `V` be polynomial time and `f: N → N` be a non-
-decreasing function.
-
-`P` communicates at most `f(n)` bits of knowledge to `V` if there exist a
-probabilistic polynomial-time machine `M` such that the `I`-ensembles `M[·]` and
-`(P,V)[·]` are at most `1-1/2^f(n)` distinguishable.
-
-`P` communicates `f(n)` bits of knowledge if for all poly-time ITM's `V'`, `P`
-communicates at most `f(n)` bits of knowledge of `V'`.
-
-For example with `f(n) = 0` we have that are 0-distinquishable.
-
-Example.
-
-A crime has happened. `V` is a reporter and `P` is a police officer. `P` tries
-to not communicate too much knowledge.
-
-If the knowledge doesn't exceed 2 bits then the conversation that the reporter
-will have with a police officer will be 3/4 distinguishable from a "real"
-conversation about the crime. ????????
+---
 
 ## Intuitive ZK Protocols
 
-While "toy-examples" exists, keep in mind that *real world* proofs are generally
-based on complex mathematical constructs and cryptographic primitives.
+While *real-world* `ZK` proofs often rely on intricate mathematical structures
+and cryptographic techniques, there are simpler, more intuitive examples that
+effectively convey the core principles of `ZK` proofs.
 
-In this section we present some of the most intuitive examples of `ZK`
+In this section, we'll present some of the most accessible and intuitive
 protocols. We start from the ones which doesn't require any technical knowledge
 but at the same time are good to relay the intuition and the power of `ZK`
 proofs.
 
-Some of the examples protocols have a quite high soundness error `ε`, however
-the protocols can be repeated indefinitely to increase the *verifier* confidence.
-
-### Where is Waldo?
+### Where is Waldo
 
 ["Where is Waldo?"](https://en.wikipedia.org/wiki/Where%27s_Wally%3F) is a famous
 kid's puzzle where, given a very detailed illustration with many different
 characters the goal is to find Waldo, the main character.
 
-The *prover* asserts he knows where Waldo is and should convince the *verifier*
-without revealing any additional information.
+Peggy asserts she knows where Waldo is and should convince Victor without
+revealing any additional information.
 
-A proof for the problem has been proposed by Naor and Reingold in their *"How
-To Convince Your Children You Are Not Cheating"*[^NR] paper and consists of a
-very simple and low tech protocol.
+*Moni Naor*, *Yael Naor* and *Omer Reingold*, in their *"How To Convince Your
+Children You Are Not Cheating"*[^NR], proposed an ingenious `ZK` proof or this
+problem.
 
 Given some illustration like:
 
 ![waldo-problem](/companions/zk-proofs/waldo-problem.png)
 
-Original Protocol (NR):
-- The *prover* covers the illustration with a big sheet of paper (bigger that
-  the one with the illustration) which has a little hole in the center. The hole
-  is positioned above Waldo in the illustration.
-- The *verifier* accepts if he sees Waldo through the hole.
+Original Protocol (as found in the paper):
+1. Peggy covers the illustration with a large sheet of paper (bigger that the
+   one with the illustration) which has a little hole in the center, positioned
+   exactly over Waldo's face.
+2. Victor is convinced if he sees Waldo through the hole.
 
 ![waldo-zk-proof](/companions/zk-proofs/waldo-zk-proof.png)
 
-Even if the verifier can't infer the position of Waldo in the illustration as its
-relative position is not known, this (non-interactive) protocol is not really sound.
-How can ensure the *verifier* that behind the cover there is the original
-illustration and not just another illustration or just the Waldo face?
+However, this initial protocol does not adequately address soundness concerns.
+How can the verifier be sure the covered illustration is the original one?
 
-Extended Protocol:
-- *Commitment*. The *prover* performs the same step as the original protocol
-  with the hole in a random place and not in the center, then he covers
-  everything with an even bigger sheet of paper, without any hole. The
-  illustration should be at a distance from the border at least equal to the
-  size of the white sheet of paper (to better hide relative positions during
-  the proof).
-- *Challenge*. The *verifier* toss a coin and depending on the result asks to
-  *prover* either to show the illustration by removing **together* both the
-  covers or to remove the bigger top cover to see Waldo face.
-- *Response*. The *prover* performs the requested action.
-- *Result*. The *verifier* accepts or reject based on the evidence.
+This is an extended protocol designed to be sound:
+1. Peggy covers the illustration with bigger sheet having a 
+   randomly positioned hole, then it covers this with an even bigger sheet
+   without any hole. The illustration should be at a distance from the border
+   at least equal to the size of the first sheet of paper (to better hide
+   relative positions during the proof).
+2. Victor flips a coin and depending on the outcome, asks to
+   Peggy either the removal of both layers to reveal the full illustration
+   or just the top layer to reveal Waldo through the hole.
+3. Peggy complies with the challenge.
+4. Victor accepts or reject based on the evidence.
 
-This new protocol is both sound and zero-knowledge as is possible to construct
-*an extractor* and a *simulator* for it.
+This new protocol is both sound and zero-knowledge as it makes possible to
+construct both an *extractor* and a *simulator*.
 
-In one run, the protocol has soundness error `ε = 1/2`.
+In one run, the soundness error is `ε = 1/2`, meaning that Peggy has a 50%
+change to cheat.
+
+--- RESTART HERE --
 
 ### The Ali Baba Cave
 
@@ -1362,14 +1373,12 @@ polynomial time.
 
 - [BFM88] Manuel Blum, Paul Feldman, and Silvio Micali. [Non-Interactive Zero-knowledge and Its Applications](https://dl.acm.org/doi/10.1145/62212.62222).
 
-- [WAL] Moni Naor, Yael Naor, Omer Reingold. [How to Convince Your Children You Are Not Chaeating](http://www.wisdom.weizmann.ac.il/~naor/PAPERS/waldo.pdf) (1999).
+- [NR] M.Naor, Y.Naor, O.Reingold. [How to Convince Your Children You Are Not Cheating](http://www.wisdom.weizmann.ac.il/~naor/PAPERS/waldo.pdf) (1999).
 
 - [FS] Amos Fiat, Adi Shamir. [How To Prove Yourself](https://link.springer.com/chapter/10.1007/3-540-47721-7_12)
 
 - [LFKN] C. Lund, L. Fortnow, H. Karloff, and N. Nisan. Algebraic methods for interactive proof systems. In Proceedings of the 31st Annual Symposium on Foundations of Computer Science, pages 2–10. IEEE, 1990.
 
 - [SH] A. Shamir. IP = PSPACE. In Proceedings [1990] 31st Annual Symposium on Foundations of Computer Science, pages 11–15. IEEE, 1990.
-
-- [NR] M.Noar, Y.Noar, O.Reingold - [How to Convince Your Children You Are Not Cheating](https://www.wisdom.weizmann.ac.il/~naor/PAPERS/waldo.pdf)
 
 - [GNPR] R.Gradwhol, M.Naor, B.Pinkas, G.Rothblum - [Cryptographic and Physical Zero Knowledge Proof Systems for Solutons of Sudoku Puzzles](https://link.springer.com/article/10.1007/s00224-008-9119-9)
