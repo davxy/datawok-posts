@@ -211,13 +211,13 @@ actively exchanging messages.
 
 The concept was first proposed in the mid-1980s by *Shafi Goldwasser*,
 *Silvio Micali*, and *Charles Rackoff* in their seminal paper "The Knowledge
-Complexity of Interactive Proof Systems" [GMR85]. This paper not only
+Complexity of Interactive Proof Systems" [GMR]. This paper not only
 introduced interactive proofs but also presented the first formal definition of
 zero-knowledge proofs.
 
 Is worth noting that Laszlo Babai independently contributed to the development
 of this field approximately during the same period with his paper "Trading Group
-Theory for Randomness"[^BAB].
+Theory for Randomness"[BAB].
 
 In `IP` systems, the complete ordered sequence of messages exchanged during the
 protocol is referred to as the **transcript**. Two runs of the same protocol
@@ -460,7 +460,7 @@ without the need for Peggy to share the entire solution (`ZK` proofs).
 ### Arthur-Merlin Protocols
 
 An [Arthur-Merlin](https://en.wikipedia.org/wiki/Arthur-Merlin_protocol) protocol,
-initially introduced by Babai [BAB85] in 1985, is an `IP` system with the
+initially introduced by Babai [BAB] in 1985, is an `IP` system with the
 additional constraint that the *prover* and the *verifier* share the same
 randomness source.
 
@@ -594,7 +594,7 @@ required to validate a statement*.
 
 The concept of Zero-Knowledge Proofs (ZKP) was first rigorously defined in the
 1980s by *Shafi Goldwasser*, *Silvio Micali*, and Rackoff in their seminal paper
-GMR85 (notably, the same paper that introduced Interactive Proof systems).
+[GMR] (notably, the same paper that introduced Interactive Proof systems).
 
 Before the GMR paper, most of the effort on `IP` systems area focused on
 the *soundness* of the protocols. That is, the sole conceived weakness was a
@@ -797,6 +797,11 @@ protocols. We start from the ones which doesn't require any technical knowledge
 but at the same time are good to relay the intuition and the power of `ZK`
 proofs.
 
+Except for instances where specifically indicated otherwise, the protocols
+discussed are both sound and zero-knowledge. This is because it is feasible
+(and often straightforward) to construct both an *extractor* and a *simulator*
+for them.
+
 ### Where is Waldo
 
 ["Where is Waldo?"](https://en.wikipedia.org/wiki/Where%27s_Wally%3F) is a famous
@@ -835,247 +840,266 @@ This is an extended protocol designed to be sound:
    Peggy either the removal of both layers to reveal the full illustration
    or just the top layer to reveal Waldo through the hole.
 3. Peggy complies with the challenge.
-4. Victor accepts or reject based on the evidence.
-
-This new protocol is both sound and zero-knowledge as it makes possible to
-construct both an *extractor* and a *simulator*.
+4. Victor is convinced based on the evidence.
 
 In one run, the soundness error is `ε = 1/2`, meaning that Peggy has a 50%
 change to cheat.
 
---- RESTART HERE --
+### Ali Baba Cave
 
-### The Ali Baba Cave
+This protocol is a real classic when explaining the basics `ZKP` protocols.
+It originates from the Kean-Jacques Quisquater's paper *"How to Explain
+Zero-Knowledge Protocols to Your Children"*[^QUI].
 
-This protocol is a classic when explaining the basics `ZKP` protocols and is
-due to *Quisquater* and others in their paper *"How to Explain Zero-Knowledge
-Protocols to Your Children"*[^QUI].
-
-To summarize, the story is about Ali Baba and a cave with one entrance which in
-the middle bisects in two. The two branches are in the end connected via a magic
-door which opens with a magic spell. Ali Baba knows the spell and can prove it.
+The story is about *Ali Baba*, who knows the magic spell to open a secret door
+in a cave. The cave has a single entrance and splits into two paths, which
+reconnect at the end through this magic door. Ali Baba can prove his knowledge
+of the spell without revealing it.
 
 Protocol:
-- *Commitment*. Ali Baba enters the cave while the *verifier* wait outside and
-  takes one of the two paths, randomly.
-- *Challenge*. The *verifier* enters the cave and goes to the bisection. Toss
-  a coin and depending on the result will ask Ali Baba to come out from one of
-  the paths.
-- *Response*. Ali Baba satisfy the *verifier* request as, if required, he can
-  open the magic door.
-- *Result*. The *verifier* checks the expectation.
+1. Ali Baba enters and randomly takes one of the two paths, while Victor waits
+   outside.
+2. Victor enters the cave, goes to the bisection, flips a coin, and based on
+   the outcome, asks Ali Baba to come out from a specific path.
+3. Ali Baba complies with the Victor's request, using the magic door if necessary.
+4. Victor is convinced or not based on the evidence.
 
 ![ali-baba-cave](/companions/zk-proofs/ali-baba-cave.png)
 
-In one run, the protocol has soundness error `ε = 1/2`.
+For one run, the protocol soundness error is `ε = 1/2`.
 
-Notice that Peggy could prove to Victor that she knows the magic word, without
-revealing it to him, in a single trial. If both Victor and Peggy go together
-to the mouth of the cave, Victor can watch Peggy go in through A and come out
-through B. This would prove with certainty that Peggy knows the magic word,
-without revealing the magic word to Victor. However, such a proof could be
-observed by a third party, or recorded by Victor and such a proof would be
-convincing to anybody. In other words, Peggy could not refute such proof by
-claiming she colluded with Victor, and she is therefore no longer in control of
-who is aware of her knowledge.
+It is worth noting that if both parties go to the cave entrance together, Victor
+can observe Ali Baba entering one path and exiting from another, confirming
+his knowledge in one single run (`ε = 0`). However, this approach doesn't align
+with the pure definition of `ZK` proof which should be tailored to convince only
+Victor. The possibility of third parties observing or Victor recording the event
+would extend the proof's validity beyond the intended verifier.
+
+TODO: proof of soundness? How can we construct an extractor?
 
 ### Sudoku
 
-The general problem of solving a Sudoku puzzle with `n²⨯n²` cells of `n⨯n`
-blocks is known to be NP-complete.
+Sudoku puzzles, particularly the `n²⨯n²` variants with `n⨯n` blocks, are an
+interesting case study in `ZKP`s, as these problems are `NP`-complete.
 
-Finding a solution to this problem is considered hard, while verifying it
-is an easy task.
+Given a Sudoku puzzle instance Peggy wants to convince Victor that she knows
+the solution without revealing it.
 
-Given a Sudoku puzzle the *prover* wants to convince the *verifier* that he
-knows the solution.
-
-The protocol has been officially proposed by Ronen Gradwhol et.all in the
-paper *Cryptographic and Physical Zero Knowledge Proof Systems for Solutons of
-Sudoku Puzzles* [^GNPR]
-
-There is a very good visual demonstration of the protocol at this [link](https://www.wisdom.weizmann.ac.il/~naor/PAPERS/SUDOKU_DEMO)
+The following protocol has been officially formally by *Ronen Gradwhol* et
+al. in the paper *Cryptographic and Physical Zero Knowledge Proof Systems for
+Solutons of Sudoku Puzzles*[^1] [GNPR].
 
 Protocol:
-- *Commitment*. The *prover* places three cards on each cell. On filled-in cells
-  of the puzzle he places three cards with the assigned value, faced up (this
-  can be done by the *verifier* as well). On the rest of the cells the *prover*
-  places the cards according to the solution, faced down.
-- *Challenge*. For each row, column and subgrid, the *verifier* chooses (at
-  random) one of the three cards of each cell in the corresponding row/column/
-  subgrid and makes 27 packets out of the chosen cards (9 rows + 9 columns +
-  9 subgrids).
-- *Response*. The *prover* shuffles each of the 27 packets separately, and hands
-  the shuffled packets to the verifier.
-- *Result*. The *verifier* checks that in each packet all numbers appear.
+1. Peggy places three cards on each cell of the Sudoku grid. Pre-filled cells
+   she places three cards with the assigned value, face-up. For other cells,
+   she places the cards according to the solution, face-down.
+2. Victor randomly selects one of the three cards from each cell across every
+   row, column and subgrid, creating 27 groups of cards.
+3. Peggy shuffles each group independently, and gives the shuffled groups to
+   Victor.
+4. Victor checks that each group contains all numbers from 1 to 9.
 
 The soundness error for this protocol is `ε = 1/9`. The proof is a bit involved
-and not reported here.
-
-The protocol is also zero-knowledge as for any verifier a simulator can be
-easily constructed by first observing what are the *verifier*'s chosen cards
-by then re-running the protocol with the cards positioned ad-hoc to pass the
-verification step.
+and not reported here for conciseness.
 
 The puzzle can be easily expressed as a graph coloring problem. For example,
-3⨯3 Sudoku is mapped to a graph with `81` vertices, one vertex for each cell.
+`3²⨯3²` variant is mapped to a graph with `81` vertices, one vertex for each cell.
 
-The vertices are labeled with ordered pairs `(x,y)`, where `x` and `y` are integers
-between `1` and `9`. Two distinct vertices labeled by `(x₁,y₁)` and `(x₂,y₂)`
-are joined by an edge if and only if:
+The vertices are labeled with ordered pairs `(x,y)`, where `x` and `y` are
+integers between `1` and `9`. Two distinct vertices labeled by `(x₁,y₁)` and
+`(x₂,y₂)` are joined by an edge if and only if:
 - `x₁ = x₂` (same column) or,
 - `y₁ = y₂` (same row) or,
-- `⌈x₁/3⌉ = ⌈x₂/3⌉` and `⌈y₁/3⌉ = ⌈y₂/3⌉` (same `3⨯3` block)
+- `⌈x₁/3⌉ = ⌈x₂/3⌉` and `⌈y₁/3⌉ = ⌈y₂/3⌉` (same `3⨯3` subgrid)
 
-A valid solution assigns an integer between `1` and `9` (the colors) to each
+A valid solution assigns an integer between `1` and `9` (the color) to each
 vertex, such that vertices that are joined by an edge do not have the same
 integer assigned to them.
 
 Sudoku solution grid is also a [Latin square](https://en.wikipedia.org/wiki/Latin_square)
 There are significantly fewer Sudoku grids than Latin squares because Sudoku
-imposes additional regional constraints.
+imposes the additional subgrid constraints.
 
 ### Graph Three Coloring
 
-The [problem](http://en.wikipedia.org/wiki/Graph_coloring) is about deciding if
-a given graph vertices can be colored such that no two adjacent vertices have
-the same color.
+The generic [graph coloring](http://en.wikipedia.org/wiki/Graph_coloring)
+problem is about deciding if a given graph vertices can be colored such that no
+two adjacent vertices share the same color.
 
-The protocol has been introduced by the Goldreich, Micali and Wigderson in (GMW2)
-and allows proving that we know a solution to the three coloring in ZK.
+Given a graph Peggy wants to convince Victor that she knows the solution for
+the graph three coloring problem for it, which is a specialization of the
+generic problem which only three colors are allowed.
 
-The solution is independent of the specific colors.
+The following `ZK` protocol has been introduced by the *Oded Goldreich*, *Silvio
+Micali* and *Avi Wigderson* in the *"All Languages in NP Have Zero-Knowledge
+Proof Systems"*[GMW2] paper and allows proving that we know a solution to the
+three coloring in ZK.
 
 Protocol:
-- *Commitment*. The *prover* draws the graph, assigns to the solution the colors
-  randomly and covers the vertices with hats.
-- *Challenge*. The *verifier* asks the *prover* to reveal the color of two
-  adjacent vertices of its choice.
-- *Response*. The *prover* will reveal the colors behind the chosen vertices.
-- *Result*. If the colors are not equal the *verifier* accepts.
+1. Peggy draws the graph, assigns to the solution the colors randomly and covers
+   each vertex with a hat.
+2. Victor randomly selects two adjacent vertices and aks Peggy to reveal their
+   colors.
+3. Peggi reveals the colors of the selected vertices.
+4. Victor accepts or reject the proof based on the evidence.
 
-Given a graph with `E` edges, the soundness error probability is `ε = (E-1)/E`.
-As usual, this value can be reduced arbitrarily by repeating the protocol.
+Even if Victor takes notes between runs, there is no way for him to link the
+data as on each run the colors are randomly assigned according to the solution.
+
+Given `E` the number of edges in the graph, since Victor checks only one out of
+the `E` possible ones, the soundness error probability is `ε = (E-1)/E`.
+
+The error approaces to `1` quite fast with the number of edges. Even though this
+value can be reduced arbitrarily by repeating the protocol, it is also quite
+expensive to be performed in practice.
 
 For example, if `E = 1000` and the *verifier* wants `ε < 0.1` then the protocol
 should be iterated for `k` rounds where `(999/1000)ᵏ < 1/10` → `k > 2301`.
 
-As for the *verifier*, even if he takes notes between runs, there is no way for
-him to link the data as on each run the colors are randomly assigned according
-to the solution.
+However, from a theoretical point of view this problem is quite important as  it
+is an `NP` complete problem, which means that we can construct a `ZK` proof for
+any problem in `NP`.
 
 You can find a nice app showing this proof in action [here](http://web.mit.edu/~ezyang/Public/graph/svg.html).
 
 ### Proofs for all NP
 
-The problems proofs presented above may not be very interesting per-se but
-some of them, such as the *graph three coloring problem* are well known NP-
-complete problems.
+While the specific examples provided earlier might seem limited in their direct
+application, some of them, such as the *Graph Three Coloring* problem, are
+`NP`-complete.
 
-What this means is that **any other** NP problem can be translated to an
-instance to the three-coloring problem, and thus there exist a ZK-proof for any
-problem in NP.
+The implication is profound: **any** problem in the `NP` class can theoretically
+be converted into an instance of the *Graph Three Coloring*, and thus a `ZKP`
+exists for every problem in `NP`.
 
-Obviously, the naive approach of taking an NP problem and translating it to
-the three-coloring problem to provide a ZK-proof works but is very expensive
-and for some problems more specialized solutions exists.
+The typical method for such a transformation begins with reformulating the `NP`
+problem into a Boolean circuit. This circuit is designed to generate a "true"
+output if and only if the input represents a correct solution to the original
+`NP` problem. Subsequently, this Boolean circuit is converted into a graph.
+The construction of this graph ensures that finding a valid three-coloring
+correlates directly with solving the original `NP` problem.
 
-(TODO: remove...) The transformation of an NP problem to the graph is probably
-performed by first mapping the problem into a boolean circuit which is satisfied
-iff we know the correct input. The circuit is then mapped into a graph.
+While it's theoretically feasible, this approach is often not practical. The
+transformation process can be computationally expensive, not to mention the
+high soundness error of the *Graph Tree Coloring* problem. Therefore, in
+practice, where possible more specialized and efficient approaches are employed
+for specific `NP` problems.
+
+---
 
 ## More Abstract ZK Protocols
 
 ### Graph Isomorphism
 
-A more abstract example of a `ZKP` is the *Graph Isomorphism Problem* (`GI`).
+Two graphs `G₀` and `G₁` are isomorphic if a bijective mapping `f: G₀ → G₁`
+exists such that for any edge `(v,w)` in `G₀` there is a corresponding edge
+`(f(v),f(w))` in `G₁`.
 
-Two graphs `G₀` and `G₁` are isomorphic if there is a bijective mapping `f: G₀ →
-G₁` such that for all the edges `(v,w) ∈ G₀` iff `(f(v),f(w)) ∈ G₁`.
-
-If two graphs are isomorphic, find an isomorphism problem is in `NP` but, at the
+The problem about determining if two graphs is known to be in `NP`, but at the
 current state of knowledge, not `NP`-complete.
 
-In this context, the *prover* wants to prove that two graphs `G₀` and `G₁` are
-isomorphic without revealing the mapping `G₁ = f(G₀)`.
+For this problem, Peggy aims to prove that `G₀` and `G₁` are isomorphic without
+revealing the specific mapping `f` such that `G₁ = f(G₀)`.
 
-The proposed protocol has been introduced by the Goldreich, Micali and Wigderson
-([GMW2]) and uses a permutation of the vertices `π` as the bijective mapping.
+That is, that the (G₁,G₂) couple belongs to he following language:
+
+    GI = { (G₁,G₂) | G₁ and G₂ are isomorphic }
+
+The following `ZK` protocol has been introduced by the *Oded Goldreich*, *Silvio
+Micali* and *Avi Wigderson* in the *"All Languages in NP Have Zero-Knowledge
+Proof Systems"*[GMW2] paper and allows proving that we know such mapping.
 
 Protocol:
-- *Commitment*. The *prover* choses a random `a ∈ {0,1}`, a random permutation
-  `π₀` and sends `H = π₀(Gₐ)` (permutation of `G₀` or `G₁`) to the *verifier*.
-- *Challenge*. The *verifier* choses a random `v ∈ {0,1}` and sends it to the *prover*.
-- *Response*. The *prover* sends a permutation `π₁` such that `π₁(H) = Gᵥ`.
-- *Result*. The *verifier* checks if `π₁` gives the expected result.
+1. Peggy selects a random bit `p ∈ {0,1}`, a random permutation `πₓ` and sends
+   `H = πₓ(Gₚ)` (permutation of `G₀` or `G₁`) to Victor.
+2. Victor selects a random bit `v ∈ {0,1}` and sends it to Peggy.
+3. Peggy sends the permutation `πᵧ` such that `πᵧ(H) = Gᵥ`.
+4. Victor checks if `πᵧ` gives the expected result.
 
-For one single protocol run the soundness error is `ε = 1/2`.
+For one run, the protocol has soundness error `ε = 1/2`.
 
-- *Completeness*: if `G₀` and `G₁` are isomorphic then doesn't matter what `bᵥ`
-  is, the *prover* will always send a valid permutation.
-- *Soundness*: the *verifier* constructs an *extractor* by sending `bᵥ = 0`,
-  to get `π₁` which maps `H` to `G₀`. Then he re-execute from the *challenge*
-  by sending `bᵥ = 1`, to get `π₁'` which maps `H` to `G₁`. He then recovers the
-  isomorphism permutation from `G₀` to `G₁` as `π = π₁·π₁'`.
-- *Zero knowledgeness*: the *prover* constructs a *simulator* which sends
-  `H = π₀(G₀)`, if the *verifer* sends `bᵥ = 1` he re-executes the protocol by
-  sending `H = π₀(G₁)`.
+- *Soundness* proof: Victor constructs an *extractor* by sending `v = 0`, to
+  get `πᵧ₀` which maps `H` to `G₀`. Then, he re-execute the protocol from step
+  2 (challenge) by sending `v = 1`, to get `πᵧ₁` which maps `H` to `G₁`. He
+  recovers the isomorphism `f` as `π = πᵧ₁·πᵧ₀`.
+
+- *Zero knowledgeness* proof: Peggy constructs a *simulator* which sends
+  `H = πₓ(G₀)`, if then Victor sends `bᵥ = 1` then Peggy re-executes the
+  protocol by sending `H = πₓ(G₁)`. She responds to the challenge with `πₓ`.
 
 ### Graph Non-Isomorphism
 
-The `GNI` problem is the complement of `GI` problem, thus is in `co-NP` (note
-that at the current state of knowledge is not known whether `NP = co-NP`, that
-is a complement of a problem in `NP` may not be in `NP`).
+The *Graph Non-Isomorphism* problem is the complement of the *Graph Isomorphism*
+one, thus falls in the `co-NP` complexity class.
 
-Unlike the `GI` problem, where if we ignore the `ZK` property, it can be solved
-using a traditional proof system by simply sharing the permutation `π` to map
-`G₀` to `G₁`, the `GNI` problem based on our current knowledge is not in `NP`
-and can't be solved without an `IP` system.
+The problem is about checking if a pair `(G₁,G₂)` belongs to the language:
 
-To prove the graph non-isomorphism, the *prover* uses its infinite resources.
+    GNI = { (G₁,G₂) | G₁ and G₂ are not isomorphic }
+
+This is of particular interest since, unlike the `GI` language where, if we
+ignore the `ZK` property, it can be solved using a traditional proof system
+by sharing the mapping `f` from `G₀` to `G₁`, the `GNI` problem based on our
+current knowledge can't be solved without an `IP` system.
+
+The protocol for proving knowledge of graph non-isomorphism has been proposed
+in the same paper which proposed the protocol to prove knowledge of graph
+isomorphism. This protocol requires the *prover* to use its infinite resources.
 
 Protocol:
-- *Challenge*. The *verifier* choses a random `a ∈ {0,1}`, a random permutation
-  `π` and sends `H = π(Gₐ)` to the *prover*.
-- *Response*. The *prover*, using its infinite computing power can infer
-  if `H` is a permutation of `G₀` or `G₁` (can't be of both as they are not
-  isomorphic). Thus sends to the *verifier* the bit `b`
-- *Result*. The *verifier* accepts if `a = b`.
+1. Victor selects a random bit `a ∈ {0,1}`, a random permutation `π` and sends
+  `H = π(Gₐ)` to Peggy.
+2. Peggy using its unbounded computational power determines whether `H` is a
+   permutation of `G₀` or `G₁` (can't be of both as they are not isomorphic).
+   Thus sends to Victor the bit `b`
+3. Victor accepts the proof if `a = b`.
 
 For one single protocol run the soundness error is `ε = 1/2`.
 
 Note that this protocol doesn't make use of a commitment and indeed its `ZK`
-property is a bit flawed. The *verifier* can send any random `H` and use the
-*prover* as an oracle to understand if is a permutation of one of the two
-graphs.
+property is a bit flawed. Victor can send any random `H` and use Peggy as an
+oracle to gain knowledge if `H` is a permutation of one of the two graphs.
 
-Is essential that the randomness `(a, π)` of the *verifier* is hidden from the
-*prover*. Otherwise, the soundness of the protocol will fall apart as well.
+The way to fix this is to require first Victor to prove to Peggy that he knows
+an isomorphism between his query graph `H` and one of the two input graphs. This
+is done using a parallel version of the `GI` proof protocol (refer to section
+2.3 of [GMW2] for the full description).
 
-### QR Protocol
+### Quadratic Residue
 
-The *verifier* wants to prove that `x ∈ Zn*` is a quadratic residue given that
-he knows `w ∈ Zn*` such that `w² = x`.
+A quadratic residue modulo `n` is an integer `x` such that there exists an
+integer `w` where `w² = x`.
+
+Peggy wants to prove that `x ∈ Zn*` is an element of the language:
+
+    QR = { x | x is a quadratic residue }
+
+The following protocol has been proposed by Goldwasser, Micali and Rackoff in
+their GMR paper.
 
 Protocol:
-- *Commitment*. Peggy chooses a random `r ∈ Zn*` and sends `y = r²`.
-- *Challenge*. Victor tosses a coin, chooses `b ∈ {0,1}` and sends it.
-- *Response*. If `b = 0` then Peggy sends `z = r` else she sends `z = r·w`.
-- *Result*. Victor accepts if:
+1. Peggy chooses a random `r ∈ Zn*` and sends `y = r²`.
+2. Victor tosses a coin, chooses `b ∈ {0,1}` and sends it.
+3. If `b = 0` then Peggy sends `z = r` else she sends `z = r·w`.
+4. Victor accepts if:
   - `b = 0` and `z² = y`, or
   - `b = 1` and `z² = x·y`
 
-For on run, the soundness error probability is `ε = 1/2`.
+For one run, the soundness error probability is `ε = 1/2`.
 
-- *Completeness*. If `x` is a quadratic residue then Victor will be definitely
-  convinced.
-- *Soundness*. Victor can construct an *extractor* which rewinds the protocol
+- *Soundness* proof. Victor can construct an *extractor* which rewinds the protocol
   execution to send to Peggy both `1` and `0` for the same run. It will thus
   acquire both `r` and `r·w` which allows recovering `w = r⁻¹·(r·w)`.
-- *Zero Knowledge*. Peggy can construct a *simulator* such that if Victor's
-  challenge is `1`, then rewinds the protocol execution, uses as *commitment*
+- *Zero Knowledgeness* proof. Peggy can construct a *simulator* such that if
+  Victor's challenge is `1`, then she rewinds the protocol execution to commit
   `y = r²·x⁻¹` and as challenge *response* `z = r`.
   In this way `x·y = x·(r²·x⁻¹) = r² = z²` satisfies Victor's check.
+
+As for `GI`, we can prove the complement the `QR` language, known as `QNR`.
+You can refer to this protocol in the GMR paper. (TODO: add paragraph reference)
+
+---
+
+--- RESTART HERE ---
 
 ## Cryptographic ZK Protocols
 
@@ -1092,14 +1116,14 @@ The context is in the realm of public key cryptography that relies on the
 hardness of the discrete logarithm problem.
 
 Given a cyclic group `G` with prime order `q` and generator `g`, Peggy wants to
-prove to Victor that he knows the discrete logarithm `x ∈ Zq*` for some number
+prove to Victor that she knows the discrete logarithm `x ∈ Zq*` for some number
 `y = gˣ ∈ G` without revealing any additional information.
 
 Protocol:
-- *Commitment*. Peggy picks a random `k ∈ Zq*` and sends `r = gᵏ`.
-- *Challenge*. Victor picks a random `c ∈ Zq*` and sends it.
-- *Response*. Peggy computes `s = x·c + k mod q` and sends it.
-- *Result*. Victor accepts if `yᶜ·r = gˢ = g^(x·c + k)`.
+1. Peggy picks a random `k ∈ Zq*` and sends `r = gᵏ`.
+2. Victor picks a random `c ∈ Zq*` and sends it.
+3. Peggy computes `s = x·c + k mod q` and sends it.
+4. Victor accepts if `yᶜ·r = gˢ = g^(x·c + k)`.
 
 Security considerations:
 - Peggy can't cheat as the only way to construct a valid `s` is to know `x`. If
@@ -1228,7 +1252,7 @@ binding a message `m` to the challenge `c`:
 
 The rest of the scheme works as the Schnorr NIZK proofs
 
-### Zero Knowledge Proofs of Computation
+### Proofs of Computation
 
 DRAFT
 
@@ -1255,19 +1279,9 @@ category of trustless computing.
 - Light clients verification
 
 
+---
 
-## Appendix
-
-### Relationship to Entropy (mia idea ... sbagliata?)
-
-We can express ZK proofs using entropy.
-
-If `s` is some secret information and `H(s)` is the entropy associated to its
-value. Then a proof `p` is zero knowledge if `H(s) = H(s|p)`.
-
-That is, the proof doesn't leak any bit of information.
-
-The mutual information is thus `I(s;p) = H(s) - H(s|p) = 0`.
+## Appendix (TODO Remove)
 
 ### Complexity Classes
 
@@ -1296,12 +1310,9 @@ resources required during computation to solve a given problem. The most common
 resources are time (how many steps it takes to solve a problem) and space (how
 much memory it takes to solve a problem).
 
-### Random Oracle Model
+---
 
-TODO: some notes inspired by Matthew Green article
-
-
-## Insights to integrate
+## Insights to integrate (TODO remove)
 
 Proving an NP-statement `x` is equivalent of saying that `x ∈ L` with `L` a
 language such that `L ⊆ NP`.
@@ -1342,24 +1353,13 @@ polynomial time.
 - Identification protocols: originating from work of Fiat and Shamir.
   An alternative approach is through digital signatures (TODO: WHY DIG SIG are not ZK)
 
+---
 
-## Lightweight Readings
+## Bibliography
 
-- [Zero Knowledge Proofs - An Illustrated Primer](https://blog.cryptographyengineering.com/2014/11/27/zero-knowledge-proofs-illustrated-primer) - Matthew Green (2014)
+- [GMR] S.Goldwasser, S.Micali, C.Rackoff - [The Knowledge Complexity of Interactive Proof-Systems](https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf). 1985.
 
-- [What is the Random Oracle Model and why should you care](https://blog.cryptographyengineering.com/2011/09/29/what-is-random-oracle-model-and-why-3/) - Matthew Green (2011)
-
-- [Zero Knowledge Proofs](https://www.cs.princeton.edu/courses/archive/fall07/cos433/lec15.pdf) - Boaz Barak (2007)
-
-- https://zkproof.org/
-
-- https://github.com/ZeroKnowledgefm/ZeroKnowledgeBasics
-
-## References
-
-- [GMR85] S.Goldwasser, S.Micali, C.Rackoff - [The Knowledge Complexity of Interactive Proof-Systems](https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf).
-
-- [BAB85] L.Babai - [Trading group theory for randomness](https://dl.acm.org/doi/10.1145/22145.22192).
+- [BAB] L.Babai - [Trading group theory for randomness](https://dl.acm.org/doi/10.1145/22145.22192). 1985
 
 - [GS] S.Goldwasser and M.Sipser - [Private coins versus public coins in interactive proof systems](https://pages.cs.wisc.edu/~jyc/710/Goldwasser-Sipser.pdf). In Proceedings of the eighteenth annual ACM symposium on Theory of computing, pages 59–68. ACM, 1986.
 
@@ -1367,7 +1367,7 @@ polynomial time.
 
 - [GMW2] O.Goldreich, Silvio Micali, Avi Wigderson. [All Languages in NP Have Zero-Knowledge Proof Systems](https://www.researchgate.net/publication/220431215_Proofs_that_Yield_Nothing_But_Their_Validity_for_All_Languages_in_NP_Have_Zero-Knowledge_Proof_Systems). (1991)
 
-- [QUI] [How to Explain Zero-Knowledge Protocols to Your Children](https://www.researchgate.net/publication/221355016_How_to_Explain_Zero-Knowledge_Protocols_to_Your_Children) - Kean-Jacques Quisquater et.all (1989)
+- [QUI] K.J Quisquater. [How to Explain Zero-Knowledge Protocols to Your Children](https://www.researchgate.net/publication/221355016_How_to_Explain_Zero-Knowledge_Protocols_to_Your_Children) (1989)
 
 - [PET] [Why and How zk-SNARK Works](https://arxiv.org/pdf/1906.07221.pdf) - Maksym Petkus (2019)
 
@@ -1382,3 +1382,6 @@ polynomial time.
 - [SH] A. Shamir. IP = PSPACE. In Proceedings [1990] 31st Annual Symposium on Foundations of Computer Science, pages 11–15. IEEE, 1990.
 
 - [GNPR] R.Gradwhol, M.Naor, B.Pinkas, G.Rothblum - [Cryptographic and Physical Zero Knowledge Proof Systems for Solutons of Sudoku Puzzles](https://link.springer.com/article/10.1007/s00224-008-9119-9)
+
+
+[^1]: good visual demonstration of the protocol can be found [here](https://www.wisdom.weizmann.ac.il/~naor/PAPERS/SUDOKU_DEMO)
