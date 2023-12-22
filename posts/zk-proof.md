@@ -441,10 +441,10 @@ This class can be further divided based on the protocol's characteristics. For
 instance, `IP[k]` denotes the class of languages that can be decided by an
 interactive proof with `k` rounds.
 
-At the beginning of 90s, Carsten Lund, Lance Fortnow, Howard Karloff and Noam
-Nisan [LFKN] proved that `PH ⊂ IP`, which shows that interactive proofs can be
-very powerful as they contain the union of all complexity classes in *polynomial
-hierarchy*, including `P`, `NP`, [`co-NP`](https://en.wikipedia.org/wiki/Co-NP).
+At the beginning of 90s, Lund, Fortnow, Karloff and Nisan [LFKN] proved that
+`PH ⊂ IP`, which shows that interactive proofs can be very powerful as they
+contain the union of all complexity classes in *polynomial hierarchy*, including
+`P`, `NP`, [`co-NP`](https://en.wikipedia.org/wiki/Co-NP).
 
 Shortly later, Adi Shamir [SH] proved that in fact `IP = PSPACE`, which gave a
 complete characterization of the capabilities of interactive proofs.
@@ -811,8 +811,7 @@ characters the goal is to find Waldo, the main character.
 Peggy asserts she knows where Waldo is and should convince Victor without
 revealing any additional information.
 
-*Moni Naor*, *Yael Naor* and *Omer Reingold*, in their *"How To Convince Your
-Children You Are Not Cheating"*[^NR], proposed an ingenious `ZK` proof or this
+M.Naor, Y.Naor and Reingold [NR], proposed an ingenious `ZK` proof or this
 problem.
 
 Given some illustration like:
@@ -847,14 +846,14 @@ change to cheat.
 
 ### Ali Baba Cave
 
-This protocol is a real classic when explaining the basics `ZKP` protocols.
-It originates from the Kean-Jacques Quisquater's paper *"How to Explain
-Zero-Knowledge Protocols to Your Children"*[^QUI].
-
-The story is about *Ali Baba*, who knows the magic spell to open a secret door
+The story is about Ali Baba, who knows the magic spell to open a secret door
 in a cave. The cave has a single entrance and splits into two paths, which
 reconnect at the end through this magic door. Ali Baba can prove his knowledge
 of the spell without revealing it.
+
+The following protocol, introduced by Quisquater [QUI], is very popular and
+perhaps the most frequently used to introduce newcomers to the basics of `ZK`
+protocols.
 
 Protocol:
 1. Ali Baba enters and randomly takes one of the two paths, while Victor waits
@@ -874,8 +873,6 @@ his knowledge in one single run (`ε = 0`). However, this approach doesn't align
 with the pure definition of `ZK` proof which should be tailored to convince only
 Victor. The possibility of third parties observing or Victor recording the event
 would extend the proof's validity beyond the intended verifier.
-
-TODO: proof of soundness? How can we construct an extractor?
 
 ### Sudoku
 
@@ -932,7 +929,7 @@ generic problem which only three colors are allowed.
 
 The following `ZK` protocol has been introduced by the *Oded Goldreich*, *Silvio
 Micali* and *Avi Wigderson* in the *"All Languages in NP Have Zero-Knowledge
-Proof Systems"*[GMW2] paper and allows proving that we know a solution to the
+Proof Systems"*[GMW] paper and allows proving that we know a solution to the
 three coloring in ZK.
 
 Protocol:
@@ -1007,7 +1004,7 @@ That is, that the (G₁,G₂) couple belongs to he following language:
 
 The following `ZK` protocol has been introduced by the *Oded Goldreich*, *Silvio
 Micali* and *Avi Wigderson* in the *"All Languages in NP Have Zero-Knowledge
-Proof Systems"*[GMW2] paper and allows proving that we know such mapping.
+Proof Systems"*[GMW] paper and allows proving that we know such mapping.
 
 Protocol:
 1. Peggy selects a random bit `p ∈ {0,1}`, a random permutation `πₓ` and sends
@@ -1062,7 +1059,7 @@ oracle to gain knowledge if `H` is a permutation of one of the two graphs.
 The way to fix this is to require first Victor to prove to Peggy that he knows
 an isomorphism between his query graph `H` and one of the two input graphs. This
 is done using a parallel version of the `GI` proof protocol (refer to section
-2.3 of [GMW2] for the full description).
+2.3 of [GMW] for the full description).
 
 ### Quadratic Residue
 
@@ -1099,18 +1096,15 @@ You can refer to this protocol in the GMR paper. (TODO: add paragraph reference)
 
 ---
 
---- RESTART HERE ---
-
 ## Cryptographic ZK Protocols
 
-We finally reached the section where we can apply what we've seen so far to a
-practical real-world protocol which in the end leads to one of the most used
-digital signature schemes in use today.
+We finally reached the section where we can apply what we've seen so far to some
+real-world cryptographic protocols.
 
 ### Schnorr's Protocol
 
-A proof of knowledge invented by *Claus-Peter Schnorr* in the 1980s which is the
-basis of many modern signature schemes.
+A proof of knowledge protocol invented by Schnorr [SC] in the early 90s whose
+ideas where used for one of the most popular modern signature schemes.
 
 The context is in the realm of public key cryptography that relies on the
 hardness of the discrete logarithm problem.
@@ -1252,6 +1246,7 @@ binding a message `m` to the challenge `c`:
 
 The rest of the scheme works as the Schnorr NIZK proofs
 
+
 ### Proofs of Computation
 
 DRAFT
@@ -1281,7 +1276,7 @@ category of trustless computing.
 
 ---
 
-## Appendix (TODO Remove)
+## Appendix (TODO: Remove)
 
 ### Complexity Classes
 
@@ -1312,76 +1307,31 @@ much memory it takes to solve a problem).
 
 ---
 
-## Insights to integrate (TODO remove)
+## References
 
-Proving an NP-statement `x` is equivalent of saying that `x ∈ L` with `L` a
-language such that `L ⊆ NP`.
+- [GMR] S. Goldwasser, S. Micali, C. Rackoff. 1985. [*The Knowledge Complexity of Interactive Proof-Systems*](https://dl.acm.org/doi/10.1145/22145.22178). STOC '85: Proceedings of ACM symposium on Theory of Computing, pages 291-304.
 
-One of the most important innovation which IP brings to the table is not about
-proving new problems which doesn't have a proof in NP (indeed most of the
-interesting problems already have a *static* proof in NP) but is about how much
-knowledge is shared between the *prover* and the *verifier*.
+- [BAB] L. Babai. 1985. [*Trading Group Theory for Randomness*](https://dl.acm.org/doi/10.1145/22145.22192). STOC '85: Proceedings of ACM symposium on Theory of Computing, pages 421-429.
 
-Coin flip ≡ read next bit from random tape
+- [GS] S. Goldwasser, M. Sipser. 1986. [*Private Coins Versus Public Coins in Interactive Proof Systems*](https://dl.acm.org/doi/10.1145/12130.12137). STOC '86: Proceedings of ACM symposium on Theory of Computing, pages 59–68.
 
-Rename Alice(A), Bob(B) to Peggy(P)/Victor(V)
+- [GMW] O. Goldreich, S. Micali, A. Wigderson. 1991. [*All Languages in NP Have Zero-Knowledge Proof Systems*](https://dl.acm.org/doi/10.1145/116825.116852). Journal of the ACM, volume 39, issue 3, pages 690-728.
 
-IP. def ...
-P and V take turns being active. V is active first
+- [QUI] K.J Quisquater. 1989. [*How to Explain Zero-Knowledge Protocols to Your Children*](https://dl.acm.org/doi/10.5555/646754.705056). CRYPTO '89: Advances in Cryptology, pages 628-631.
 
-[GMW] every language in NP has an IP system NP ⊂ IP
+- [BFM] M. Blum, P. Feldman, S. Micali. 1988. [*Non-Interactive Zero-knowledge and Its Applications*](https://dl.acm.org/doi/10.1145/62212.62222). STOC '88: Proceedings of ACM symposium on Theory of Computing, pages 103-112.
 
-Example of a language in IP but not known to be in NP is the "graph nonisomorphism" ([GMW]).
+- [NR] M. Naor, Y. Naor, O. Reingold. 1999. [*Applied Kid Cryptography or How to Convince Your Children You Are Not Cheating*](https://citeseerx.ist.psu.edu/doc_view/pid/297fd6cfc62313cc9bce6efa856651f5496cf51d). CiteSeerX.
 
-AM ⊆ IP is immediate since in IP the *verifier* can send to the *prover* an arbitrary function
-of the randomness source output f(R) while in AP is only allowed to send f(R) = R.
+- [FS] A. Fiat, A. Shamir. 1986. [*How To Prove Yourself: Practical Solutions to Identification and Signature Problems*](https://dl.acm.org/doi/10.5555/36664.36676). CRYPTO' 86: Advances in Cryptology, pages 186-194.
 
-[GS] proven that AM = IP. All languages with an interactive proof with private
-coins (IP) also have an interactive proof with public coints (AM.)
+- [LFKN] C. Lund, L. Fortnow, H. Karloff, N. Nisan. 1990. [*Algebraic Methods for Interactive Proof Systems*](https://ieeexplore.ieee.org/document/89518). IEEE symposium on Foundations of Computer Science, volume 1, pages 2–10.
 
-Conjecture. Though the ability to make secret random choices doesn't allow
-recognizing more languages but seems crucial to recognize languages in ZK.
+- [SH] A. Shamir. 1992. [*IP = PSPACE*](https://dl.acm.org/doi/10.1145/146585.146609). Journal of the ACM, volume 39, issue 4, pages 869-877.
 
-ZK: Given any *verifier* B', the distribution that B' sees on its tapes is
-indistinguishable from a distribution which can be computed from input x in
-polynomial time.
+- [GNPR] R. Gradwhol, M. Naor, B. Pinkas, G. Rothblum. 2009. [*Cryptographic and Physical Zero Knowledge Proof Systems for Solutions of Sudoku Puzzles*](https://dl.acm.org/doi/abs/10.1007/s00224-008-9119-9). Theory of Computing Systems, volume 44, pages 245-268
 
-### Applications
-
-- [A zero-knowledge protocol for nuclear warhead verificaiton](https://www.nature.com/articles/nature13457)
-- Voting: completely transparent vote counting
-- Identification protocols: originating from work of Fiat and Shamir.
-  An alternative approach is through digital signatures (TODO: WHY DIG SIG are not ZK)
-
----
-
-## Bibliography
-
-- [GMR] S.Goldwasser, S.Micali, C.Rackoff - [The Knowledge Complexity of Interactive Proof-Systems](https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf). 1985.
-
-- [BAB] L.Babai - [Trading group theory for randomness](https://dl.acm.org/doi/10.1145/22145.22192). 1985
-
-- [GS] S.Goldwasser and M.Sipser - [Private coins versus public coins in interactive proof systems](https://pages.cs.wisc.edu/~jyc/710/Goldwasser-Sipser.pdf). In Proceedings of the eighteenth annual ACM symposium on Theory of computing, pages 59–68. ACM, 1986.
-
-- [GMW] [Goldreich Micali Wigderson]...how to play any mental game?
-
-- [GMW2] O.Goldreich, Silvio Micali, Avi Wigderson. [All Languages in NP Have Zero-Knowledge Proof Systems](https://www.researchgate.net/publication/220431215_Proofs_that_Yield_Nothing_But_Their_Validity_for_All_Languages_in_NP_Have_Zero-Knowledge_Proof_Systems). (1991)
-
-- [QUI] K.J Quisquater. [How to Explain Zero-Knowledge Protocols to Your Children](https://www.researchgate.net/publication/221355016_How_to_Explain_Zero-Knowledge_Protocols_to_Your_Children) (1989)
-
-- [PET] [Why and How zk-SNARK Works](https://arxiv.org/pdf/1906.07221.pdf) - Maksym Petkus (2019)
-
-- [BFM88] Manuel Blum, Paul Feldman, and Silvio Micali. [Non-Interactive Zero-knowledge and Its Applications](https://dl.acm.org/doi/10.1145/62212.62222).
-
-- [NR] M.Naor, Y.Naor, O.Reingold. [How to Convince Your Children You Are Not Cheating](http://www.wisdom.weizmann.ac.il/~naor/PAPERS/waldo.pdf) (1999).
-
-- [FS] Amos Fiat, Adi Shamir. [How To Prove Yourself](https://link.springer.com/chapter/10.1007/3-540-47721-7_12)
-
-- [LFKN] C. Lund, L. Fortnow, H. Karloff, and N. Nisan. Algebraic methods for interactive proof systems. In Proceedings of the 31st Annual Symposium on Foundations of Computer Science, pages 2–10. IEEE, 1990.
-
-- [SH] A. Shamir. IP = PSPACE. In Proceedings [1990] 31st Annual Symposium on Foundations of Computer Science, pages 11–15. IEEE, 1990.
-
-- [GNPR] R.Gradwhol, M.Naor, B.Pinkas, G.Rothblum - [Cryptographic and Physical Zero Knowledge Proof Systems for Solutons of Sudoku Puzzles](https://link.springer.com/article/10.1007/s00224-008-9119-9)
+- [SC] C.P. Schnorr. 1991. [*Efficient Signature Generation by Smart Cards*](https://dl.acm.org/doi/10.1007/BF00196725). Journal of Cryptology, volume 4, issue 3, pages 161-174.
 
 
 [^1]: good visual demonstration of the protocol can be found [here](https://www.wisdom.weizmann.ac.il/~naor/PAPERS/SUDOKU_DEMO)
