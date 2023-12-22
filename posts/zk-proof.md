@@ -1190,36 +1190,22 @@ signature scheme by binding a message `m` to the challenge `c`:
 
     c = H(r || m)
 
----
+## Conclusions
 
-## Appendix (TODO: Remove)
+Embarking on a journey from classical mathematical proofs to the innovative
+world of Zero-Knowledge Proofs, we've traversed the landscape of both
+computational complexity and cryptography.
 
-### Complexity Classes
+The evolution from classical proofs to ZKPs highlight a significant shift
+in problem-solving techniques, illustrating how complex solutions can be
+verified without sharing sensitive information.
 
-**NP-complete** problems are a set of problems to each of which any other
-NP problem can be reduced in polynomial time and whose solution may still be
-verified in polynomial time.
+This advancement is pivotal in today's technology-centric world, finding
+applications spanning from blockchain technology to secure cloud computing.
 
-Informally, an NP-complete problem is an NP problem that is at least as "tough"
-as any other problem in NP.
-
-The first natural problem proven to be NP-complete was the Boolean
-satisfiability problem, also known as SAT (Cook–Levin theorem).
-
-**NP-hard** problems are those at least as hard as NP problems; i.e., all NP
-problems can be reduced (in polynomial time) to them. NP-hard problems need not
-be in NP; i.e., they need not have solutions verifiable in polynomial time.
-
-Zero Knowledge relies on the notion of NP completeness, as well as the view of
-NP as a proof system.
-
-#### P ≠ NP
-
-The relation between the complexity classes P and NP is studied in computational
-complexity theory, the part of the theory of computation dealing with the
-resources required during computation to solve a given problem. The most common
-resources are time (how many steps it takes to solve a problem) and space (how
-much memory it takes to solve a problem).
+New protocols like zk-SNARKs and zk-STARKs lately emerged to push even further
+the area from the verification of simple static statements to verification
+arbitrary computation, paving the way for a new era for data privacy.
 
 ---
 
