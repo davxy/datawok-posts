@@ -1,18 +1,15 @@
 +++
-title = "Zero-Knowledge Proofs"
+title = "The Evolution of Proof: A Journey through Zero-Knowledge"
 date = "2023-08-06"
-modified = "2023-12-20"
-tags = ["cryptography", "zk-proof"]
+modified = "2023-12-22"
+tags = ["cryptography", "mathematics", "zk-proof"]
 toc = true
-draft = true
 +++
 
-Version - v0.1.20
-
-## *Abstract*
+## Introduction
 
 Zero-Knowledge Proofs (ZKP) represent a fascinating and influential concept
-within the realm of cryptographic protocols. 
+within the realm of cryptographic protocols.
 
 At a glance, a ZKP enables one party to demonstrate the correctness of a
 statement to another party without revealing any details beside the validity of
@@ -21,47 +18,49 @@ the claim itself.
 ZKPs find applications in various areas, including secure authentication
 protocols, blockchain systems, and secure computation, among others.
 
-Another motivation is philosophical. The notion of a proof is basic
-to mathematics and to people in general. It is a very interesting and
-fascinating question whether a proof carries with it some knowledge or not.
+Another motivation is philosophical. The notion of a proof is basic to
+mathematics and to people in general. It is a very interesting and fascinating
+question whether a proof carries with it some knowledge or not.
 
-In this discussion we will go from the most classic mathematical notion of
-proof down to proofs which shares zero knowledge.
+In this paper we incrementally construct a path leading from the classic
+mathematical notion of proof to those that share zero knowledge. One of the
+goals is to demystify the subject, maintaining the necessary rigor while
+ensuring accessibility for a broader audience.
 
 ---
 
 ## Classical Proofs
 
-### Introduction to Deductive Reasoning
+### Deductive Reasoning
 
 Deductive reasoning is a fundamental method of logical thinking used across
 various disciplines, from philosophy and mathematics to computer science and
 law.
 
-It involves deriving specific conclusions from a set of general premises
+It involves deriving specific **conclusions** from a set of general **premises**
 or known facts. The strength of deductive reasoning lies in its ability to
-guarantee the truth of the conclusion, provided the premises are true and the
+guarantee the truth of the conclusion, provided the premises are true, and the
 reasoning process is logically sound.
 
 One of the earliest examples of deductive reasoning can be traced back
 to ancient Greek philosophers, particularly *Aristotle*, who formalized the
 syllogistic reasoning. A classic example of a syllogism is:
 
-1. All men are mortal (general premise).
-2. Socrates is a man (specific premise).
+1. All men are mortal (premise).
+2. Socrates is a man (premise).
 3. Therefore, Socrates is mortal (conclusion).
 
 This example captures the essence of deductive reasoning: if the premises are
 true and the reasoning is valid, then the conclusion must also be true.
 
-### Deductive Reasoning in Mathematics
+#### Deductive Reasoning in Mathematics
 
 In the realm of mathematics, deductive reasoning takes on a more structured
 form known as a mathematical proof.
 
-A **mathematical proof** is a logical argument presented in a systematic way
-to verify the truth of a mathematical *statement*. Here, deductive reasoning
-is used to derive conclusions from a set of *axioms* (self-evident truths) and
+A **mathematical proof** is a logical argument presented systematically to
+verify the truth of a mathematical *statement*. Here, deductive reasoning is
+used to derive conclusions from a set of *axioms* (self-evident truths) and
 previously established *theorems* (proven statements) by using some *inference
 rules* which can be applied in the specific context.
 
@@ -74,7 +73,7 @@ As all the proof reasoning rely on the basic properties of boolean algebra, it
 is implicit that Boolean logic axioms and theorems holds as premises for any
 reasonable proof systems which we'll analyze in the context of this document.
 
-### Proofs Soundness
+### Validity and Soundness
 
 A proof is **valid** if the conclusion logically follows the premises,
 regardless of whether those promises are true or not.
@@ -108,7 +107,7 @@ is formally correct, but as the second premise is not incorrect it is not sound.
 The example emphasize how we can reach incorrect conclusions even though we
 constructed an apparently correct proof just because of a bad premise.
 
-### Proof Systems
+### Prooving Systems
 
 A **proof system** is a formal and systematic (algorithmic) approach to
 construct and evaluate proofs.
@@ -663,77 +662,40 @@ noticing.
 From Victor's perspective, the outputs produced by the *simulator* are
 statistically indistinguishable from any genuine protocol execution.
 
-### Probability Distributions Distinguishability 
+#### Probability Distributions Distinguishability 
 
-(TODO: completely review)
+**distinguishability** refers to the ability of a polynomially computationally
+bounded Turing machine to distinguish between two random variables.
 
-The core idea is to define when two random variables are considered
-**indistinguishable** to a particular observer. In the context of interactive
-proofs, these observers are usually computationally bounded (polynomial time)
-verifiers.
+In the realm of cryptographic protocols, ensuring indistinguishability between
+different protocol paths or choices is key to maintaining security against
+adversaries.
 
-This concept is crucial for `ZK` proofs, where a prover tries to convince a
-verifier of a statement's validity without revealing any other information.
-The indistinguishability of random variables ensures that whatever the verifier
-observes during this process doesn't give them any knowledge beyond the fact
-that the statement is true.
+In particular, in ZKP protocol, indistinguishability is relevant to ensure
+that during the protocol execution no information is leaked by the prover
+and thus the property is carefully evaluated when analyzing the protocol
+*zero-knowledgeness* property and thus when constructing the *simulator*. The
+verifier should not be able to distinguish between the real prover and the
+simulator responses.
 
-Consider the family of random variables `U = { U(x) }` where the parameter `x`
-belongs to a language `L ⊆ {0,1}*`. Each random variable in this family takes
-values in `{0,1}*`
+More formally, consider two families of random variables, `P` and `S`, defined
+over a language `L ⊆ {0,1}*`. Indistinguishability of these variables becomes
+significant in scenarios where a verifier must decide whether a given sample `s`
+originated from `P(x)` or `S(x)` for some `x ∈ L`.
 
-Given two such families of random variables, `U` and `V`, imagine a scenario
-where a value `s` is sampled from either `U(x)` or `V(x)`. A judge should
-decide if `s ∈ U(x)` or `s ∈ V(x)`.
+The verifier's decision-making process is influenced by two factors:
+- The size of the sample `s`.
+- The time available to decide.
 
-The concept of **replaceability** comes into play when the judge's decision
-becomes effectively random as the length of `x` increases. In such cases, `U(x)`
-is said to be replaceable with `V(x)`.
-
-The judge's decision-making process is influenced by two crucial factors:
-- The *size* of the sample `s`.
-- The *time* available for making the decision.
-
-Based on these parameters, two families of random variables `U` and `V` can be
-classified as:
-- **Equal**: if the verdict is random regardless of the decision time the sample
-  size.
+Based on these parameters, `P` and `S` can be classified as:
+- **Equal**: if the decision is random regardless of time and sample size.
 - **Statistically indistinguishable**: if the verdict becomes random when given
   infinite time and samples with polynomial size with respect to `|x|`.
 - **Computationally indistinguishable**: if the verdict becomes random when both
   time and samples size are polynomially bounded by `|x|`.
 
-To ensure that no additional information is leaked, it's crucial that whatever
-the verifier observes during the interaction is indistinguishable from what
-they would observe in a simulation that doesn't involve the actual witness (the
-secret information proving the statement's truth). In other words, the verifier
-cannot distinguish between the real interaction and a simulated one.
-
-A ZK proof often involves a simulation argument, where it is shown that for
-every possible interaction in the actual proof system, there is a corresponding
-(probabilistically similar) interaction that could be generated by a
-simulator without access to the secret.
-
-If these two sets of interactions are indistinguishable from each other, then
-the proof system is zero-knowledge.
-
-In practice, given the verifier (judge) polynomial bounds, practical `ZK` proofs
-are often concerned with computational indistinguishability
-
-In an interactive `ZK` proof, the prover and verifier exchange messages. The
-indistinguishability concept ensures that, through these exchanges, the verifier
-learns nothing more than the fact that the statement is true. Each step of the
-interaction is designed such that it doesn't leak any extra information.
-
-This concept is also widely used in generic cryptographic applications.
-When constructing secure cryptographic protocols, taking into account 
-indistinguishability property ensures that different protocol paths or choices
-do not reveal additional information to potential adversaries.
-
-In general, indistinguishability property ensures that, while Victor (the judge)
-become convinced that I know the witness he doesn't learn any additional
-information as the proof presented by the Peggy is indistinguishable from
-random data.
+In practice, given the verifier polynomial bounds, practical ZK proofs are often
+concerned with computational indistinguishability
 
 ### Additional Takeaways
 
@@ -761,10 +723,9 @@ reflects the pure definition found in the original paper.
 
 ### Commitment Protocols
 
-TODO: Maintain this paragraph?
-
-In all the `ZKP` protocols discussed in this paper, the only overarching
-cryptographic required tool is a **commitment protocol**.
+In all the `ZK` protocols discussed in this paper, the only overarching
+cryptographic required tool is a **commitment protocol** so we thing a short
+glimpse to the topic is necessary.
 
 This protocol consists of two phases:
 
@@ -1092,14 +1053,14 @@ For one run, the soundness error probability is `ε = 1/2`.
   In this way `x·y = x·(r²·x⁻¹) = r² = z²` satisfies Victor's check.
 
 As for `GI`, we can prove the complement the `QR` language, known as `QNR`.
-You can refer to this protocol in the GMR paper. (TODO: add paragraph reference)
+You can find more information for this protocol in the [GMR2] paper.
 
 ---
 
 ## Cryptographic ZK Protocols
 
-We finally reached the section where we can apply what we've seen so far to some
-real-world cryptographic protocols.
+We finally reached the section where we can apply what we've seen so far to
+analyze some real-world cryptographic protocols.
 
 ### Schnorr's Protocol
 
@@ -1107,172 +1068,127 @@ A proof of knowledge protocol invented by Schnorr [SC] in the early 90s whose
 ideas where used for one of the most popular modern signature schemes.
 
 The context is in the realm of public key cryptography that relies on the
-hardness of the discrete logarithm problem.
+hardness of solving the discrete logarithm problem in a cyclic group.
 
-Given a cyclic group `G` with prime order `q` and generator `g`, Peggy wants to
-prove to Victor that she knows the discrete logarithm `x ∈ Zq*` for some number
-`y = gˣ ∈ G` without revealing any additional information.
+Given a cyclic group `G` with a generator `g` of prime order `p`, Peggy wants to
+prove to Victor her knowledge of the discrete logarithm `x ∈ Zₚ*` for some group
+element `y = gˣ ∈ G` without revealing any additional information.
 
 Protocol:
-1. Peggy picks a random `k ∈ Zq*` and sends `r = gᵏ`.
-2. Victor picks a random `c ∈ Zq*` and sends it.
-3. Peggy computes `s = x·c + k mod q` and sends it.
-4. Victor accepts if `yᶜ·r = gˢ = g^(x·c + k)`.
+1. Peggy selects a random `k ∈ Zₚ*` and sends `r = gᵏ` to Victor.
+2. Victor selects a random `c ∈ Zₚ*` and sends it to Peggy.
+3. Peggy computes `s = x·c + k mod p` and sends it to Victor.
+4. Victor accepts if `gˢ = yᶜ·r `.
 
 Security considerations:
-- Peggy can't cheat as the only way to construct a valid `s` is to know `x`. If
-  the challenge `c` is sent before `r` then he can easily cheat by constructing
-  `r = gˢ·y⁻ᶜ mod q` for any arbitrary `s`. But this is not allowed since he
-  requires to first commit the value `r` before he knows `c`.
-- Victor can't infer the value of `x` as it only receives `r`, an apparently
-  random value, and `s`. To extract `x` from `s` he must compute `x = (s - k)·c⁻¹`.
-  But this requires to compute the discrete logarithm of `r` which is considered
-  unfeasible.
+- Peggy can't cheat because constructing a valid `s` requires knowledge of `x`.
+  The only scenario where she might successfully cheat is if she's able to
+  predict the challenge `c` before committing to `r`. In such a case, she can
+  construct `r = gˢ·y⁻ᶜ mod p` for any chosen `s`.
+- Victor can't cheat because to extract the value of `x` from `s` he must
+  compute `x = (s - k)·c⁻¹`. However, this requires him to solve the discrete
+  logarithm problem for `r` in order to compute `k`.
 
 More formal versions of the core properties follows.
 
 #### Soundness Proof
 
-Victor needs to construct an **extractor**. If he's able to rewind Peggy
-execution to the challenge step after she performed the response step then an
-extractor is constructed by sending Peggy a different challenge `c₂` to trick
-her to create a different `s₂` using the same value for `k`:
+The **extractor** rewinds Peggy's execution to the challenge step after she
+already responded to the challenge `c₁` with `s₁`. By presenting a different
+challenge `c₂` the extractor can induce Peggy to generate a different response
+`s₂` using the same `k`:
 
-    s₁ = x·c₁ + k mod q
-    s₂ = x·c₂ + k mod q
+    s₁ = x·c₁ + k mod p
+    s₂ = x·c₂ + k mod p
 
-    → s₁ - s₂ = x·(c₁ - c₂) mod q
-    → x = (s₁ - s₂)·(c₁ - c₂)⁻¹ mod q
+    → s₁ - s₂ = x·(c₁ - c₂) mod p
+    → x = (s₁ - s₂)·(c₁ - c₂)⁻¹ mod p
 
-**Security Note**. The soundness proof shows a very important assumption for
-the protocol soundness. Peggy must **never reuse the same value for `k`** in two
-different runs of the protocol, as otherwise her secret can be easily recovered.
+The soundness proof highlights a crucial prerequisite for the protocol. Peggy
+must **never reuse the same value for `k`** in two different runs of the
+protocol. Reusing `k` easily leads to the disclosure of her secret.
 
 #### Zero-Knowledgeness Proof
 
-We need to construct a **simulator**.
+The **simultor** rewinds Victor's execution before the commitment phase after he
+shared the challenge `c`. She can now convince him without knowing the secret by
+committing to a value `r` computed as:
 
-If Peggy can rewind Victor's execution after he shared the challenge `c` then
-she can easily convince him without knowing the secret by committing a value `r`
-computed as:
-
-    r = gˢ·y⁻ᶜ mod q
+    r = gˢ·y⁻ᶜ mod p
 
 For any arbitrary value `s`.
 
-Victor is convinced as: `yᶜ·r = yᶜ·gˢ·y⁻ᶜ = gˢ`
+This convinces Victor, as the equation `gˢ = yᶜ·r = yᶜ·gˢ·y⁻ᶜ` holds true.
 
-The proof assumes that the *verifier* is honest (**HVZK**), which in this
-context means that `c` is not chosen in function of the value `r`. If this is
-the case, then `y^f(r)·r = yʷ·r = yʷ·gˢ·y⁻ᶜ ≠ gˢ` and thus the *simulator*, as
-we've defined it, doesn't work as the simulation is no longer indistinguishable
-from the real transcript.
+Is worth noting that the *zero-knowledgeness* proof assumes the *verifier* to be
+honest (**HVZK**), meaning that `c` is not chosen in function of `r`. If `c` is
+dependent on `r` then `gˢ ≠ y^f(r)·r = y^f(r)·gˢ·y⁻ᶜ` rendering our *simulator*
+ineffective. In such a case, the simulation would no longer be indistinguishable
+from the actual transcript.
 
-Some stronger `ZKP` systems are zero-knowledge even when the verifier is
-malicious.
+Although certain ZKP systems can prove *zero-knowledgeness* property even in the
+presence of a malicious verifier, this minor theoretical limitation in Schnorr's
+Protocol is not a concern for practical applications.
 
 ### Non-Interactive Schnorr's Protocol
 
-Interactive protocols add some non-negligible overhead as they require several
-messages (potentially over the network) and add unbounded delays, unless the
-two participants are online at the same time. Due to this, a non-interactive
-protocol is often preferable.
+Our discussion so far has emphasized the importance of interactive proofs for
+certain problems. In the *real world*, this remains predominantly true. However,
+there is an *imaginary world* where this limitation can be circumvented.
 
-Turning the *Schnorr* protocol into a non-interactive proof seems initially quite
-difficult, since it fundamentally relies on Victor picking a true random
-challenge. But in practice there is a smart trick we can use.
+Converting Schnorr's protocol into a **non-interactive proof** initially seems
+infeasible due to its fundamental reliance on the verifier's randomly chosen
+challenge. Yet, this is not true in the *imaginary world*.
 
-In the 1980s, *Amos Fiat* and *Adi Shamir* developed a technique [FS] to convert
-an interactive protocol to a non-interactive proof in the random oracle model.
-
-The technique is popularly known as the [Fiat-Shamir heuristic](https://en.wikipedia.org/wiki/Fiat%E2%80%93Shamir_heuristic)
-or transformation.
-
-We move the proof system to what is known as the *Random Oracle Model* (ROM),
-an "imaginary" environment where the randomness source is replaced with a
-cryptographically secure hash function output.
-
-The ROM introduction is quite
-[controversal](https://blog.cryptographyengineering.com/2011/09/29/what-is-random-oracle-model-and-why-3/)
-but has successfully used in practice for quite a while and to implement a
-lot of strong cryptographic primitives. The assumption is that the Peggy can't
-predictably control the hash output in any way.
-
-The idea is to replace the *verifier*'s random challenge `c` with the output of
-a cryptographically secure hash function `H`, which is modeled as a random
-oracle, with input the prover random value `r`.
+In the 1980s, Fiat and Shamir introduced a technique [FS], known as the
+*Fiat-Shamir heuristic*, to transform an interactive protocol into a
+non-interactive proof within an imaginary environment known as the **random
+oracle model** (ROM). Within this model we can replace the verifier's random
+challenge with the output of a cryptographically secure hash function `H` seeded
+by both the problem input and the prover's commitment.
 
 Protocol:
-- Peggy picks a random `k ∈ Zq*` and computes `r = gᵏ`.
-- Peggy computes the challenge `c = H(r) ∈ Zq*`.
-- Peggy computes `s = x·c + k mod q`.
+1. Peggy picks a random `k ∈ Zₚ*` and computes `r = gᵏ`.
+2. Peggy computes the challenge `c = H(r) ∈ Zₚ*`.
+3. Peggy computes `s = x·c + k mod p`.
 
-Any *verifier* accepts if `yᶜ·r = gˢ = g^(x·c + k)`.
+A verifier accepts the proof if `gˢ = yᶜ·r = g^(x·c + k)`.
 
-The theoretical repercussion of this protocol is that it completely breaks the
-assuptions used by the soundness and zero-knowledgeness proofs of Schnorr protocol.
+The implications of using the Fiat-Shamir heuristic are significant,
+fundamentally altering the assumptions used to prove *soundness* and
+*zero-knowledgeness* of ZK protocols.
 
-The good news is that the proof still hold in the ROM. For the sake of the
-proof, when constructing the *extractor* and the *simulator* the random oracle
-can be programmed.
+Of course, since we are already working in a hypothetical environment we can
+also imagine to work with a programmable random oracle.
 
-**Implications to Soundness**
+**Restoring Soundness**: In a standard settings, an extractor depends on receiving
+two different responses `s₁` and `s₂` for the same commitment `r`, with different
+challenges. However, this approach doesn't work when using the Fiat-Shamir heuristic
+as `c = H(r)`. In the ROM, the proof holds if the extractor programs the oracle
+to return the same value `c` for two distict challenges `c₁` and `c₂`.
 
-The interactive *extractor* relies on the fact to be able to generate two different
-challenges `r` for the same commitment `c`. This doesn't apply here as `c = H(r)`.
+**Restoring Zero-Knowledgeness**: Similarly, a simulator depends on predicting
+the challenge `c` before generating the commitment `r`. This doesn't work with
+Fiat-Shamir heuristic as `c = H(r)` and `r` should be generated as
+`r = gˢ·y⁻ᶜ mod p`. In the ROM, the proof holds if the simulator programs the
+oracle to return a known value for the commitment `r`.
 
-The proof still holds in the ROM, where the *extractor* programs the oracle
-to return two different values `c₁` and `c₂` for the same challenge `r`.
+While the concept of a programmable oracle aids in validating proofs within this
+theoretical model, in practical applications, the random oracle is typically
+realized through a non-programmable, cryptographically secure hash function.
 
-**Implications to Zero-Knowledgeness**
-
-The interactive *simulator* relies on the fact to be able to get the same challenge `r`
-for two different commitments `r₁` and `r₂`. This doesn't apply here as `c = H(r)`.
-
-The proof still holds in the ROM, where the *simulator* programs the oracle
-to return the value of choice `c` (thus not in function of `r`).
-
-Obviously the ROM is a trick which helps to restore the proof validity in an
-imaginary world, in the real world the random oracle is implemented with a
-(non-programmable) cryptographically secure hash function such as SHA-256.
-This is why the ROM is loved and hated at the same time by cryptographers.
+To summarize, although the ROM assumption is
+[controversal](https://blog.cryptographyengineering.com/2011/09/29/what-is-random-oracle-model-and-why-3/),
+it has been effectively used to demonstrate the security of various real-world
+cryptographic primitives. The essential requirement is that the prover must not
+be able to predict or control the hash output.
 
 #### Schnorr Signature Scheme
 
-The Schnorr NIZK proof can be easily transformed into a signature scheme by
-binding a message `m` to the challenge `c`:
+The Non-Interactive Schnorr's protocol can be easily transformed into a
+signature scheme by binding a message `m` to the challenge `c`:
 
     c = H(r || m)
-
-The rest of the scheme works as the Schnorr NIZK proofs
-
-
-### Proofs of Computation
-
-DRAFT
-
-We could also prove the correct execution of any program even if we removed
-some of the inputs or outputs.
-
-General-purpose ZKPs allow Peggy to convince Victor about the integrity of
-an execution trace (the inputs of a program and the outputs obtained after
-its execution) while hiding some of the inputs or outputs involved in the
-computation.
-
-An example of this is a Prover trying to prove that a sudoku can be solved.
-
-TODO: some notes about ZK-SNARKs and its bleeding edge applications.
-
-Outsourcing of computation. Outsource an expensive computation and validate that
-the result is correct without redoing the execution. This opens up a whole new
-category of trustless computing.
-
-#### Applications In Blockchain context
-
-- Anonymous ring signatures
-- Fast chain synching
-- Light clients verification
-
 
 ---
 
@@ -1310,6 +1226,8 @@ much memory it takes to solve a problem).
 ## References
 
 - [GMR] S. Goldwasser, S. Micali, C. Rackoff. 1985. [*The Knowledge Complexity of Interactive Proof-Systems*](https://dl.acm.org/doi/10.1145/22145.22178). STOC '85: Proceedings of ACM symposium on Theory of Computing, pages 291-304.
+
+- [GMR2] S. Goldwasser, S. Micali, C. Rackoff. 1989. [*The Knowledge Complexity of Interactive Proof-Systems*](https://epubs.siam.org/doi/10.1137/0218012). SIAM Journal on Computing, volume 18, issue 1.
 
 - [BAB] L. Babai. 1985. [*Trading Group Theory for Randomness*](https://dl.acm.org/doi/10.1145/22145.22192). STOC '85: Proceedings of ACM symposium on Theory of Computing, pages 421-429.
 
