@@ -1,7 +1,7 @@
 +++
-title = "The Evolution of Proof: A Journey through Zero-Knowledge"
+title = "The Evolution of Proof: A Journey to Zero-Knowledge"
 date = "2023-08-06"
-modified = "2023-12-22"
+modified = "2023-12-23"
 tags = ["cryptography", "mathematics", "zk-proof"]
 toc = true
 +++
@@ -97,9 +97,9 @@ Example. Valid but not sound proof:
 
 - *Premises*:
   - All prime numbers are odd (wrong premise).
-  - 2 is a prime number (as it has no divisors other 1 and itself)
+  - 2 is a prime number (as it has no divisors other than 1 and itself)
 - *Conclusion*: 2 is odd
-- *Proof*: conclusion follows directly from premises.
+- *Proof*: The conclusion follows directly from premises.
 
 As you can see, since the conclusion can be derived from the premises, the proof
 is formally correct, but as the second premise is not incorrect it is not sound.
@@ -107,7 +107,7 @@ is formally correct, but as the second premise is not incorrect it is not sound.
 The example emphasize how we can reach incorrect conclusions even though we
 constructed an apparently correct proof just because of a bad premise.
 
-### Prooving Systems
+### Proof Systems
 
 A **proof system** is a formal and systematic (algorithmic) approach to
 construct and evaluate proofs.
@@ -154,7 +154,7 @@ factorization of `n`.
 The information which facilitates the construction of the proof is known as
 the **witness**. In a classical proof system, sharing the witness with
 the verifier equates to providing a standard proof. However, if the witness
-remains confidential, the proof is known as a Zero-Knowledge(`ZK`) proof.
+remains confidential, the proof is known as a Zero-Knowledge (ZK) proof.
 
 ### Formalization and Relationship to Complexity Theory
 
@@ -208,24 +208,23 @@ system by transitioning from a proof conceived as a *static* sequence of symbols
 to an *interactive protocol* where Peggy incrementally convinces Victor by
 actively exchanging messages.
 
-The concept was first proposed in the mid-1980s by *Shafi Goldwasser*,
-*Silvio Micali*, and *Charles Rackoff* in their seminal paper "The Knowledge
-Complexity of Interactive Proof Systems" [GMR]. This paper not only
-introduced interactive proofs but also presented the first formal definition of
-zero-knowledge proofs.
+The concept was first proposed in the mid-1980s by *Goldwasser*, *Micali*, and
+*Rackoff* in their seminal paper "*The Knowledge Complexity of Interactive Proof
+Systems*" [GMR]. Their work not only introduced interactive proofs but also
+presented the first formal definition of zero-knowledge proofs.
 
-Is worth noting that Laszlo Babai independently contributed to the development
-of this field approximately during the same period with his paper "Trading Group
-Theory for Randomness"[BAB].
+Is worth noting that Babai [BAB] independently contributed to the development
+of this field approximately during the same period with his paper *"Trading Group
+Theory for Randomness"*.
 
-In `IP` systems, the complete ordered sequence of messages exchanged during the
+In IP systems, the complete ordered sequence of messages exchanged during the
 protocol is referred to as the **transcript**. Two runs of the same protocol
 can result in different transcripts. This variability depends on whether the
 protocol is deterministic or probabilistic.
 
 ### Sigma Protocols
 
-Any `IP` system with a transcript composed of four messages is called a *sigma
+Any IP system with a transcript composed of four messages is called a *sigma
 protocol*.
 
 The name of the protocol is inspired by the Greek letter `Σ`, which shape
@@ -238,11 +237,11 @@ mirrors the sequence of the protocol's steps:
 ![sigma-protocol](/companions/zk-proofs/sigma-protocol.png)
 
 The names of these steps were chosen to reflect their functional roles in
-the execution of typical proofs, particularly in the `ZK` context. For the
+the execution of typical proofs, particularly in the ZK context. For the
 moment the detailed mechanics and purpose of each step are left open.
 
-This type of protocols is the most widespread when comes to `ZKP`, indeed
-every protocol which will be analyzed in the `ZKP` examples section is a *sigma
+This type of protocols is the most widespread when comes to ZKP, indeed
+every protocol which will be analyzed in the ZKP examples section is a *sigma
 protocol*.
 
 For completeness, note that some sources describe sigma protocols with just
@@ -305,7 +304,7 @@ The introduction of randomness into the protocol can, in some scenarios, lead
 to more efficient proofs or enable to prove en entire new class of languages
 which can't be proven using deterministic proof systems.
 
-As outlined in the seminal GMR paper:
+As outlined by the GMR paper:
 - Peggy is assumed to have unbounded computational resources, while Victor
   operates within polynomial time constraints relative to the size of the
   statement to prove.
@@ -313,7 +312,7 @@ As outlined in the seminal GMR paper:
   exchanged between the two must also be polynomial.
 - Both Peggy and Victor have access to a **private** random generator.
 
-More formally.
+Formally:
 
 > A probabilistic `IP` system for a language `L` is a protocol `(P,V)`
 for communication between a computationally unbounded machine `P` and a
@@ -371,7 +370,7 @@ A proper proof of protocol soundness generally requires an **extractor**, a
 hypothetical tool tailored for the specific protocol which allows Victor to
 extract key information used by Peggy to construct the proof.
 
-Imagine Victor being capable of 'rewind' Peggy's execution without her
+Imagine Victor being capable of rewind Peggy's execution without her
 knowledge. In such a case, Peggy would re-execute the protocol exactly as
 before, even using the same random values as in the previous execution.
 From Peggy's perspective, these executions would appear statistically
@@ -387,9 +386,9 @@ thin air.
 
 It is important to note that the extractor is a theoretical construct, not meant
 to be present in any real-world execution of the protocol. For example, if the
-environment is the *real world*, it could be something like a "time machine". In
-the *digital world*, it could be the capability to snapshot and restart a *prover*
-state at any point.
+environment is the *real world*, it could be something like a time machine.
+In the *digital world*, it could be the capability to snapshot and restart the
+*prover* state at any point.
 
 ### Interactive Turing Machines
 
@@ -440,12 +439,12 @@ This class can be further divided based on the protocol's characteristics. For
 instance, `IP[k]` denotes the class of languages that can be decided by an
 interactive proof with `k` rounds.
 
-At the beginning of 90s, Lund, Fortnow, Karloff and Nisan [LFKN] proved that
-`PH ⊂ IP`, which shows that interactive proofs can be very powerful as they
-contain the union of all complexity classes in *polynomial hierarchy*, including
-`P`, `NP`, [`co-NP`](https://en.wikipedia.org/wiki/Co-NP).
+At the beginning of the 90s, *Lund*, *Fortnow*, *Karloff* and *Nisan* [LFKN]
+proved that `PH ⊂ IP`, which shows that interactive proofs can be very powerful
+as they contain the union of all complexity classes in *polynomial hierarchy*
+(`PH`), including `P`, `NP`, [`co-NP`](https://en.wikipedia.org/wiki/Co-NP).
 
-Shortly later, Adi Shamir [SH] proved that in fact `IP = PSPACE`, which gave a
+Shortly later, *Shamir* [SH] proved that in fact `IP = PSPACE`, which gave a
 complete characterization of the capabilities of interactive proofs.
 
 As a direct outcome, employing an interactive proof system enables to verify
@@ -459,11 +458,11 @@ without the need for Peggy to share the entire solution (`ZK` proofs).
 ### Arthur-Merlin Protocols
 
 An [Arthur-Merlin](https://en.wikipedia.org/wiki/Arthur-Merlin_protocol) protocol,
-initially introduced by Babai [BAB] in 1985, is an `IP` system with the
+initially introduced by *Babai* [BAB] in 1985, is an `IP` system with the
 additional constraint that the *prover* and the *verifier* share the same
 randomness source.
 
-In this context, *Merlin* is the *prover*, *Arthur* is the *verifier* and both
+In this context, Merlin is the *prover*, Arthur is the *verifier* and both
 of them are allowed to see the randomness source of the other party.
 
 ![AM](/companions/zk-proofs/AM.png)
@@ -472,19 +471,19 @@ The fundamental attributes of an `AM` proof system `(P,V)` for a language `L`,
 such as *completeness*, *soundness*, and *efficiency*, align with those of
 general `IP` systems.
 
-#### MA Protocol
+#### MA Protocols
 
 The set of decision problems that can be verified in polynomial time using a
 single message `AM` protocol forms the `MA` set.
 
 Steps for a generic `MA` protocol:
-1. *Merlin* sends to *Arthur* the proof
-2. *Arthur* decides
+1. Merlin sends to Arthur the proof.
+2. Arthur decides.
 
 `MA` protocols are very similar to traditional `NP` proofs with the addition
 that the *prover* can use a public randomness source to construct its proof.
 
-#### AM Protocol
+#### AM Protocols
 
 The set of decision problems that can be decided in polynomial time by an `AM`
 protocol with `k` messages is called `AM[k]`.
@@ -496,19 +495,19 @@ protocol execution, and thus it doesn't affect *Merlin* messages.
 `MA` is strictly contained in `AM`, since `AM[2]` contains `MA` but `AM[2]`
 cannot be reduced to `MA`
 
-Shafi Goldwasser and Michael Sipster [GS] proved that for any language with
+*Goldwasser* and *Sipster* [GS] proved that for any language with
 an interactive proof protocol with private randomness (`IP`) also have an
-interactive proof with public randomness (`AP`). In particular, for any `k`
-`AM[k] ⊂ IP[k] ⊂ AM[k + 2]`. And because `AM[k + 2] = AM[k] = AM[2]` follows
+interactive proof with public randomness (`AP`). In particular, for any `k`:
+`AM[k] ⊂ IP[k] ⊂ AM[k + 2]`. And since `AM[k + 2] = AM[k] = AM[2]` follows
 that `IP[k] = AM[2]`.
 
 In short, any language with a `k`-round *private coin* `IP` system has a
 `k = 2` round *public-coin* `AM` system.
 
-Said that, is worth anticipating that even though general `IP` with secret
-random sources are not more powerful in terms of the range of languages they can
-prove, the secrecy of the randomness becomes crucial for proving statements
-without sharing any knowledge.
+Said that, is worth anticipating that even though general `IP` systems with
+secret random source are not more powerful in terms of the range of languages
+they can prove, the secrecy of the randomness becomes crucial for proving
+statements without sharing any knowledge.
 
 ### Examples
 
@@ -535,9 +534,9 @@ able to cheat (soundness error) is `ε = 1/2`. By repeating this protocol `k`
 times, the probability of Peggy cheating reduces to `1/2ᵏ`.
 
 Note that in this protocol a malicious Victor may put another, apparently equal,
-marble in front of the *prover* and infer if that is equal or not to the other.
+marble in front of Peggy and infer if that is equal or not to the other.
 
-#### Quadratic Non-Residuosity Problem
+#### Quadratic Non-Residuosity
 
 A number `y ∈ Zₘ*` is a quadratic residue if there exists an `x ∈ Zₘ*` such that
 `x² ≡ y (mod m)`. If no such `x` exists, `y` is a quadratic non-residue modulo `m`.
@@ -592,8 +591,8 @@ better discuss the core topic of this lecture: *the quantity of knowledge
 required to validate a statement*.
 
 The concept of Zero-Knowledge Proofs (ZKP) was first rigorously defined in the
-1980s by *Shafi Goldwasser*, *Silvio Micali*, and Rackoff in their seminal paper
-[GMR] (notably, the same paper that introduced Interactive Proof systems).
+1980s by *Goldwasser*, *Micali*, and *Rackoff* in their seminal paper [GMR]
+(notably, the same paper that introduced Interactive Proof systems).
 
 Before the GMR paper, most of the effort on `IP` systems area focused on
 the *soundness* of the protocols. That is, the sole conceived weakness was a
@@ -616,9 +615,9 @@ extending even to facts that are not directly related to the proof itself.
 
 More formally.
 
-> **Definition**. A proof system for a language `L` is considered
-**zero-knowledge** if, for all `x ∈ L`, Peggy reveals to Victor only the fact
-that `x ∈ L` (i.e., a single bit of information).
+> **Definition**. A proof system for a language `L` is  **zero-knowledge** if,
+for all `x ∈ L`, Peggy reveals to Victor only the fact that `x ∈ L` (i.e., a
+single bit of information).
 
 This definition holds true even when Victor is not honest, bounded by his
 polynomial-time capabilities.
@@ -631,7 +630,7 @@ Key attributes of a `ZKP` system `(P,V)` for a language `L`:
 - **Zero-Knowledgeness**: The proof does not reveal any additional information
   other than the fact that the statement is true.
 
-Of most importance is the following theorem found in the [GMW] paper:
+Of most importance is the following result found in the [GMW] paper:
 
 > **Theorem**. For any problem in `NP` there exist a `ZKP` system.
 
@@ -664,8 +663,8 @@ statistically indistinguishable from any genuine protocol execution.
 
 #### Probability Distributions Distinguishability 
 
-**distinguishability** refers to the ability of a polynomially computationally
-bounded Turing machine to distinguish between two random variables.
+**Distinguishability** refers to the ability of a polynomially computationally
+bounded *Turing machine* to distinguish between two random variables.
 
 In the realm of cryptographic protocols, ensuring indistinguishability between
 different protocol paths or choices is key to maintaining security against
@@ -680,11 +679,11 @@ simulator responses.
 
 More formally, consider two families of random variables, `P` and `S`, defined
 over a language `L ⊆ {0,1}*`. Indistinguishability of these variables becomes
-significant in scenarios where a verifier must decide whether a given sample `s`
+significant in scenarios where a verifier must decide whether a given sample
 originated from `P(x)` or `S(x)` for some `x ∈ L`.
 
 The verifier's decision-making process is influenced by two factors:
-- The size of the sample `s`.
+- The size of the sample.
 - The time available to decide.
 
 Based on these parameters, `P` and `S` can be classified as:
@@ -697,14 +696,14 @@ Based on these parameters, `P` and `S` can be classified as:
 In practice, given the verifier polynomial bounds, practical ZK proofs are often
 concerned with computational indistinguishability
 
-### Additional Takeaways
+#### Additional Considerations
 
 Any `ZK` protocol must be run in an environment which preclude the feasibility
 of constructing either an *extractor* or a *simulator*. The existence of these
 tools fundamentally compromise the proof's *soundness* and *zero-knowledgeness*.
 
 If Victor is able to construct an *extractor* then it will be able to
-extract knowledge from the proof, and thus undermine *zero-knowledgeness.
+extract knowledge from the proof, and thus undermine *zero-knowledgeness*.
 Conversely, if Peggy is able to construct a *simulator* she will be able to
 forge valid proofs without any knowledge, and thus undermine *soundness*.
 
@@ -736,10 +735,10 @@ This protocol consists of two phases:
    where the receiver learns the value of `v`. There should only one value of
    `v` which is compatible with the committed value.
 
-A very simple commitment scheme example for a value `x` is to generate some
-random salt and share the value `c = Hash(salt || x)`. To open the commitment
-the value of `x` and the salt is revealed. This is secure under the assumption
-that the hash function is secure.
+Given `H` a cryptographically secure hash function, a very simple commitment
+scheme for a value `x` is to share the value `c = H(x)`. To open the commitment
+the value of `x` is revealed. This is secure under the assumption that the hash
+function is secure.
 
 Both the computational complexity and the communication complexity of such
 protocols are reasonable and in fact one can amortize the work if there are
@@ -747,7 +746,7 @@ several simultaneous commitments.
 
 ---
 
-## Intuitive ZK Protocols
+## Simple ZK Protocols
 
 While *real-world* `ZK` proofs often rely on intricate mathematical structures
 and cryptographic techniques, there are simpler, more intuitive examples that
@@ -772,7 +771,7 @@ characters the goal is to find Waldo, the main character.
 Peggy asserts she knows where Waldo is and should convince Victor without
 revealing any additional information.
 
-M.Naor, Y.Naor and Reingold [NR], proposed an ingenious `ZK` proof or this
+*M.Naor*, *Y.Naor* and *Reingold* [NR], proposed an ingenious `ZK` proof or this
 problem.
 
 Given some illustration like:
@@ -802,8 +801,8 @@ This is an extended protocol designed to be sound:
 3. Peggy complies with the challenge.
 4. Victor is convinced based on the evidence.
 
-In one run, the soundness error is `ε = 1/2`, meaning that Peggy has a 50%
-change to cheat.
+In one run, the soundness error is `ε = 1/2`, meaning that Peggy has a `50%`
+chance to cheat.
 
 ### Ali Baba Cave
 
@@ -812,7 +811,7 @@ in a cave. The cave has a single entrance and splits into two paths, which
 reconnect at the end through this magic door. Ali Baba can prove his knowledge
 of the spell without revealing it.
 
-The following protocol, introduced by Quisquater [QUI], is very popular and
+The following protocol, introduced by *Quisquater* [QUI], is very popular and
 perhaps the most frequently used to introduce newcomers to the basics of `ZK`
 protocols.
 
@@ -835,17 +834,17 @@ with the pure definition of `ZK` proof which should be tailored to convince only
 Victor. The possibility of third parties observing or Victor recording the event
 would extend the proof's validity beyond the intended verifier.
 
-### Sudoku
+---
 
-Sudoku puzzles, particularly the `n²⨯n²` variants with `n⨯n` blocks, are an
-interesting case study in `ZKP`s, as these problems are `NP`-complete.
+## Intermediate ZK Proofs
+
+### Sudoku
 
 Given a Sudoku puzzle instance Peggy wants to convince Victor that she knows
 the solution without revealing it.
 
-The following protocol has been officially formally by *Ronen Gradwhol* et
-al. in the paper *Cryptographic and Physical Zero Knowledge Proof Systems for
-Solutons of Sudoku Puzzles*[^1] [GNPR].
+The following protocol has been formally introduced by *Gradwhol*, *Naor*,
+*Pinkas* and *Rothblum* [GNPR].
 
 Protocol:
 1. Peggy places three cards on each cell of the Sudoku grid. Pre-filled cells
@@ -874,10 +873,6 @@ A valid solution assigns an integer between `1` and `9` (the color) to each
 vertex, such that vertices that are joined by an edge do not have the same
 integer assigned to them.
 
-Sudoku solution grid is also a [Latin square](https://en.wikipedia.org/wiki/Latin_square)
-There are significantly fewer Sudoku grids than Latin squares because Sudoku
-imposes the additional subgrid constraints.
-
 ### Graph Three Coloring
 
 The generic [graph coloring](http://en.wikipedia.org/wiki/Graph_coloring)
@@ -888,10 +883,9 @@ Given a graph Peggy wants to convince Victor that she knows the solution for
 the graph three coloring problem for it, which is a specialization of the
 generic problem which only three colors are allowed.
 
-The following `ZK` protocol has been introduced by the *Oded Goldreich*, *Silvio
-Micali* and *Avi Wigderson* in the *"All Languages in NP Have Zero-Knowledge
-Proof Systems"*[GMW] paper and allows proving that we know a solution to the
-three coloring in ZK.
+The following `ZK` protocol has been introduced by the *Goldreich*, *Micali*
+and *Wigderson* and allows proving that we know a solution to the three coloring
+in ZK.
 
 Protocol:
 1. Peggy draws the graph, assigns to the solution the colors randomly and covers
@@ -907,45 +901,45 @@ data as on each run the colors are randomly assigned according to the solution.
 Given `E` the number of edges in the graph, since Victor checks only one out of
 the `E` possible ones, the soundness error probability is `ε = (E-1)/E`.
 
-The error approaces to `1` quite fast with the number of edges. Even though this
+The error approaches to `1` quite fast with the number of edges. Even though this
 value can be reduced arbitrarily by repeating the protocol, it is also quite
 expensive to be performed in practice.
 
 For example, if `E = 1000` and the *verifier* wants `ε < 0.1` then the protocol
-should be iterated for `k` rounds where `(999/1000)ᵏ < 1/10` → `k > 2301`.
+should be iterated for `k` rounds where `(999/1000)ᵏ < 1/10` and thus `k > 2301`.
 
-However, from a theoretical point of view this problem is quite important as  it
+However, from a theoretical point of view this problem is quite important as it
 is an `NP` complete problem, which means that we can construct a `ZK` proof for
 any problem in `NP`.
 
-You can find a nice app showing this proof in action [here](http://web.mit.edu/~ezyang/Public/graph/svg.html).
+You can find a nice app showing this proof in action
+[here](http://web.mit.edu/~ezyang/Public/graph/svg.html).
 
 ### Proofs for all NP
 
-While the specific examples provided earlier might seem limited in their direct
-application, some of them, such as the *Graph Three Coloring* problem, are
-`NP`-complete.
+While the examples provided in this section might seem limited in their direct
+application both are solutions for `NP`-complete problems.
 
 The implication is profound: **any** problem in the `NP` class can theoretically
-be converted into an instance of the *Graph Three Coloring*, and thus a `ZKP`
+be converted into an instance of the *graph three coloring*, and thus a `ZKP`
 exists for every problem in `NP`.
 
 The typical method for such a transformation begins with reformulating the `NP`
-problem into a Boolean circuit. This circuit is designed to generate a "true"
+problem into a *Boolean circuit*. This circuit is designed to generate a *true*
 output if and only if the input represents a correct solution to the original
 `NP` problem. Subsequently, this Boolean circuit is converted into a graph.
 The construction of this graph ensures that finding a valid three-coloring
 correlates directly with solving the original `NP` problem.
 
-While it's theoretically feasible, this approach is often not practical. The
+While theoretically feasible, this approach is often not practical. The
 transformation process can be computationally expensive, not to mention the
-high soundness error of the *Graph Tree Coloring* problem. Therefore, in
+high soundness error of the *graph three coloring* problem. Therefore, in
 practice, where possible more specialized and efficient approaches are employed
 for specific `NP` problems.
 
 ---
 
-## More Abstract ZK Protocols
+## More Advanced ZK Protocols
 
 ### Graph Isomorphism
 
@@ -959,13 +953,12 @@ current state of knowledge, not `NP`-complete.
 For this problem, Peggy aims to prove that `G₀` and `G₁` are isomorphic without
 revealing the specific mapping `f` such that `G₁ = f(G₀)`.
 
-That is, that the (G₁,G₂) couple belongs to he following language:
+That is, that the `(G₀,G₁)` couple belongs to the following language:
 
-    GI = { (G₁,G₂) | G₁ and G₂ are isomorphic }
+    GI = { (G₀,G₁) | G₀ and G₁ are isomorphic }
 
-The following `ZK` protocol has been introduced by the *Oded Goldreich*, *Silvio
-Micali* and *Avi Wigderson* in the *"All Languages in NP Have Zero-Knowledge
-Proof Systems"*[GMW] paper and allows proving that we know such mapping.
+The following `ZK` protocol has been introduced by the *Goldreich*, *Micali* and
+Wigderson* [GMW] and allows proving that we know such mapping.
 
 Protocol:
 1. Peggy selects a random bit `p ∈ {0,1}`, a random permutation `πₓ` and sends
@@ -990,9 +983,9 @@ For one run, the protocol has soundness error `ε = 1/2`.
 The *Graph Non-Isomorphism* problem is the complement of the *Graph Isomorphism*
 one, thus falls in the `co-NP` complexity class.
 
-The problem is about checking if a pair `(G₁,G₂)` belongs to the language:
+The problem is about checking if a pair `(G₀,G₁)` belongs to the language:
 
-    GNI = { (G₁,G₂) | G₁ and G₂ are not isomorphic }
+    GNI = { (G₀,G₁) | G₀ and G₁ are not isomorphic }
 
 This is of particular interest since, unlike the `GI` language where, if we
 ignore the `ZK` property, it can be solved using a traditional proof system
@@ -1044,15 +1037,15 @@ Protocol:
 
 For one run, the soundness error probability is `ε = 1/2`.
 
-- *Soundness* proof. Victor can construct an *extractor* which rewinds the protocol
+- *Soundness* proof. Victor constructs an *extractor* which rewinds the protocol
   execution to send to Peggy both `1` and `0` for the same run. It will thus
   acquire both `r` and `r·w` which allows recovering `w = r⁻¹·(r·w)`.
-- *Zero Knowledgeness* proof. Peggy can construct a *simulator* such that if
+- *Zero knowledgeness* proof. Peggy constructs a *simulator* such that if
   Victor's challenge is `1`, then she rewinds the protocol execution to commit
-  `y = r²·x⁻¹` and as challenge *response* `z = r`.
+  `y = r²·x⁻¹` and as the challenge response `z = r`.
   In this way `x·y = x·(r²·x⁻¹) = r² = z²` satisfies Victor's check.
 
-As for `GI`, we can prove the complement the `QR` language, known as `QNR`.
+As for `GI`, we can prove the complement of the `QR` language, known as `QNR`.
 You can find more information for this protocol in the [GMR2] paper.
 
 ---
@@ -1062,17 +1055,17 @@ You can find more information for this protocol in the [GMR2] paper.
 We finally reached the section where we can apply what we've seen so far to
 analyze some real-world cryptographic protocols.
 
-### Schnorr's Protocol
-
-A proof of knowledge protocol invented by Schnorr [SC] in the early 90s whose
-ideas where used for one of the most popular modern signature schemes.
-
-The context is in the realm of public key cryptography that relies on the
+The context is the realm of public key cryptography that relies on the
 hardness of solving the discrete logarithm problem in a cyclic group.
+
+### Schnorr's Protocol
 
 Given a cyclic group `G` with a generator `g` of prime order `p`, Peggy wants to
 prove to Victor her knowledge of the discrete logarithm `x ∈ Zₚ*` for some group
 element `y = gˣ ∈ G` without revealing any additional information.
+
+Follows a proof of knowledge protocol invented by *Schnorr* [SC] whose ideas where
+used for one of the most popular modern signature schemes.
 
 Protocol:
 1. Peggy selects a random `k ∈ Zₚ*` and sends `r = gᵏ` to Victor.
@@ -1093,16 +1086,15 @@ More formal versions of the core properties follows.
 
 #### Soundness Proof
 
-The **extractor** rewinds Peggy's execution to the challenge step after she
+The *extractor* rewinds Peggy's execution to the challenge step after she
 already responded to the challenge `c₁` with `s₁`. By presenting a different
 challenge `c₂` the extractor can induce Peggy to generate a different response
 `s₂` using the same `k`:
 
     s₁ = x·c₁ + k mod p
     s₂ = x·c₂ + k mod p
-
-    → s₁ - s₂ = x·(c₁ - c₂) mod p
-    → x = (s₁ - s₂)·(c₁ - c₂)⁻¹ mod p
+    s₁ - s₂ = x·(c₁ - c₂) mod p
+    x = (s₁ - s₂)·(c₁ - c₂)⁻¹ mod p
 
 The soundness proof highlights a crucial prerequisite for the protocol. Peggy
 must **never reuse the same value for `k`** in two different runs of the
@@ -1110,7 +1102,7 @@ protocol. Reusing `k` easily leads to the disclosure of her secret.
 
 #### Zero-Knowledgeness Proof
 
-The **simultor** rewinds Victor's execution before the commitment phase after he
+The *simulator* rewinds Victor's execution before the commitment phase after he
 shared the challenge `c`. She can now convince him without knowing the secret by
 committing to a value `r` computed as:
 
@@ -1120,15 +1112,15 @@ For any arbitrary value `s`.
 
 This convinces Victor, as the equation `gˢ = yᶜ·r = yᶜ·gˢ·y⁻ᶜ` holds true.
 
-Is worth noting that the *zero-knowledgeness* proof assumes the *verifier* to be
-honest (**HVZK**), meaning that `c` is not chosen in function of `r`. If `c` is
-dependent on `r` then `gˢ ≠ y^f(r)·r = y^f(r)·gˢ·y⁻ᶜ` rendering our *simulator*
-ineffective. In such a case, the simulation would no longer be indistinguishable
-from the actual transcript.
+Is worth noting that the *zero-knowledgeness* proof assumes Victor to be
+honest (**HVZK**), which in this case means that `c` is not chosen in function
+of `r`. If instead `c` is dependent on `r` then `gˢ ≠ y^f(r)·r = y^f(r)·gˢ·y⁻ᶜ`
+rendering our *simulator* ineffective. In such a case, the simulation would no
+longer be indistinguishable from the actual transcript.
 
 Although certain ZKP systems can prove *zero-knowledgeness* property even in the
-presence of a malicious verifier, this minor theoretical limitation in Schnorr's
-Protocol is not a concern for practical applications.
+presence of a malicious verifier, this minor theoretical limitation in
+*Schnorr*'s protocol is not a concern for practical applications.
 
 ### Non-Interactive Schnorr's Protocol
 
@@ -1136,16 +1128,16 @@ Our discussion so far has emphasized the importance of interactive proofs for
 certain problems. In the *real world*, this remains predominantly true. However,
 there is an *imaginary world* where this limitation can be circumvented.
 
-Converting Schnorr's protocol into a **non-interactive proof** initially seems
-infeasible due to its fundamental reliance on the verifier's randomly chosen
+Converting *Schnorr*'s protocol into a **non-interactive proof** initially seems
+infeasible due to its fundamental reliance on the *verifier*'s randomly chosen
 challenge. Yet, this is not true in the *imaginary world*.
 
-In the 1980s, Fiat and Shamir introduced a technique [FS], known as the
-*Fiat-Shamir heuristic*, to transform an interactive protocol into a
+In the 1980s, *Fiat* and *Shamir* [FS] introduced a technique, known as the
+**Fiat-Shamir heuristic**, to transform an interactive protocol into a
 non-interactive proof within an imaginary environment known as the **random
-oracle model** (ROM). Within this model we can replace the verifier's random
+oracle model** (ROM). Within this model we can replace the *verifier*'s random
 challenge with the output of a cryptographically secure hash function `H` seeded
-by both the problem input and the prover's commitment.
+by both the problem input and the *prover*'s commitment.
 
 Protocol:
 1. Peggy picks a random `k ∈ Zₚ*` and computes `r = gᵏ`.
@@ -1154,22 +1146,23 @@ Protocol:
 
 A verifier accepts the proof if `gˢ = yᶜ·r = g^(x·c + k)`.
 
-The implications of using the Fiat-Shamir heuristic are significant,
+The implications of using the *Fiat-Shamir* heuristic are significant,
 fundamentally altering the assumptions used to prove *soundness* and
 *zero-knowledgeness* of ZK protocols.
 
 Of course, since we are already working in a hypothetical environment we can
 also imagine to work with a programmable random oracle.
 
-**Restoring Soundness**: In a standard settings, an extractor depends on receiving
-two different responses `s₁` and `s₂` for the same commitment `r`, with different
-challenges. However, this approach doesn't work when using the Fiat-Shamir heuristic
-as `c = H(r)`. In the ROM, the proof holds if the extractor programs the oracle
-to return the same value `c` for two distict challenges `c₁` and `c₂`.
+*Restoring soundness*: in the standard settings, an *extractor* depends on
+receiving two different responses `s₁` and `s₂` for the same commitment `r`,
+with different challenges. However, this approach doesn't work when using
+the *Fiat-Shamir* heuristic as `c = H(r)`. In the ROM, the proof holds if the
+extractor programs the oracle to return the same value `c` for two distict
+challenges `c₁` and `c₂`.
 
-**Restoring Zero-Knowledgeness**: Similarly, a simulator depends on predicting
+*Restoring zero-knowledgeness*: similarly, the *simulator* depends on predicting
 the challenge `c` before generating the commitment `r`. This doesn't work with
-Fiat-Shamir heuristic as `c = H(r)` and `r` should be generated as
+*Fiat-Shamir* heuristic as `c = H(r)` and `r` should be generated as
 `r = gˢ·y⁻ᶜ mod p`. In the ROM, the proof holds if the simulator programs the
 oracle to return a known value for the commitment `r`.
 
@@ -1183,9 +1176,9 @@ it has been effectively used to demonstrate the security of various real-world
 cryptographic primitives. The essential requirement is that the prover must not
 be able to predict or control the hash output.
 
-#### Schnorr Signature Scheme
+#### Schnorr Signature
 
-The Non-Interactive Schnorr's protocol can be easily transformed into a
+The non-interactive *Schnorr*'s protocol can be easily transformed into a
 signature scheme by binding a message `m` to the challenge `c`:
 
     c = H(r || m)
@@ -1203,7 +1196,7 @@ verified without sharing sensitive information.
 This advancement is pivotal in today's technology-centric world, finding
 applications spanning from blockchain technology to secure cloud computing.
 
-New protocols like zk-SNARKs and zk-STARKs lately emerged to push even further
+New protocols like *zk-SNARK*s and *zk-STARK*s lately emerged to push even further
 the area from the verification of simple static statements to verification
 arbitrary computation, paving the way for a new era for data privacy.
 
