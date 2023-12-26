@@ -304,7 +304,7 @@ The introduction of randomness into the protocol can, in some scenarios, lead
 to more efficient proofs or enable to prove en entire new class of languages
 which can't be proven using deterministic proof systems.
 
-As outlined by the GMR paper:
+As outlined by GMR:
 - Peggy is assumed to have unbounded computational resources, while Victor
   operates within polynomial time constraints relative to the size of the
   statement to prove.
@@ -560,7 +560,7 @@ system.
 A protocol to show that `y ∈ QNR` is based on the fact that if `y ∈ QNR` then
 `y·k² ∈ QNR` for any `k ∈ Zₘ*`.
 
-Protocol:
+Protocol [GMR]:
 1. Victor selects a random number `r ∈ Zₘ*` and flips a coin. If the coin
    shows 'heads' he sets `t = r² mod m` else `t = y·r² mod m`. He sends `t`
    to Peggy.
@@ -748,19 +748,13 @@ several simultaneous commitments.
 
 ## Simple ZK Protocols
 
-While *real-world* `ZK` proofs often rely on intricate mathematical structures
-and cryptographic techniques, there are simpler, more intuitive examples that
-effectively convey the core principles of `ZK` proofs.
+While *real-world* ZK proofs often rely on intricate mathematical structures
+and cryptographic techniques, there are intuitive examples that effectively
+convey the same core principles of ZK proofs.
 
-In this section, we'll present some of the most accessible and intuitive
-protocols. We start from the ones which doesn't require any technical knowledge
-but at the same time are good to relay the intuition and the power of `ZK`
-proofs.
-
-Except for instances where specifically indicated otherwise, the protocols
-discussed are both sound and zero-knowledge. This is because it is feasible
-(and often straightforward) to construct both an *extractor* and a *simulator*
-for them.
+Except where specifically indicated, the protocols discussed are both sound and
+zero-knowledge. This is because it is feasible (and often straightforward) to
+construct both an *extractor* and a *simulator* for them.
 
 ### Where is Waldo
 
@@ -768,17 +762,12 @@ for them.
 kid's puzzle where, given a very detailed illustration with many different
 characters the goal is to find Waldo, the main character.
 
+![waldo-problem](/companions/zk-proofs/waldo-problem.png)
+
 Peggy asserts she knows where Waldo is and should convince Victor without
 revealing any additional information.
 
-*M.Naor*, *Y.Naor* and *Reingold* [NR], proposed an ingenious `ZK` proof or this
-problem.
-
-Given some illustration like:
-
-![waldo-problem](/companions/zk-proofs/waldo-problem.png)
-
-Original Protocol (as found in the paper):
+Protocol [NR]:
 1. Peggy covers the illustration with a large sheet of paper (bigger that the
    one with the illustration) which has a little hole in the center, positioned
    exactly over Waldo's face.
@@ -789,8 +778,8 @@ Original Protocol (as found in the paper):
 However, this initial protocol does not adequately address soundness concerns.
 How can the verifier be sure the covered illustration is the original one?
 
-This is an extended protocol designed to be sound:
-1. Peggy covers the illustration with bigger sheet having a 
+The following extended protocol is designed to be sound:
+1. Peggy covers the illustration with a bigger sheet with a 
    randomly positioned hole, then it covers this with an even bigger sheet
    without any hole. The illustration should be at a distance from the border
    at least equal to the size of the first sheet of paper (to better hide
@@ -801,23 +790,25 @@ This is an extended protocol designed to be sound:
 3. Peggy complies with the challenge.
 4. Victor is convinced based on the evidence.
 
-In one run, the soundness error is `ε = 1/2`, meaning that Peggy has a `50%`
-chance to cheat.
+For one run, soundness error is `ε = 1/2`, meaning that Peggy has a `50%` chance
+to cheat.
+
+A similar technique will be used in most of the subsequent protocols. Once
+Peggy committed the illustration position in the initial step, she can't
+change it. Since she doesn't know if Victor will ask her to reveal the original
+illustration or the face of Waldo, she must be prepared to satisfy either of
+these potential demands.
 
 ### Ali Baba Cave
 
-The story is about Ali Baba, who knows the magic spell to open a secret door
-in a cave. The cave has a single entrance and splits into two paths, which
+The story is about Ali Baba, a guy who knows the magic spell to open a secret
+door in a cave. The cave has a single entrance and splits into two paths, which
 reconnect at the end through this magic door. Ali Baba can prove his knowledge
 of the spell without revealing it.
 
-The following protocol, introduced by *Quisquater* [QUI], is very popular and
-perhaps the most frequently used to introduce newcomers to the basics of `ZK`
-protocols.
-
-Protocol:
-1. Ali Baba enters and randomly takes one of the two paths, while Victor waits
-   outside.
+Protocol [QUI]:
+1. Ali Baba enters the cave and randomly takes one of the two paths, while
+   Victor waits outside.
 2. Victor enters the cave, goes to the bisection, flips a coin, and based on
    the outcome, asks Ali Baba to come out from a specific path.
 3. Ali Baba complies with the Victor's request, using the magic door if necessary.
@@ -825,12 +816,12 @@ Protocol:
 
 ![ali-baba-cave](/companions/zk-proofs/ali-baba-cave.png)
 
-For one run, the protocol soundness error is `ε = 1/2`.
+For one run, soundness error is `ε = 1/2`.
 
 It is worth noting that if both parties go to the cave entrance together, Victor
 can observe Ali Baba entering one path and exiting from another, confirming
 his knowledge in one single run (`ε = 0`). However, this approach doesn't align
-with the pure definition of `ZK` proof which should be tailored to convince only
+with the pure definition of ZK proof which should be tailored to convince only
 Victor. The possibility of third parties observing or Victor recording the event
 would extend the proof's validity beyond the intended verifier.
 
@@ -840,13 +831,10 @@ would extend the proof's validity beyond the intended verifier.
 
 ### Sudoku
 
-Given a Sudoku puzzle instance Peggy wants to convince Victor that she knows
+Given a Sudoku puzzle instance, Peggy wants to convince Victor that she knows
 the solution without revealing it.
 
-The following protocol has been formally introduced by *Gradwhol*, *Naor*,
-*Pinkas* and *Rothblum* [GNPR].
-
-Protocol:
+Protocol [GNPR]:
 1. Peggy places three cards on each cell of the Sudoku grid. Pre-filled cells
    she places three cards with the assigned value, face-up. For other cells,
    she places the cards according to the solution, face-down.
@@ -856,8 +844,8 @@ Protocol:
    Victor.
 4. Victor checks that each group contains all numbers from 1 to 9.
 
-The soundness error for this protocol is `ε = 1/9`. The proof is a bit involved
-and not reported here for conciseness.
+The soundness error for this protocol is `ε = 1/9` (refer to [GNPR pp.~9] for
+a proof).
 
 The puzzle can be easily expressed as a graph coloring problem. For example,
 `3²⨯3²` variant is mapped to a graph with `81` vertices, one vertex for each cell.
@@ -883,20 +871,13 @@ Given a graph Peggy wants to convince Victor that she knows the solution for
 the graph three coloring problem for it, which is a specialization of the
 generic problem which only three colors are allowed.
 
-The following `ZK` protocol has been introduced by the *Goldreich*, *Micali*
-and *Wigderson* and allows proving that we know a solution to the three coloring
-in ZK.
-
-Protocol:
+Protocol [GMW]:
 1. Peggy draws the graph, assigns to the solution the colors randomly and covers
    each vertex with a hat.
 2. Victor randomly selects two adjacent vertices and aks Peggy to reveal their
    colors.
 3. Peggi reveals the colors of the selected vertices.
 4. Victor accepts or reject the proof based on the evidence.
-
-Even if Victor takes notes between runs, there is no way for him to link the
-data as on each run the colors are randomly assigned according to the solution.
 
 Given `E` the number of edges in the graph, since Victor checks only one out of
 the `E` possible ones, the soundness error probability is `ε = (E-1)/E`.
@@ -957,10 +938,7 @@ That is, that the `(G₀,G₁)` couple belongs to the following language:
 
     GI = { (G₀,G₁) | G₀ and G₁ are isomorphic }
 
-The following `ZK` protocol has been introduced by the *Goldreich*, *Micali* and
-Wigderson* [GMW] and allows proving that we know such mapping.
-
-Protocol:
+Protocol [GMW]:
 1. Peggy selects a random bit `p ∈ {0,1}`, a random permutation `πₓ` and sends
    `H = πₓ(Gₚ)` (permutation of `G₀` or `G₁`) to Victor.
 2. Victor selects a random bit `v ∈ {0,1}` and sends it to Peggy.
@@ -996,7 +974,7 @@ The protocol for proving knowledge of graph non-isomorphism has been proposed
 in the same paper which proposed the protocol to prove knowledge of graph
 isomorphism. This protocol requires the *prover* to use its infinite resources.
 
-Protocol:
+Protocol [GMW]:
 1. Victor selects a random bit `a ∈ {0,1}`, a random permutation `π` and sends
   `H = π(Gₐ)` to Peggy.
 2. Peggy using its unbounded computational power determines whether `H` is a
@@ -1024,10 +1002,7 @@ Peggy wants to prove that `x ∈ Zn*` is an element of the language:
 
     QR = { x | x is a quadratic residue }
 
-The following protocol has been proposed by Goldwasser, Micali and Rackoff in
-their GMR paper.
-
-Protocol:
+Protocol [GMR]:
 1. Peggy chooses a random `r ∈ Zn*` and sends `y = r²`.
 2. Victor tosses a coin, chooses `b ∈ {0,1}` and sends it.
 3. If `b = 0` then Peggy sends `z = r` else she sends `z = r·w`.
@@ -1064,10 +1039,7 @@ Given a cyclic group `G` with a generator `g` of prime order `p`, Peggy wants to
 prove to Victor her knowledge of the discrete logarithm `x ∈ Zₚ*` for some group
 element `y = gˣ ∈ G` without revealing any additional information.
 
-Follows a proof of knowledge protocol invented by *Schnorr* [SC] whose ideas where
-used for one of the most popular modern signature schemes.
-
-Protocol:
+Protocol [SC]:
 1. Peggy selects a random `k ∈ Zₚ*` and sends `r = gᵏ` to Victor.
 2. Victor selects a random `c ∈ Zₚ*` and sends it to Peggy.
 3. Peggy computes `s = x·c + k mod p` and sends it to Victor.
@@ -1081,8 +1053,6 @@ Security considerations:
 - Victor can't cheat because to extract the value of `x` from `s` he must
   compute `x = (s - k)·c⁻¹`. However, this requires him to solve the discrete
   logarithm problem for `r` in order to compute `k`.
-
-More formal versions of the core properties follows.
 
 #### Soundness Proof
 
@@ -1185,20 +1155,17 @@ signature scheme by binding a message `m` to the challenge `c`:
 
 ## Conclusions
 
-Embarking on a journey from classical mathematical proofs to the innovative
-world of Zero-Knowledge Proofs, we've traversed the landscape of both
-computational complexity and cryptography.
+The evolution from *classical* proofs to *zero-knowledge* proofs highlights
+a significant shift in problem-solving techniques, illustrating how complex
+solutions can be verified without sharing sensitive information.
 
-The evolution from classical proofs to ZKPs highlight a significant shift
-in problem-solving techniques, illustrating how complex solutions can be
-verified without sharing sensitive information.
+In recent years, *zero-knowledge* proofs have further evolved from being
+simple proofs of knowledge to more complex proofs of arbitrary computation,
+as exemplified by technologies like *zk-SNARK*s (Zero-Knowledge Succinct
+Non-Interactive Argument of Knowledge).
 
-This advancement is pivotal in today's technology-centric world, finding
+This advancement is crucial in today's technology-centric world, finding
 applications spanning from blockchain technology to secure cloud computing.
-
-New protocols like *zk-SNARK*s and *zk-STARK*s lately emerged to push even further
-the area from the verification of simple static statements to verification
-arbitrary computation, paving the way for a new era for data privacy.
 
 ---
 
