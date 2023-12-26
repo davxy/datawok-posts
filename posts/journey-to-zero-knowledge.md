@@ -1,7 +1,7 @@
 +++
-title = "The Evolution of Proof: A Journey to Zero-Knowledge"
+title = "Journey to Zero-Knowledge"
 date = "2023-08-06"
-modified = "2023-12-23"
+modified = "2023-12-26"
 tags = ["cryptography", "mathematics", "zk-proof"]
 toc = true
 +++
