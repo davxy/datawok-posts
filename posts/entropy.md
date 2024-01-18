@@ -1,7 +1,7 @@
 +++
 title = "Information Entropy"
 date = "2023-07-22"
-modified = "2023-09-02"
+modified = "2024-01-18"
 tags = ["cryptography","codes","entropy","information-theory"]
 toc = true
 +++
@@ -30,13 +30,13 @@ be seen as the inverse of **redundancy**.
 ## Random Variable Information
 
 If `X` is a data source that yields symbols of an alphabet and `x ∈ X` is a
-particular instance of `X` (aka an event), we can model `X` as a random variable
+particular instance of `X` (an event), we can model `X` as a random variable
 by assigning a probability value to each event `x ∈ X` such that `Pr(x) ∈ [0, 1]`
 and `∑ₓ Pr(X = x) = 1`.
 
-From now on, for conciseness we are going to alias `Pr(X = x)` with `p(x)`.
+From now on, for conciseness, we are going to alias `Pr(X = x)` with `p(x)`.
 
-When analyzing the entropy of a data source `X` its probability distribution is
+When analyzing the entropy of a data source `X`, its probability distribution is
 assumed to be known.
 
 We want to quantify the information gained from the observation of a particular
@@ -88,7 +88,7 @@ and if all the elements have the same probability of being observed, then
 this is the situation where on average we are mostly surprised to observe one
 specific event.
 
-The opposite case is when the probability is concentrated on a smaller set of
+The opposite case is when the probability is concentrated on a small set of
 elements. The surprise factor associated with high probable events is low and
 thus the overall `H(x)` value is lowered.
 
@@ -117,10 +117,13 @@ The left-hand trivially follows the entropy definition.
 
 The right-hand side intuitively follows the fact that we have max entropy when
 `X` has a uniform distribution. For a formal proof we need to resort to the
-Jensen's inequality:
+Jensen's inequality. For a concave function `f`:
 
-    E[f(Y)] ≤ f(E[Y]). Setting Y = 1/p(X):
-    → E[log₂(1/p(X))] = H(X) ≤ log₂(E[1/p(X)]) = log₂(|X|)
+    E[f(Y)] ≤ f(E[Y])
+
+Setting `Y = 1/p(X)` and `f(Y) = log₂(Y)`:
+
+    E[log₂(1/p(X))] = H(X) ≤ log₂(E[1/p(X)]) = log₂(|X|)
 
 Which follows from `E[1/p(X)] = ∑ₓ p(x)·1/p(x) = ∑ₓ 1 = |X|`
 
@@ -128,31 +131,31 @@ Which follows from `E[1/p(X)] = ∑ₓ p(x)·1/p(x) = ∑ₓ 1 = |X|`
 
 Example. `X` is the result of throwing a `6` faces die.
   
-Fair die: `p(x) = 1/6`
+Fair die: `p(x) = 1/6`, for all `x ∈ X`
 
     H(X) = -[p(1)·log₂(p(1)) + ... + p(6)·log₂(p(6))]
          = -[1/6·log₂(1/6) + ... + 1/6·log₂(1/6)]
          = -6·1/6·log₂(1/6) = log₂6 ≈ 2.58
 
-Unfair die: `p(5) = 1` and `p(i≠5) = 0`
+Unfair die: `p(5) = 1` and `p(x) = 0, ∀ x ≠ 5`
 
     H(X) = -p(5)·log₂(p(5)) = -1·log₂1 = 0
 
-Biased die: `p(1) = 1/2` and `p(x) = 1/10  ∀x ≠ 1`
+Biased die: `p(1) = 1/2` and `p(x) = 1/10, ∀ x ≠ 1`
 
     H(X) = -[p(1)·log₂(p(1)) + p(2)·log₂(p(2)) + ... + p(6)·log₂(p(6))]
          = -[1/2·log₂(1/2) + 5/10·log₂(1/10)]
          = 1/2 + 1/2·log₂10 = (1 + log₂10)/2 ≈ 2.16
 
-Note that `2^(2.58) ≈ 6` are the total number of possible events `|X|`.
+Note that `2^2.58 ≈ 6` are the total number of possible events `|X|`.
 
-Thus, the max entropy corresponds to the power of two that gives back the number
-of possible outcomes in a uniform distribution.
+Max entropy corresponds to the power of `2` that gives back the number of
+possible outcomes in a uniform distribution.
 
 
 ## Joint Entropy
 
-Given two random variables `X` and `Y`, the couple `(X,Y)` is still random
+Given two random variables `X` and `Y`, the couple `(X,Y)` is still a random
 variable. Follows that we can compute `H(X,Y)`.
 
 The values of `(X,Y)` are distributed according to the joint probability
@@ -160,7 +163,7 @@ distribution `p(X,Y)`:
 
     H(X,Y) = -∑ₓᵧ p(x,y)·log₂(p(x,y))
 
-(Remember, for a joint probability distribution `∑ₓᵧ p(x,y) = 1`)
+As for any other probability distribution, `∑ₓᵧ p(x,y) = 1`.
 
 
 ## Conditional Entropy
@@ -172,24 +175,25 @@ Let `X` and `Y` be two random variables. The conditional probability of `X`
 given `Y` is written as `p(X|Y)` and is defined as the probability of an event
 of `X` to happen after that an event of `Y` has been observed.
 
-The conditional probability is still a probability distribution, but typically
-defined on a smaller set of elements with respect to `X`.
+The conditional probability `p(X|Y)` is still a probability distribution, but
+generally defined on a sub set of elements of the whole set `X`.
 
-Computing the conditional entropy is just a matter of using conditional
-probabilities for the single events of `X` given the event `Y = y`:
+Computing the conditional entropy `p(X|Y=y)` is just a matter of using
+conditional probabilities for the single events of `X` given the event `Y = y`:
 
     H(X|Y=y) = -∑ₓ p(x|y)·log₂(p(x|y))
 
-(Remember, for a conditional probability distribution `∑ₓ p(x|y) = 1`)
+Remember, for a conditional probability distribution `∑ₓ p(x|y) = 1`.
 
 We now define the expected entropy of `X` after the observation a generic event
 `y ∈ Y`:
 
-    H(X|Y) = ∑ᵧ p(y)·H(X|y)
+    H(X|Y) = ∑ᵧ p(y)·H(X|Y=y)
            = ∑ᵧ [p(y) · -∑ₓ p(x|y)·log₂(p(x|y))]
+           = -∑ₓᵧ p(y)·p(x|y)·log₂(p(x|y))
            = -∑ₓᵧ p(x,y)·log₂(p(x|y))
 
-Equivalently
+Equivalently:
 
     H(X|Y) = -E[log₂(p(X|Y))] = E[I(x|y)]
 
@@ -214,27 +218,37 @@ reduces the entropy by one bit.
 
     → H(X|Y) = 1/2·H(X|Y=0) + 1/2·H(X|Y=1) ≈ log₂3 = 1.58
 
-For a biased die where `p(X=1) = 1/2` and `p(X=k) = 1/10`, `∀k ≠ 1`
+For a biased die where `p(X=1) = 1/2` and `p(X=x) = 1/10`, `∀x ≠ 1`
 
     H(X) = 1/2·log₂2 + 5·1/10·log₂10 ≈ 2.16
 
 We set `Y=0` iff `X=1` and `Y=1` otherwise. The events are equally probable.
     
     p(X=1|Y=0) = 1 and p(X≠1|Y=0) = 0
-    p(X=1,Y=0) = p(Y=0)·p(X=1|Y=0) = 1/2·1 = 1/2
-    → H(X|Y=0) = p(X=1,Y=0)·log₂(1/p(X=1|Y=0)) = 1/2·log₂1 = 0
+    → H(X|Y=0) = p(X=1|Y=0)·log₂(1/p(X=1|Y=0)) = 1·log₂1 = 0
 
-In this case knowing that the outcome of `Y` completely determine `X`.
+In this case knowing the outcome of `Y` completely determine `X`.
 
-    p(X=1|Y=1) = 0 and p(X=k|Y=1) = 1/5, ∀ k ≠ 1  
-    p(X=k,Y=1) = p(Y=1)·p(X=k|Y=1) = 1/2·1/5 = 1/10
-    → H(X|Y=1) = ∑ₖ p(X=k,Y=1)·log₂(1/p(X=k|Y=1)) = 5·1/10·log₂5  1/2·log₂5 ≈ 1.16
+    p(X=1|Y=1) = 0 and p(X=x|Y=1) = 1/5, ∀ x ≠ 1  
+    → H(X|Y=1) = ∑ₓ p(X=x|Y=1)·log₂(1/p(X=x|Y=1)) = 5·1/5·log₂5 ≈ 2.32
 
-In this case knowing that the outcome is `>1` reduces the entropy by one bit.
+The overall conditional entropy is thus:
 
-Reducing the entropy of one bit doesn't imply the removal of half of the
-possible outcomes. Instead, it signifies the elimination of one or more possible
-events whose combined probabilities equal `1/2`.
+    H(X|Y) = 1/2·H(X|Y=0) + 1/2·H(X|Y=1) = 1/2·0 + 1/2·log₂5 ≈ 1.16
+
+In this case knowing that the outcome is `>1` lowers the entropy by `1` bit.
+
+Note that removing one bit of entropy doesn't necessarily mean the exclusion
+of half of the possible events. Instead, it means the exclusion of one or more
+possible events whose probabilities sum is equal to `1/2`.
+
+Even though is perfectly possible that:
+
+    H(X|Y=y) ≥ H(X)
+
+In general, we always have that:
+
+    H(X|Y) ≤ H(X)
 
 ### Chain Rule
 
@@ -245,7 +259,6 @@ Proof.
     H(X,Y) = -∑ₓᵧ p(x,y)·log₂p(x,y)
            = -∑ₓᵧ p(x,y)·log₂(p(y)·p(x|y))
            = -∑ₓᵧ p(x,y)·[log₂p(y) + log₂p(x|y)]
-           = -∑ₓᵧ [p(x,y)·log₂p(y) + p(x,y)·log₂p(x|y)]
            = -∑ₓᵧ p(x,y)·log₂p(y) + -∑ₓᵧ p(x,y)·log₂p(x|y) 
            = -∑ᵧ p(y)·log₂p(y) + -∑ₓᵧ p(x,y)·log₂p(x|y) 
            = H(Y) + H(X|Y)
@@ -259,7 +272,8 @@ Example for the die roll with `Y = 0` iff `X` is even and `Y = 1` otherwise:
     H(Y,X) = H(Y) + H(X|Y) = log₂2 + log₂3 = log₂6
 
 Follows that, when possible, it is always convenient to compute the conditional
-probability that has a zero value.
+probability that has a zero value (i.e. the one where the conditioned variable
+value is completely determined by the other).
 
 **Corollary**. When `Y` is a function of `X` (`X` completely determines `Y`)
 then `H(X,Y) = H(X)`.
@@ -273,7 +287,37 @@ only when `X` and `Y` are independent.
 
     H(X,Y) = H(X) + H(Y|X) ≤ H(X) + H(Y)
 
-All these properties can be generalized to arbitrary sized tuples.
+All these properties can be generalized to an arbitrary number of variables.
+
+### Residual Possibilities Bound
+ 
+Given `|Xᵧ| = |{x: p(x|y) > 0}|` the number of events of `X` that are possible
+after the observation of the event `Y = y`. Then:
+
+    E[|Xᵧ|] ≥ 2^H(X|Y)
+
+Proof.
+
+    0 ≤ H(X|y) ≤ log₂(|Xᵧ|)
+
+(This is quite natural given that: `0 ≤ H(X) ≤ log₂(|X|)`)
+
+Taking the average values over `Y`:
+
+    0 ≤ ∑ᵧ p(y)·H(X|y) ≤ ∑ᵧ p(y)·log₂(|Xᵧ|)
+
+Using the *Jensen's Inequality* for concave functions:
+
+    0 ≤ H(X|Y) ≤ E[log₂(|Xᵧ|)] ≤ log₂(E[|Xᵧ|])
+
+And thus:
+
+    1 ≤ 2^H(X|Y) ≤ E(|Xᵧ|).
+
+∎
+ 
+For the die roll example of previous section, `H(X|Y) = log₂3` and thus
+`E[|Xᵧ|] ≥ 2^log₂3 = 3`.
 
 
 ## Mutual Information
@@ -296,7 +340,6 @@ relative to `X` the observation of `Y` yields. Obviously `0 ≤ I(X;Y) ≤ H(X)`
     I(X;Y) = H(X) - H(X|Y) = H(X) - H(X,Y) + H(Y)
     I(Y;X) = H(Y) - H(Y|X) = H(Y) - H(X,Y) + H(X)
 
-    I(X;Y) - I(Y;X) = 0  →  I(X;Y) = I(Y;X)
 ∎
 
 Example for the die roll with `Y = 0` if `X` is even and `Y = 1` otherwise:
@@ -307,64 +350,37 @@ Example for the die roll with `Y = 0` if `X` is even and `Y = 1` otherwise:
 In the second case note that observing `X` gives full information about `Y`.
 
 
-## Residual Possibilities Bound
- 
-Given `|Xᵧ| = |{x: p(x|y) > 0}|` the number of events of `X` that are possible
-after the observation of the event `Y = y`.
-
-We are interested in the expected value of `|Xᵧ|` after the observation of a
-generic event `y ∈ Y`.
-
-    E[|Xᵧ|] = ∑ᵧ p(y)·|Xᵧ| , ∀ y ∈ Y
-
-Because `H(X|Y)` are the average bits of uncertainty after the observation of
-a generic event `y ∈ Y` then as the upper bound to the entropy we can use the
-average elements of `X` after the observation of the same variable `Y`:
-
-    0 ≤ H(X|y) ≤ log₂(|Xᵧ|)
-
-Taking the average values over `Y` and using the *Jensen's Inequality*
-
-    0 ≤ ∑ᵧ p(y)·H(X|y) ≤ ∑ᵧ p(y)·log₂(|Xy|)
-
-    0 ≤ H(X|Y) ≤ E[log₂(|Xy|)] ≤ log₂(E[|Xy|])
-
-And thus
-
-    1 ≤ 2^H(X|Y) ≤ E(|Xy|).
- 
-Example. For die roll `H(X|Y) = log₂3`, thus `E[|Xy|] ≥ 2^log₂3 = 3`
-
-
 ## Kullback-Leibler Divergence
 
-Also known as KL divergence or relative entropy, is a measure of how much
-two probability distributions are different from each other.
+Also known as KL relative entropy, it provides a measure of how much two
+probability distributions are different from each other.
 
 **Definition**. Given two probability distributions `p` and `q` defined for the
-same variable `X`, KL divergence measures some kind of *distance* between the
-two distributions.
+same variable `X`, the Kullback-Leibler divergence measures some kind of
+*distance* between the two distributions.
 
     D(p||q) = ∑ₓ p(x)·log₂(p(x)/q(x))  ∀x ∈ X
 
-With the convention that:
+With the conventions that:
 
-    0·log₂(0/q) = 0  for q ≥ 0
-    p·log₂(p/0) = +∞ for p ≥ 0
+    0·log₂(0/q(x)) = 0      for q ≥ 0
+    p(x)·log₂(p(x)/0) = +∞  for p > 0
+
+This is a limitation, it can be infinite where `q(x) = 0` and `p(x) ≠ 0`.
 
 Note that it is not a distance in the strict mathematical sense of the term,
 as triangle inequality doesn't hold and `D(p||q) ≠ D(q||p)`.
 
 Furthermore, it is additive for independent distributions. 
 
-**Gibbs Inequality**
+Theorem. **Gibbs Inequality**
 
     D(p||q) ≥ 0, with D(p||q) = 0 iff p = q
 
 *Proof*
 
 Given that `log₂x = logₑx/logₑ2`, we'll use `logₑ` instead of `log₂` as `logₑ2`
-only scales the relation we want to prove.
+only scales the relation we want to prove by a constant factor.
 
 Because `logₑx ≤ x - 1` for all `x > 0`, with equality iff `x = 1`, We have:
 
@@ -382,75 +398,73 @@ of the function `f(x) = x - logₑx - 1` (i.e. find local minima using derivativ
 
 ### Application to Hypothesis Testing
 
-Hypothesis testing is a statistical methodology where we are required to choose
-between two hypotheses: `H0` and `H1` who correspond to two possible
+Hypothesis testing is a statistical technique where we are required to
+choose between two hypotheses: `H₀` and `H₁` who correspond to two possible
 distributions `p` and `q`.
 
 Given a random variable `X` we want to decide if it follows the distribution
 `p` or `q`, and thus to check which of the hypothesis is correct.
 
-`H0` is called **null hypothesis** and `H1` is called **alternative hypothesis**.
+`H₀` is called **null hypothesis** and `H₁` is called **alternative hypothesis**.
 
-The process involves calculating a test statistic and determining the
-corresponding *p-value*, which represents the probability of observing a test
-statistic as extreme or more extreme than the one calculated, given that the
-null hypothesis is true.
-
-A *statistic* is a single value computed from a sample of data summarizing
+A test *statistic* is a single value computed from a sample of data summarizing
 some aspects of the sample and used to make inferences about the population.
-Example statistics are *mean*, *median* and *mode* of a dataset.
+Example statistics are the *mean*, *median* and *mode* of a dataset.
 
-**Log-Likelihood Ratio (LLR)**
+The hypothesis testing process involves computing a test statistic and
+determining the corresponding *p-value*, which represents the probability of
+observing a test statistic as extreme or more extreme than the one calculated,
+assuming the null hypothesis is true.
 
-For each independent event `x ∈ X` we compute the LLR:
+#### Log-Likelihood Ratio (LLR)
+
+For each independent event `x ∈ X` we compute:
 
     LLR = log₂(p(x)/q(x))
 
 For each event:
-- If `LLR > 0`, i.e. `p(x)/q(x) > 1`, then the event `x` is more probable under
-  `H0` than under `H1`.
-- If `LLR < 0`, i.e. `p(x)/q(x) < 1`, then the event `x` is more probable under
-  `H1` than under `H0`.
-- If `LLR = 0` then are equally likely.
+- If `LLR > 0` (`p(x)/q(x) > 1`), then the event `x` is more probable under `H₀`;
+- If `LLR < 0` (`p(x)/q(x) < 1`), then the event `x` is more probable under `H₁`
+- If `LLR = 0`, then is equally likely under `H₀` and `H₁`.
 
 We then calculate the `LLR` empirical expected value as:
 
-    E[LLR] = 1/|X| · ∑ₓ log(p(x)/q(x)), ∀ x ∈ X
+    E[LLR] = ∑ₓ freq(x)/|X| · log₂(p(x)/q(x)), ∀ x ∈ X
 
-- If `H0` is true: `E[LLR]` converges to `∑ₓ p(x)·log₂(p(x)/q(x)) = D(p||q)` 
-- If `H1` is true: `E[LLR]` converges to `∑ₓ q(x)·log₂(p(x)/q(x)) =
+With `freq(x)` the empirical frequency of `x` in the sample.
+
+- If `H₀` is true then `E[LLR]` converges to `∑ₓ p(x)·log₂(p(x)/q(x)) = D(p||q)` 
+- If `H₁` is true then `E[LLR]` converges to `∑ₓ q(x)·log₂(p(x)/q(x)) =
                                          -∑ₓ q(x)·log₂(q(x)/p(x)) = -D(q||p)`
 
-Follows that if `H0` is true `E[LLR] ≥ 0` else `E[LLR] < 0`
+Follows that if `H₀` is true `E[LLR] ≥ 0` else `E[LLR] < 0`
 
 Note that the test can fail:
-- **False positive**: if we incorrectly reject `H0`.
-- **False negative**: if we incorrectly accept `H0`. 
-
-The test error probability can be quantified.
+- **False positive**: if we incorrectly reject `H₀`.
+- **False negative**: if we incorrectly accept `H₀`. 
 
 #### Chernoff-Stein Lemma
 
 The decision error probability respects the following laws (`k = |X|`):
-1. The false positive probability `α` decreases asymptotically as `2^(-k·D(q||p))`
-2. The false negative probability `β` decreases asymptotically as `2^(-k·D(p||q))`
+1. The false positive probability `𝛼` decreases asymptotically as `2^(-k·D(q||p))`
+2. The false negative probability `𝛽` decreases asymptotically as `2^(-k·D(p||q))`
 
 In both cases we assume that both `D(p||q)` and `D(q||p)` are less than `+∞`.
 
-Because in general `D(p||q) ≠ D(q||p)` then `α ≠ β`.
+Because in general `D(p||q) ≠ D(q||p)` then `𝛼 ≠ 𝛽`.
 
-Example with coin toss.
+Example with coin toss:
 
     p = {1/2, 1/2},  q = {3/5, 2/5}
     D(p||q) = 1/2·log₂(1/2·5/3) + 1/2·log₂(1/2·5/2) ≈ 0.029
     D(q||p) = 3/5·log₂(3/5·2/1) + 2/5·log₂(2/5·2/1) ≈ 0.093
 
-    α ≈ 2^(-k·0.093) , β ≈ 2^(-k·0.029)
+    𝛼 ≈ 2^(-k·0.093) , 𝛽 ≈ 2^(-k·0.029)
 
 Using these estimations we can arbitrarily lower the error probability,
 for example:
 
-    α ≈ 2^(-k·D(q||p)) < ε → k > -log₂ε/D(q||p)
+    𝛼 ≈ 2^(-k·D(q||p)) < ε → k > -log₂ε/D(q||p)
 
 
 ## Cross Entropy
@@ -460,16 +474,17 @@ observed then we may end up using a distribution `q` that is not equal to the
 real distribution driving the data source `p`.
 
 Using the code determined by `q` when the real distribution is `p` gives us an
-average encoding for a symbol `x`:
+average encoding length for the symbols of the language:
 
-    H(X;p||q) = ∑ₓ p(x)·|c(x)| ≈ ∑ₓ p(x)·log₂(1/q(x))
+    H(p||q) = ∑ₓ p(x)·|c(x)| ≈ ∑ₓ p(x)·log₂(1/q(x))
 
-Where `c(x)` is the encoding of the symbol `x`.
+Where `c(x)` is the encoding of the symbol `x` and `|c(x)| = 1/q(x)` is the
+optimal encoding length of `x` when `p(x) = q(x)`.
 
 In general:
-- `H(X;p||q)` is not an entropy value (in the strict sense)
-- `H(X;p||q) ≠ H(X;q||p)`
-- `H(X) ≤ H(X;p||q)`
+- `H(X; p||q)` is not an entropy value (in the strict sense)
+- `H(X; p||q) ≠ H(X; q||p)`
+- `H(X) ≤ H(X; p||q)`
 
 The last statement proof is a corollary of Gibb's inequality:
 
@@ -477,19 +492,19 @@ The last statement proof is a corollary of Gibb's inequality:
             = ∑ₓ p(x)·log₂p(x) - ∑ₓ p(x)·log₂q(x) ≥ 0
 
     → ∑ₓ p(x)·log₂p(x) ≥ ∑ₓ p(x)·log₂q(x)
-    → H(X) = -∑ₓ p(x)·log₂p(x) ≤ -∑ₓ p(x)·log₂q(x) = H(X;p||q)
+    → H(X) = -∑ₓ p(x)·log₂p(x) ≤ -∑ₓ p(x)·log₂q(x) = H(X; p||q)
 
 **Linking Identity**:
 
-    H(X;p||q) = H(X) + D(p||q)
+    H(X; p||q) = H(X) + D(p||q)
 
 *Proof*. Let's assume that `q(x) ≥ 0`.
 
-    H(p||q) = ∑ₓ p(x)·log₂(1/q(x))
-            = ∑ₓ p(x)·log₂(1/p(x)·p(x)/q(x))
-            = ∑ₓ (p(x)·log₂(1/p(x)) + p(x)·log₂(p(x)/q(x)))
-            = ∑ₓ p(x)·log₂(1/p(x)) + ∑ₓ p(x)·log₂(p(x)/q(x))
-            = H(p) + D(p||q)
+    H(X; p||q) = ∑ₓ p(x)·log₂(1/q(x))
+               = ∑ₓ p(x)·log₂(1/p(x) · p(x)/q(x))
+               = ∑ₓ (p(x)·log₂(1/p(x)) + p(x)·log₂(p(x)/q(x)))
+               = ∑ₓ p(x)·log₂(1/p(x)) + ∑ₓ p(x)·log₂(p(x)/q(x))
+               = H(p) + D(p||q)
 
 
 ## Other Properties
