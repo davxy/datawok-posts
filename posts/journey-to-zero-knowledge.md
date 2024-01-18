@@ -6,6 +6,8 @@ tags = ["cryptography", "mathematics", "zk-proof"]
 toc = true
 +++
 
+Article [download](/companions/zk-proofs/journey-to-zero-knowledge.pdf)
+
 ## Introduction
 
 Zero-Knowledge Proofs (ZKP) represent a fascinating and influential concept

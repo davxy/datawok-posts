@@ -155,11 +155,11 @@ to a removable media.
 Export the key information in 'armor' format (printable base64 encoded
 data).
 
-Export all the secret keys (including the subkeys)
+Export the secret key (including any subkeys)
 
     $ gpg --armor --export-secret-key <key-id> > secret_key.asc
 
-Export the secret key only (not the exclamation mark)
+Export the secret key only (not any subkeys)
 
     $ gpg --armor --export-secret-key <key-id>! > master_secret_key.asc
 
@@ -391,6 +391,8 @@ deletion. This is by using the following command:
 ### Import Smart Card Secrets Stubs
 
 Import the secret keys *stubs* from a smart card or token (e.g. Yubikey):
+
+    $ gpg --import <public-keys.asc>
 
     $ gpg --card-status
     ...
