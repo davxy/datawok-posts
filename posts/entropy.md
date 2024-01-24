@@ -6,68 +6,60 @@ tags = ["cryptography","codes","entropy","information-theory"]
 toc = true
 +++
 
-Entropy is the basic measure to quantify the information yielded by some source.
+Entropy serves as a fundamental metric for quantifying the information produced
+by a data source. This concept, primarily developed and explored by Shannon
+around 1948, forms the cornerstone of **information theory**. This field
+underpins the development of modern techniques in error correction, data
+compression, and cryptographic systems.
 
-The measure has been mostly introduced and studied by Shannon (~1948) as part of
-the broader area of **information theory**, which represents the foundation of
-modern correction, compression and cryptographic codes.
+Consider a random variable `X`. The entropy of `X` quantifies the uncertainty
+associated with the outcomes of `X`. It is intrinsically linked to the notion of
+**information content**. Indeed, these terms are frequently used synonymously.
+For any data source, a higher entropy signifies greater informational content in
+each data sample.
 
-
-## Introduction
-
-**Entropy**. Given a random variable `X`, the entropy of `X` is the measure
-of uncertainty on the result of `X`.
-
-Entropy is closely related to **information content**, and in fact, they are
-often used interchangeably. For a data source, the higher is its entropy the
-more information a particular message extraction contains in general.
-
-The entropy of a data source also implicitly defines how much we can
-**compress** the yielded information. In practice, in this context, entropy can
-be seen as the inverse of **redundancy**.
-
+Moreover, the entropy of a data source provides insights into the potential
+for compressing its information. In practical terms, entropy can be regarded
+as the converse of **redundancy**, indicating the extent to which data can be
+efficiently encoded.
 
 ## Random Variable Information
 
 If `X` is a data source that yields symbols of an alphabet and `x ∈ X` is a
 particular instance of `X` (an event), we can model `X` as a random variable
-by assigning a probability value to each event `x ∈ X` such that `Pr(x) ∈ [0, 1]`
-and `∑ₓ Pr(X = x) = 1`.
+by assigning a probability value `p(X = x)` to each event `x ∈ X`.
 
-From now on, for conciseness, we are going to alias `Pr(X = x)` with `p(x)`.
+From now on, for conciseness, we are going to alias `p(X = x)` with `p(x)`.
 
-When analyzing the entropy of a data source `X`, its probability distribution is
-assumed to be known.
+When analyzing the entropy of a data source `X`, its probability distribution
+`p` is assumed to be known.
 
-We want to quantify the information gained from the observation of a particular
-instance `x` of the variable `X`.
+We want to quantify the **information** gained from the observation of a
+particular instance `x` of the variable `X`.
 
 When a particular instance `x` is observed, if `p(x)` is small then the
 information gain associated with the event for an observer is high. In contrast,
 if `p(x)` is high then the event doesn't provide a lot of new information
 because the event was already expected to happen.
 
-The **information** gained by observing the event `x` is thus some kind of
-inverse of `p(x)`, in particular it is defined as the logarithm in base `2` of
-the inverse:
+The information gained by observing an event `x` is thus some kind of inverse of
+`p(x)`, in particular it is defined as:
 
     I(x) = log₂(1/p(x))
 
 The `log₂` is used because we are reasoning in terms of bits of information.
 
-For example:
+For instance:
 
     p(x) = 1/2  →  I(x) = 1    (one bit of information, i.e. true/false)
     p(x) = 1/8  →  I(x) = 3
 
 The logarithm has some nice properties we rely on, we want that the information
 provided by two independent events `x` and `y` to be equal to the sum of the
-two information:
+information they independently yield:
 
-    I(x,y) = log₂(1/p(x,y)) =     (the events are independent, thus..)
-           = log₂(1/(p(x)p(y))) = (for the log properties..)
-           = log₂(1/p(x)) + log₂(1/p(y))
-           = I(x) + I(y)
+    I(x,y) = log₂(1/p(x,y)) = log₂(1/(p(x)p(y)))
+           = log₂(1/p(x)) + log₂(1/p(y)) = I(x) + I(y)
 
 
 ## Entropy
@@ -165,6 +157,8 @@ distribution `p(X,Y)`:
 
 As for any other probability distribution, `∑ₓᵧ p(x,y) = 1`.
 
+Note that since `p(X,Y) = p(Y,X)` then `H(X,Y) = H(Y,X)`.
+          
 
 ## Conditional Entropy
 
@@ -183,19 +177,16 @@ conditional probabilities for the single events of `X` given the event `Y = y`:
 
     H(X|Y=y) = -∑ₓ p(x|y)·log₂(p(x|y))
 
-Remember, for a conditional probability distribution `∑ₓ p(x|y) = 1`.
+Remember, for a conditional probability distribution `∑ₓ p(x|y) = 1`
+(Note that we sum just over all possible `x`, `y` is fixed).
 
-We now define the expected entropy of `X` after the observation a generic event
+Now we define the expected entropy of `X` after the observation a generic event
 `y ∈ Y`:
 
     H(X|Y) = ∑ᵧ p(y)·H(X|Y=y)
            = ∑ᵧ [p(y) · -∑ₓ p(x|y)·log₂(p(x|y))]
            = -∑ₓᵧ p(y)·p(x|y)·log₂(p(x|y))
            = -∑ₓᵧ p(x,y)·log₂(p(x|y))
-
-Equivalently:
-
-    H(X|Y) = -E[log₂(p(X|Y))] = E[I(x|y)]
 
 Example:
 
@@ -238,17 +229,16 @@ The overall conditional entropy is thus:
 
 In this case knowing that the outcome is `>1` lowers the entropy by `1` bit.
 
-Note that removing one bit of entropy doesn't necessarily mean the exclusion
-of half of the possible events. Instead, it means the exclusion of one or more
-possible events whose probabilities sum is equal to `1/2`.
+This last example shows that removing one bit of entropy doesn't necessarily
+mean the exclusion of half of the possible events. Instead, it means the
+exclusion of one or more possible events whose probabilities sum to `1/2`.
 
-Even though is perfectly possible that:
-
-    H(X|Y=y) ≥ H(X)
-
-In general, we always have that:
+Even though is absolutely possible that `H(X|Y=y) ≥ H(X)`, in general:
 
     H(X|Y) ≤ H(X)
+
+This last statement will be proven later after the introduction of mutual
+information and Kullback-Leibler divergence.
 
 ### Chain Rule
 
@@ -264,8 +254,6 @@ Proof.
            = H(Y) + H(X|Y)
 ∎
 
-Note that since `p(X,Y) = p(Y,X)` then `H(X,Y) = H(Y,X)`.
-          
 Example for the die roll with `Y = 0` iff `X` is even and `Y = 1` otherwise:
 
     H(X,Y) = H(X) + H(Y|X) = log₂6 + 0 = log₂6
@@ -298,7 +286,7 @@ after the observation of the event `Y = y`. Then:
 
 Proof.
 
-    0 ≤ H(X|y) ≤ log₂(|Xᵧ|)
+    0 ≤ H(X|Y=y) ≤ log₂(|Xᵧ|)
 
 (This is quite natural given that: `0 ≤ H(X) ≤ log₂(|X|)`)
 
@@ -316,13 +304,13 @@ And thus:
 
 ∎
  
-For the die roll example of previous section, `H(X|Y) = log₂3` and thus
+For the die roll example of the previous section, `H(X|Y) = log₂3` and thus
 `E[|Xᵧ|] ≥ 2^log₂3 = 3`.
 
 
 ## Mutual Information
 
-**Definition**. The quantity `I(X;Y) = H(X) - H(X|Y) `is known as **mutual
+**Definition**. The quantity `I(X;Y) = H(X) - H(X|Y)` is known as **mutual
 information** between `X` and `Y` and represents how many bits of information
 relative to `X` the observation of `Y` yields. Obviously `0 ≤ I(X;Y) ≤ H(X)`.
 
@@ -347,17 +335,15 @@ Example for the die roll with `Y = 0` if `X` is even and `Y = 1` otherwise:
     I(X;Y) = H(X) - H(X|Y) = log₂6 - log₂3 = 1
     I(Y;X) = H(Y) - H(Y|X) = log₂2 - 0 = log₂2 = 1
 
-In the second case note that observing `X` gives full information about `Y`.
-
 
 ## Kullback-Leibler Divergence
 
 Also known as KL relative entropy, it provides a measure of how much two
 probability distributions are different from each other.
 
-**Definition**. Given two probability distributions `p` and `q` defined for the
-same variable `X`, the Kullback-Leibler divergence measures some kind of
-*distance* between the two distributions.
+Given two probability distributions `p` and `q` defined for the over the same
+variable `X`, the Kullback-Leibler divergence measures some kind of distance
+between the two distributions.
 
     D(p||q) = ∑ₓ p(x)·log₂(p(x)/q(x))  ∀x ∈ X
 
@@ -366,12 +352,11 @@ With the conventions that:
     0·log₂(0/q(x)) = 0      for q ≥ 0
     p(x)·log₂(p(x)/0) = +∞  for p > 0
 
-This is a limitation, it can be infinite where `q(x) = 0` and `p(x) ≠ 0`.
+The second condition is indeed a limitation, as the distance can be infinite
+wherever `q(x) = 0` and `p(x) ≠ 0` for some `x`.
 
 Note that it is not a distance in the strict mathematical sense of the term,
 as triangle inequality doesn't hold and `D(p||q) ≠ D(q||p)`.
-
-Furthermore, it is additive for independent distributions. 
 
 Theorem. **Gibbs Inequality**
 
@@ -469,17 +454,16 @@ for example:
 
 ## Cross Entropy
 
-When we decide what is the optimal encoding for a language that we empirically
-observed then we may end up using a distribution `q` that is not equal to the
-real distribution driving the data source `p`.
+When we decide what is the optimal encoding for a data source `X` that we
+empirically observed then we may end up using a distribution `q` that is not
+equal to the real distribution driving the data source `p`.
 
 Using the code determined by `q` when the real distribution is `p` gives us an
 average encoding length for the symbols of the language:
 
     H(p||q) = ∑ₓ p(x)·|c(x)| ≈ ∑ₓ p(x)·log₂(1/q(x))
 
-Where `c(x)` is the encoding of the symbol `x` and `|c(x)| = 1/q(x)` is the
-optimal encoding length of `x` when `p(x) = q(x)`.
+Where `|c(x)|` is the encoding length of the symbol `x`.
 
 In general:
 - `H(X; p||q)` is not an entropy value (in the strict sense)
