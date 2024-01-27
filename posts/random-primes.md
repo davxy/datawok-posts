@@ -270,10 +270,10 @@ and indeed there relatively *small* pre-built tables.
 
 ### Miller-Rabin Test
 
-Extends the Fermat test by applying the quadratic reminders' property to
+Extends the Fermat test by applying the quadratic remainders' property to
 a candidate.
 
-#### Quadratic reminders
+#### Quadratic remainders
 
 **QR Theorem**. Given a prime number `p` and `x < p`, then:
 

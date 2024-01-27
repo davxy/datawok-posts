@@ -1,5 +1,5 @@
 +++
-title = "Chinese Reminder Theorem"
+title = "Chinese Remainder Theorem"
 date = "2017-10-02"
 modified = "2023-12-11"
 tags = ["cryptography","number-theory"]
@@ -30,7 +30,7 @@ The system has a unique solution `x ∈ Zₘ`.
 
 *Existence* (by construction)
 
-By hypothesis, `mᵢ | m` and `(m/mᵢ,mᵢ) = 1` then `m/mᵢ` has multiplicative
+By hypothesis, `mᵢ|m` and `(m/mᵢ,mᵢ) = 1` then `m/mᵢ` has multiplicative
 inverse modulo `mᵢ`.
 
     cᵢ = m/mᵢ · [(m/mᵢ)⁻¹ mod mᵢ]

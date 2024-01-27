@@ -342,7 +342,7 @@ Padding prevents the attack as it:
 ## References
 
 - [Euler's theorem](/posts/fermat-euler-theorems)
-- [Chinese Remainder Theorem](/posts/chinese-reminder-theorem/#rsa-crt-speed-up) RSA optimization
+- [Chinese Remainder Theorem](/posts/chinese-remainder-theorem/#rsa-crt-speed-up) RSA optimization
 - [Generation of big primes](/posts/random-primes)
 - [Timing attack](/posts/timing-attack)
 - [Simple RSA implementation](https://github.com/davxy/cry/blob/master/src/crypt/rsa.c) (no CRT)

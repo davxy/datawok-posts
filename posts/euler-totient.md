@@ -70,7 +70,7 @@ Follows that:
 
 *Proof*
 
-See [CRT](/posts/chinese-reminder-theorem/#eulers-totient-proof) applications.
+See [CRT](/posts/chinese-remainder-theorem/#eulers-totient-proof) applications.
 
 
 ## General Formula
@@ -171,6 +171,6 @@ References
 ----------
 
 - [Modular Arithmetic Basics](/posts/modular-arithmetic)
-- [Chinese Reminder Theorem](/posts/chinese-reminder-theorem/#eulers-totient-proof)
+- [Chinese Remainder Theorem](/posts/chinese-remainder-theorem/#eulers-totient-proof)
 - Sequence [A000010](https://oeis.org/A000010) in the OEIS
 - [Wikipedia](https://en.wikipedia.org/wiki/Euler_totient_function)

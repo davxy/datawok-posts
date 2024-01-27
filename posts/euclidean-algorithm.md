@@ -84,11 +84,24 @@ Example:
 Given two integers `a` and `b` with `b ≥ 1` and `d = (a,b)` there exist two
 integers `x` and `y` such that `d = a·x + b·y`.
 
-*Proof*.
+*Existence Proof*.
 
-By construction using the basic Euclid's algorithm.
+Consider the set `S` of all integers that can be written as `a·x + b·y`.
+`S` is non-empty since it contains numbers like `a·1 + b·0 = a`,
+`a·0 + b·1 = b` and `0`. For the *well ordering principle* let `d = a·s + b·t`
+be the smallest positive number in `S`.
 
-We initially set `r₀ = a` and `r₁ = b`
+- `d` is a common divisor. For the division algorithm `a = d·q + r`, with
+  `0 ≤ r < d`. Then `r = a - d·q = a - (a·s + b·t)·q = a·(1 - s·q) + b·t·q`.
+  As `r = a·z + b·w` then `r ∈ S`. And because `d` is the smaller positive
+  number, then `r = 0`.
+
+- `d` is the `gcd(a,b)`. If `c` is any common divisor, since `d = a·s + b·t`
+  then `c` divides `d` and thus `d` is the `gcd`.
+
+*Construction Proof*.
+
+Using the Euclid's algorithm, we set `r₀ = a` and `r₁ = b`
 
     r₀ = q₁·r₁ + r₂                 (r₀, r₁) = (r₁, r₀ mod r₁) = (r₁, r₂)
     r₁ = q₂·r₂ + r₃                 (r₁, r₂) = (r₂, r₁ mod r₂) = (r₂, r₃)

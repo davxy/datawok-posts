@@ -26,18 +26,20 @@ We define the following **aleatory variables**:
 Each variable has a known probability distribution: `p(M)`, `p(K)`, `p(C)`.
 
 - `M` and `K` are independent variables.
-- `C` is a function of `M` and `K`, i.e. `C = E(K, M)`
+- `C` is function of `M` and `K`, i.e. `C = E(K, M)`
 - If we fix a message `m ∈ M` then the value of `c ∈ C` depends only on `k ∈ K`.
-  But this doesn't imply that `M` and `C` are independent variables.
+  But this alone doesn't imply that `M` and `C` are independent variables.
+
+Even if `M` and `K` are independent, the function `E` may generate a `c ∈ C`
+which may be more or less dependent on `m ∈ M`.
 
 From now on, when is clear from the context, we're going to write `p(M = m)` as
 `p(m)`, the same applies for `C` and `K` variables.
 
-**Unconditional Secrecy**. For Shannon, a cipher is perfect if `∀ m ∈ M` and `∀ c ∈ C`
+**Unconditional Secrecy**. For Shannon, a cipher is **perfect** if for all
+`m ∈ M` and `c ∈ C`: `p(M=m|C=c) = p(M=m)`.
 
-    p(m|c) = p(m)
-
-That is, observing the value of `C` doesn't leak any information about `M`, in
+That is, observing the value of `c` doesn't leak any information about `m`, in
 other words `M` and `C` are independent variables.
 
 Note that this doesn't say anything about the probability distribution of `M`.
@@ -55,7 +57,7 @@ If for absurd (in a perfect cipher) `|K| < |M|`, then `|K| < |C|`
 
 If we fix a message `m`, such that `p(m) > 0`, then we have that there exist a
 ciphertext `c'` for which it doesn't exist any key `k` such that `E[k, m] = c'`,
-and thus `0 < P(m) ≠ p(m|c') = 0`. The cipher can't be perfect. 
+and thus `0 < p(m) ≠ p(m|c') = 0`. The cipher can't be perfect. 
 
 ∎
 
@@ -67,11 +69,11 @@ associate each message to each plaintext as far as `|K| ≥ |M|`.
 
 ## One Time Pad (Vernam Cipher)
 
-The cipher is defined over:
-- An alphabet `A = { 0, 1 }`
-- Keyspace `K ⊆ Aⁿ`
+The OTP cipher is defined over:
+- Alphabet `A = { 0, 1 }`
 - Plaintext `M ⊆ A*`
 - Ciphertext `C ⊆ A*`
+- Keyspace `K ⊆ Aⁿ`
 
 With `A*` the set of binary strings with length less than or equal `n` and `Aⁿ`
 the set of binary strings of length `n`.
@@ -95,12 +97,12 @@ distribution.
 
 For example:
 
-    |K| = 4, M = { 0101, 1010 }, p(M = 0101) = 3/4, p(M = 1010) = 1/4
+    |K| = 2⁴, M = { 0101, 1010 }, p(M = 0101) = 3/4, p(M = 1010) = 1/4
 
 Regardless of the value of `m`, the ciphertext `c` has the same probability to
 be one of the `2⁴` possible values.
 
-**Proposition**. One Time Pad is unconditionally secure:
+**Proposition**. OTP is unconditionally secure:
 
     p(m|c) = p(m).
 
@@ -111,13 +113,8 @@ For Bayes theorem:
     p(m|c) = p(c|m)·p(m)/p(c)
 
 For a fixed pair of `c` and `m`, in OTP there exists a unique key `k` such that
-`Eₖ(m) = c`. Because it is unique, it completely depends on `c` and `m`, i.e.
-`k` is a function of these two.
-
-    c = m ⊕ k  →  k = c ⊕ m
-
-Follows that for a fixed `m` the probability that it encrypts to `c` is equal to
-the probability to choose `k`:
+`Eₖ(m) = c`. Follows that for a fixed `m` the probability that it encrypts to
+`c` is equal to the probability to choose `k`:
 
     p(c|m) = p(k) = 1/2ⁿ
         
@@ -128,13 +125,11 @@ To compute `p(c)`:
          = 1/2ⁿ · (p(m₁) + .. + p(mₙ))
          = 1/2ⁿ
 
-So finally we can write `p(m|c) = p(m)`.
-
 ∎
 
 ### Reusing the Key
 
-If we want to preserve the perfect-secrecy property over different messages
+If we want to preserve the perfect-secrecy property for different messages
 encryption then we must choose a new key:
 
     c₁ = m₁ ⊕ k
@@ -145,7 +140,7 @@ For example, if we know `m₁` and `c₁`, then `p(m₁|c₂) = 0`, regardless o
 
 Reusing the key, also makes OTP extremely weak as it easily
 [leaks information](https://crypto.stackexchange.com/questions/59/taking-advantage-of-one-time-pad-key-reuse)
-e.g. with images or using **crib-dragging** attack.
+e.g. with pictures or using **crib-dragging** attack.
 
 
 ## Latin Squares
@@ -184,14 +179,14 @@ The decryption table `D` is easily derived from the encryption table:
 
 **Proposition**. The Latin square cipher is a perfect cipher.
 
-In practice, a Latin square is a generalized one time pad where the encryption
-function may not be driven by the xor operation.
+In practice, a Latin square is a generalized OTP where the encryption function
+may not be driven by the xor operation.
 
-The one time pad is a particular latin square where the association between the
+The one time pad is a particular Latin square where the association between the
 cipher elements is driven by the xor function. In a general Latin square this
 association is completely arbitrary.
 
-Follows the latin square for OTP with key length 2:
+Follows the Latin square for OTP with key length 2:
 
             00 01 10 11
           +------------
@@ -201,5 +196,4 @@ Follows the latin square for OTP with key length 2:
        11 | 11 10 01 00        3 2 1 0
 
 As far as the key (the row index) is chosen randomly the ciphertext and the
-plaintext are independent, and thus we can apply the same proof as for one-
-time-pad.
+plaintext are independent, and thus we can apply the same proof used for OTP.
