@@ -16,6 +16,7 @@ cat << EOF > "$tmp"
 +++
 title = "$title"
 date = "$current_date"
+modified = "$current_date"
 tags = ["draft"]
 draft = true
 toc = true
