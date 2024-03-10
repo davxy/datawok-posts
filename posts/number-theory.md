@@ -12,4 +12,4 @@ rings and fields.
 
 The following notes synthesize some foundation results
 
-- [Download](/companions/algebra/algebra.pdf)
+- [Download](/companions/algebra.pdf)
