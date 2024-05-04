@@ -61,7 +61,34 @@ Follows that:
            = p·q - (1 + p-1 + q-1) = p·q - p - q + 1
            = (p-1)·(q-1) = φ(p)·φ(q)
 
+
+---
+
+For two primes $p$ and $q$,
+
+$$ \varphi(pq) = \varphi(p) \varphi(q). $$
+
+*Proof*
+
+Given two primes $p$ and $q$, the elements $x < pq$ such that $\gcd(x, pq) \neq 1$ are:
+- $A = \set{ 0 }$
+- $B = \set { p, 2p, 3p, \dots, (q-1)p }$
+- $C = \set { q, 2q, 3q, \dots, (p-1)q }$
+
+The three sets are disjoint.
+
+That is, if $ip = jq \implies q \mid (ip) \implies q \mid i$ (because $p$ is prime), and this is impossible because $i < q$.
+
+It follows that:
+
+$$
+\varphi(pq) = |\mathbb{Z}_{pq}| - (|A| + |B| + |C|) = pq - (1 + (p-1) + (q-1)) = pq - p - q + 1 = (p-1)(q-1) = \varphi(p)\varphi(q)
+$$
+
 ∎
+
+---
+
 
 
 ## Product of Coprimes
