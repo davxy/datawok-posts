@@ -1,6 +1,7 @@
 +++
 title = "Cyclic Redundancy Check"
 date = "2015-08-25"
+modified = "2015-08-25"
 tags = ["cryptography"]
 +++
 

@@ -1,6 +1,7 @@
 +++
 title = "Integer Overflow Detection"
 date = "2017-11-07"
+modified = "2017-11-07"
 tags = ["programming","security"]
 +++
 
@@ -123,6 +124,7 @@ or
 When programs execute undefined operations, optimizing compilers may
 silently break them in non-obvious and not necessarily consistent ways.
 
+```c
     int foo(int x) { return (x + 1) > x; }
 
     int main(void)
@@ -131,6 +133,7 @@ silently break them in non-obvious and not necessarily consistent ways.
         printf("%d\n", foo(INT_MAX));
         return 0;
     }
+```
 
 Compiling without optimizations the results are consistently: 0 and 0.
 Compiling with `-O2` optimizations an inconsistent answer is produced: 0 and 1.

@@ -14,42 +14,37 @@ protocols and schemes. The hardness of certain mathematical problems in cyclic
 groups, such as the discrete logarithm problem, forms the basis for the security
 of these cryptographic systems.
 
-
 ## Cyclic Groups and Generators
 
-Given a group `G` with identity `e`, the **order** of `a ∈ G` is defined as:
+Given a group $G$ with identity $e$, the **order** of $a \in G$ is defined as
+$ord(a) := \text{min} \set{i \in Z_n: a^i = e }$
 
-    ord(a) := min{i ∈ Zₙ} such that aⁱ = e
+Where $a^i$ represents the repeated application of the group operation to $a$.
 
-Where `aⁱ` represents the repeated application of the group operation to `a`.
+**Definition**. A group $G$ is said to be **cyclic** if there exist at least
+one element $g \in G$, called a generator (or base or primitive root), such that
+every element in $G$ can be obtained by repeated application of the group
+operation on $g$.
 
-**Definition**. A group `G` is said to be **cyclic** if there exist at least
-one element `g ∈ G`, called a generator (or base or primitive root), such that
-every element in `G` can be obtained by repeated application of the group
-operation on `g`.
+**Definition**. The number $g \in G$ is a **generator** of $G$ if $ord(g) = |G|$.
 
-**Definition**. The number `g ∈ G` is a **generator** of `G` if `ord(g) = |G|`.
-
-**Proposition**. If `g` is a generator of `G` then `{g¹, .. , g𐞶ᴳ𐞶}` are
+**Proposition**. If $g$ is a generator of $G$ then $\set{g^1, .. , g^{|G|}}$ are
 all distinct.
 
-*Proof*
-
-For two exponents `0 ≤ i < j < |G|`, we set `r = j - i < |G|`. If `gⁱ ≡ gʲ` then
-`gⁱ = gⁱ⁺ʳ = gⁱ·gʳ`. Given that `g` is invertible then we can cancel `gⁱ` on
-both sides leaving with `1 ≡ gʳ`. But then `g` is not a generator as `r < |G|`.
-
-∎
+*Proof*. For two exponents $0 \leq i \lt j \lt |G|$, we set $r = j - i < |G|$.
+If $g^j = g^j$ then $g^i = g^{i+r} = g^i·g^r$. Given that $g$ is invertible then
+we can cancel $g^i$ on both sides leaving with $1 = g^r$. But then $g$ is not a
+generator as $r < |G|$. ∎
 
 In this discussion we're going to mostly focus on groups
-`Zₙ* = { x: x < n and gcd(x,n) = 1 }` defined by the group operation product
+$Z_n^* = \set{ x: x < n \land gcd(x,n) = 1 }$ defined by the group operation product
 modulo `n`.
 
-*Example*. Given `p = 19` we know that `Zp*` is a group with respect to the
-product modulo `p` and that `|Zp*| = 18`
+*Example*. Given $p = 19$ we know that $ Z_p^* $ is a group with respect to the
+product modulo $p$ and that $|Z_p^*| = 18$
 
-    a = 7  →  7¹ mod 19 = 7, ..., 7³  mod 19 = 1  →  ord(7) = 3 
-    a = 2  →  2¹ mod 19 = 2, ..., 2¹⁸ mod 19 = 1  →  ord(2) = 18
+$$a = 7  →  7^1 \bmod 19 = 7 ... 7^3  \bmod 19 = 1  →  ord(7) = 3$$
+$$a = 2  →  2^1 \bmod 19 = 2 ... 2^{18} \bmod 19 = 1  →  ord(2) = 18$$
 
 For *Euler*'s theorem, if `(a,n) = 1` then `α^φ(n) = 1`, however the order of an
 element `α` can be smaller that `φ(n)`.
