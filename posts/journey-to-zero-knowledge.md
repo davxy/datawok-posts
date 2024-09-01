@@ -6,7 +6,8 @@ tags = ["cryptography", "mathematics", "zk-proof"]
 toc = true
 +++
 
-Article [download](/companions/zk-proofs/journey-to-zero-knowledge.pdf)
+- [Article](/companions/zk-proofs/journey-to-zero-knowledge.pdf)
+- [Presentation](/companions/zk-proofs/journey-to-zero-knowledge-presentation.pdf)
 
 ## Introduction
 
