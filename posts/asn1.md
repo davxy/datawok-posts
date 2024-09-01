@@ -1,6 +1,7 @@
 +++
 title = "Abstract Syntax Notation 1"
 date = "2017-03-02"
+updated = "2024-09-01"
 tags = ["standards","encoding"]
 +++
 
@@ -146,27 +147,37 @@ arbitrary type.
 
 ## Example
 
-Data structures of (a fictitious) Foo Protocol defined using ASN.1
+Data structures of (a fictitious) Foo protocol defined using ASN.1
 notation:
 
-    FooProtocol DEFINITIONS ::= BEGIN
+`schema.asn`
+```rust
+    Foo DEFINITIONS ::= BEGIN
 
-    FooQuestion ::= SEQUENCE
-    {
+    Question ::= SEQUENCE {
         id          INTEGER(0..255),
         question    VISIBLE STRING
     }
 
-    FooAnswer ::= SEQUENCE
-    {
+    Answer ::= SEQUENCE {
         id          INTEGER(0,255),
         answer      BOOLEAN
     }
 
     END
+```
 
+Try parse using `asn1tools` python library:
+
+```python
+foo = asn1tools.compile_files(["schema.asn"], codec='ber')
+encoded = foo.encode('Question', {'id': 1, 'question': 'Is 1+1=3?'})
+print(encoded.hex(' '))
+decoded = foo.decode('Question', encoded)
+print(decoded)
+```
 
 ## References
 
-- [Layman's Guide to ASN1](http://luca.ntop.org/Teaching/Appunti/asn1.html): good ASN.1 tutorial.
-
+- [Layman's Guide to ASN1](http://luca.ntop.org/Teaching/Appunti/asn1.html)
+- [Python Library](https://github.com/eerimoq/asn1tools)
