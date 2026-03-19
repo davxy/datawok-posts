@@ -1,7 +1,7 @@
 +++
 title = "Abstract Syntax Notation 1"
 date = "2017-03-02"
-updated = "2024-09-01"
+modified = "2024-09-01"
 tags = ["standards","encoding"]
 +++
 
