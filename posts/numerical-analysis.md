@@ -37,6 +37,6 @@ that are usually targeted by an undergraduate academic course.
 All the numerical methods are accompanied by both a Python and an Octave
 implementation.
 
-- Book [Download](/companions/numeric-analysis.pdf)
+- Book [Download](/companions/numerical-analysis.pdf)
 - Source code @ [github](https://github.com/davxy/numeric)
 - Linear algebra refresher [post](/posts/linear-algebra).

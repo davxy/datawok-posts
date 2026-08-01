@@ -2,7 +2,7 @@
 title = "KZG Polynomial Commitment Scheme"
 date = "2024-09-09"
 modified = "2024-09-09"
-tags = ["cryptography", "scheme"]
+tags = ["cryptography"]
 toc = true
 +++
 
