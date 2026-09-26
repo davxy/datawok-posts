@@ -1,5 +1,5 @@
 +++
-title = "Introduction to Perfect Secrecy"
+title = "Perfect Secrecy"
 date = "2023-08-30"
 modified = "2023-08-30"
 tags = ["cryptography"]
@@ -38,102 +38,112 @@ in a report of 1941, which apparently is still classified.
 ## Perfect Secrecy Foundations
 
 We define the following **random variables**:
-- `M` taking values from the plaintext set.
-- `C` taking values from the ciphertext set.
-- `K` taking values from the key set.
+- $M$ taking values from the plaintext set.
+- $C$ taking values from the ciphertext set.
+- $K$ taking values from the key set.
 
 With a small abuse of notation, we use the same letters for the sets, e.g.
-`m ∈ M`.
+$m \in M$.
 
-- `M` and `K` are independent variables with known probability distributions
-  `p(M)` and `p(K)`.
-- `C` is a function of `M` and `K`, i.e. `C = E(K, M)`. Thus `p(C)` is
-  determined by `p(M)`, `p(K)` and `E`.
-- If we fix a message `m ∈ M` then the value of `c ∈ C` depends only on `k ∈ K`.
-  But this alone doesn't imply that `M` and `C` are independent variables.
+- $M$ and $K$ are independent variables with known probability distributions
+  $p(M)$ and $p(K)$.
+- $C$ is a function of $M$ and $K$, i.e. $C = E(K, M)$. Thus $p(C)$ is
+  determined by $p(M)$, $p(K)$ and $E$.
+- If we fix a message $m \in M$ then the value of $c \in C$ depends only on
+  $k \in K$. But this alone doesn't imply that $M$ and $C$ are independent
+  variables.
 
-Even if `M` and `K` are independent, the function `E` may generate a `c ∈ C`
-which may be more or less dependent on `m ∈ M`.
+Even if $M$ and $K$ are independent, the function $E$ may generate a $c \in C$
+which may be more or less dependent on $m \in M$.
 
 We assume that every element of the three sets has a non-zero probability.
 Messages that are never sent and ciphertexts that are never produced can be
 removed from the sets.
 
-From now on, when it is clear from the context, we're going to write `p(M = m)`
-as `p(m)`, the same applies for `C` and `K` variables.
+From now on, when it is clear from the context, we're going to write $p(M = m)$
+as $p(m)$, the same applies for $C$ and $K$ variables.
 
-**Perfect Secrecy**. For Shannon, a cipher is **perfect** if for all `m ∈ M` and
-`c ∈ C`: `p(M=m|C=c) = p(M=m)`.
+**Perfect Secrecy**. For Shannon, a cipher is **perfect** if for all $m \in M$
+and $c \in C$:
 
-That is, observing the value of `c` doesn't leak any information about `m`, in
-other words `M` and `C` are independent variables. By Bayes' theorem, this is
-equivalent to `p(c|m) = p(c)`.
+$$p(m \mid c) = p(m)$$
 
-Note that this doesn't say anything about the probability distribution of `M`.
-If some plaintext is more probable than the others, observing `c` doesn't change
+That is, observing the value of $c$ doesn't leak any information about $m$, in
+other words $M$ and $C$ are independent variables. By Bayes' theorem:
+
+$$p(m \mid c) = \frac{p(c \mid m) \cdot p(m)}{p(c)}$$
+
+Thus $p(m \mid c) = p(m)$ if and only if $p(c \mid m) \cdot p(m) = p(c) \cdot p(m)$.
+Since $p(m) > 0$, this is equivalent to $p(c \mid m) = p(c)$.
+
+Note that this doesn't say anything about the probability distribution of $M$.
+If some plaintext is more probable than the others, observing $c$ doesn't change
 its probability.
 
-**Proposition**. In a perfect cipher `|C| ≤ |K|`.
+**Proposition**. In every cipher $|M| \le |C|$.
 
 *Proof*
 
-Fix a message `m`. For every ciphertext `c` we have `p(c|m) = p(c) > 0`, thus
-there exists a key `k` such that `E(k, m) = c`.
-
-For a fixed `m`, each key produces exactly one ciphertext, thus different
-ciphertexts require different keys, and `|C| ≤ |K|`.
+For every key $k$ the encryption function $E(k, \cdot)$ must be injective,
+otherwise decryption is ambiguous. Thus $|M| \le |C|$.
 
 ∎
 
-**Corollary**. In a perfect cipher `|M| ≤ |K|`.
+**Proposition**. In a perfect cipher $|C| \le |K|$.
 
 *Proof*
 
-For every cipher (perfect or not) the encryption function `E(k, ·)` must be
-injective, otherwise decryption is ambiguous. Thus `|M| ≤ |C| ≤ |K|`.
+Suppose $|K| < |C|$ and fix a message $m$. The keys encrypt $m$ to at most $|K|$
+different ciphertexts, thus there exists a $c \in C$ such that $E(k, m) \ne c$
+for every $k \in K$. Then $p(c \mid m) = 0$, and by Bayes' theorem
+$p(m \mid c) = 0$, which contradicts $p(m \mid c) = p(m) > 0$.
 
 ∎
 
-Note that it is not required to have `|M| = |C|`. Even if `|M| < |C|` the cipher
-can still be perfect, as long as there are enough keys: `|K| ≥ |C|`.
+**Corollary**. In a perfect cipher $|M| \le |C| \le |K|$.
+
+Note that it is not required to have $|M| = |C|$. Even if $|M| < |C|$ the cipher
+can still be perfect, as long as there are enough keys: $|K| \ge |C|$.
 
 
 ## One Time Pad (Vernam Cipher)
 
 The OTP cipher is defined over:
-- Alphabet `A = { 0, 1 }`
-- Plaintext `M ⊆ Aⁿ`
-- Ciphertext `C = Aⁿ`
-- Keyspace `K = Aⁿ`
+- Alphabet $A = \{0, 1\}$
+- Plaintext $M \subseteq A^n$
+- Ciphertext $C = A^n$
+- Keyspace $K = A^n$
 
-With `Aⁿ` the set of binary strings of length `n`.
+With $A^n$ the set of binary strings of length $n$.
 
-Shorter messages must be padded to `n` bits. Otherwise the length of the
+Shorter messages must be padded to $n$ bits. Otherwise the length of the
 ciphertext leaks the length of the message.
 
-As usual, there is a known probability distribution `p(M)`, we can't do anything
-about it (e.g. if `m ∈ M` is an English text then it will follow the known
+As usual, there is a known probability distribution $p(M)$, we can't do anything
+about it (e.g. if $m \in M$ is an English text then it will follow the known
 distribution for English letters).
 
-For `p(K)` we can instead choose the probability distribution, and we're going
-to use the uniform distribution: `p(k) = 1/2ⁿ`.
+For $p(K)$ we can instead choose the probability distribution, and we're going
+to use the uniform distribution: $p(k) = 1/2^n$.
 
 Encryption and decryption procedures are defined as bitwise xor of the input
 binary string with the key binary string:
 
-    Eₖ(m) = m ⊕ k = c
-    Dₖ(c) = c ⊕ k = m
+$$\begin{aligned}
+E_k(m) &= m \oplus k = c \\
+D_k(c) &= c \oplus k = m
+\end{aligned}$$
 
-Even though different elements of `M` have different probabilities these don't
+Even though different elements of $M$ have different probabilities these don't
 influence the ciphertext probabilities that are driven only by the key uniform
 distribution.
 
 For example:
 
-    |K| = 2⁴, M = { 0101, 1010 }, p(M = 0101) = 3/4, p(M = 1010) = 1/4
+$$|K| = 2^4, \quad M = \{0101, 1010\}, \quad p(M = 0101) = \frac{3}{4}, \quad p(M = 1010) = \frac{1}{4}$$
 
-Regardless of the value of `m`, the ciphertext `c` has the same probability to
-be one of the `2⁴` possible values.
+Regardless of the value of $m$, the ciphertext $c$ has the same probability to
+be one of the $2^4$ possible values.
 
 The important point is that the message distribution can be arbitrarily skewed;
 it doesn't matter. The key distribution supplies exactly the amount of randomness
@@ -141,30 +151,32 @@ needed to make the ciphertext equally likely.
 
 **Proposition**. OTP is a perfect cipher:
 
-    p(m|c) = p(m).
+$$p(m \mid c) = p(m)$$
 
 *Proof*
 
 By Bayes' theorem:
 
-    p(m|c) = p(c|m)·p(m)/p(c)
+$$p(m \mid c) = \frac{p(c \mid m) \cdot p(m)}{p(c)}$$
 
-For a fixed pair of `c` and `m`, in OTP there exists a unique key `k = c ⊕ m`
-such that `Eₖ(m) = c`. It follows that for a fixed `m` the probability that it
-encrypts to `c` is equal to the probability to choose `k`:
+For a fixed pair of $c$ and $m$, in OTP there exists a unique key $k = c \oplus m$
+such that $E_k(m) = c$. Thus $M = m$ encrypts to $c$ if and only if $K = c \oplus m$.
+Since $K$ is independent of $M$ and uniform over $|K| = 2^n$ keys:
 
-    p(c|m) = p(k) = 1/2ⁿ
+$$p(c \mid m) = p(K = c \oplus m \mid M = m) = p(K = c \oplus m) = \frac{1}{|K|} = \frac{1}{2^n}$$
 
-To compute `p(c)`, let `m₁, .., mₜ` be the elements of `M`:
+To compute $p(c)$, let $m_1, \dots, m_t$ be the elements of $M$:
 
-    p(c) = p(c,m₁) + .. + p(c,mₜ)
-         = p(c|m₁)·p(m₁) + .. + p(c|mₜ)·p(mₜ)
-         = 1/2ⁿ · (p(m₁) + .. + p(mₜ))
-         = 1/2ⁿ
+$$\begin{aligned}
+p(c) &= p(c, m_1) + \dots + p(c, m_t) \\
+     &= p(c \mid m_1) \cdot p(m_1) + \dots + p(c \mid m_t) \cdot p(m_t) \\
+     &= \frac{1}{2^n} \cdot (p(m_1) + \dots + p(m_t)) \\
+     &= \frac{1}{2^n}
+\end{aligned}$$
 
 Thus:
 
-    p(m|c) = (1/2ⁿ · p(m)) / (1/2ⁿ) = p(m)
+$$p(m \mid c) = \frac{\frac{1}{2^n} \cdot p(m)}{\frac{1}{2^n}} = p(m)$$
 
 ∎
 
@@ -173,13 +185,15 @@ Thus:
 If we want to preserve the perfect-secrecy property over the encryption of
 different messages, then we must choose a new key for each message:
 
-    c₁ = m₁ ⊕ k
-    c₂ = m₂ ⊕ k
-    c₁ ⊕ c₂ = m₁ ⊕ m₂
+$$\begin{aligned}
+c_1 &= m_1 \oplus k \\
+c_2 &= m_2 \oplus k \\
+c_1 \oplus c_2 &= m_1 \oplus m_2
+\end{aligned}$$
 
-The pair `(c₁, c₂)` reveals `m₁ ⊕ m₂`, thus the ciphertexts are no longer
-independent of the messages. For example, if we know `m₁` then we can recover
-`m₂ = c₁ ⊕ c₂ ⊕ m₁`, regardless of `p(m₂)`.
+The pair $(c_1, c_2)$ reveals $m_1 \oplus m_2$, thus the ciphertexts are no
+longer independent of the messages. For example, if we know $m_1$ then we can
+recover $m_2 = c_1 \oplus c_2 \oplus m_1$, regardless of $p(m_2)$.
 
 Reusing the key, also makes OTP extremely weak as it easily
 [leaks information](https://crypto.stackexchange.com/questions/59/taking-advantage-of-one-time-pad-key-reuse)
@@ -187,7 +201,9 @@ e.g. with pictures or using **crib-dragging** attack.
 
 ### Key Reuse in Practice
 
-The xor of two ciphertexts encrypted with the same key is known as a **depth**.
+Two or more messages encrypted with the same key are said to be **in depth**,
+a term from the time when analysts wrote such ciphertexts one below the other.
+For a Vernam cipher, a depth of two gives $c_1 \oplus c_2 = m_1 \oplus m_2$.
 History has two famous examples.
 
 The German High Command used the
@@ -215,69 +231,83 @@ management was enough to break it.
 
 ## Latin Squares
 
-Latin squares are `N⨯N` tables where each of `N` symbols appears exactly once in
-every row and in every column. For example:
+Latin squares are $N \times N$ tables where each of $N$ symbols appears exactly
+once in every row and in every column. For example:
 
-        ⌈ 1 2 3 ⌉
-    E = | 3 1 2 |
-        ⌊ 2 3 1 ⌋
+$$E = \begin{bmatrix}
+0 & 1 & 2 \\
+1 & 2 & 0 \\
+2 & 0 & 1
+\end{bmatrix}$$
 
-Given a Latin square of size `N⨯N`, we number the keys, the messages and the
-ciphertexts from `1` to `N`. The **Latin square cipher** encrypts `m ∈ M` with
-`k ∈ K` using `k` and `m` as row and column indices of the encryption table `E`:
+Given a Latin square of size $N \times N$, we number the keys, the messages and
+the ciphertexts from $0$ to $N - 1$. The **Latin square cipher** encrypts
+$m \in M$ with $k \in K$ using $k$ and $m$ as row and column indices of the
+encryption table $E$:
 
-    E(k,m) = c,  (example: E(2,1) = 3)
+$$E(k, m) = c, \quad \text{(example: } E(2, 1) = 0\text{)}$$
 
-Every row of `E` is a permutation, thus the decryption table is defined by
-`D(k,c) = m` if and only if `E(k,m) = c`. The row `k` of `D` is the inverse of
-the permutation in the row `k` of `E`:
+Every row of $E$ is a permutation, thus the decryption table is defined by
+$D(k, c) = m$ if and only if $E(k, m) = c$. The row $k$ of $D$ is the inverse of
+the permutation in the row $k$ of $E$:
 
-        ⌈ 1 2 3 ⌉
-    D = | 2 3 1 |
-        ⌊ 3 1 2 ⌋
+$$D = \begin{bmatrix}
+0 & 1 & 2 \\
+2 & 0 & 1 \\
+1 & 2 & 0
+\end{bmatrix}$$
 
-Note that `D` is a Latin square too.
+Note that $D$ is a Latin square too.
 
 **Proposition**. The Latin square cipher with a uniform key distribution
-`p(k) = 1/N` is a perfect cipher.
+$p(k) = 1/N$ is a perfect cipher.
 
 *Proof*
 
-In the column `m` each ciphertext `c` appears exactly once, thus there exists a
-unique key `k` such that `E(k,m) = c`. This is the only property of OTP used in
-its proof, and the same steps give `p(c|m) = p(c) = 1/N`, thus `p(m|c) = p(m)`.
+In the column $m$ each ciphertext $c$ appears exactly once, thus there exists a
+unique key $k$ such that $E(k, m) = c$. This is the only property of OTP used in
+its proof, and the same steps give $p(c \mid m) = p(c) = 1/N$, thus
+$p(m \mid c) = p(m)$.
 
 ∎
 
-The one time pad is a particular Latin square where the map from `(k, m)` to `c`
+The one time pad is a particular Latin square where the map from $(k, m)$ to $c$
 is the xor. In a general Latin square this map is completely arbitrary.
 
 The Latin square for OTP with a key length of 2 is:
 
-            00 01 10 11
-          +------------
-       00 | 00 01 10 11        0 1 2 3
-       01 | 01 00 11 10   <=>  1 0 3 2
-       10 | 10 11 00 01        2 3 0 1  
-       11 | 11 10 01 00        3 2 1 0
+$$\begin{array}{c|cccc}
+   & 00 & 01 & 10 & 11 \\ \hline
+00 & 00 & 01 & 10 & 11 \\
+01 & 01 & 00 & 11 & 10 \\
+10 & 10 & 11 & 00 & 01 \\
+11 & 11 & 10 & 01 & 00
+\end{array}
+\quad \iff \quad
+\begin{bmatrix}
+0 & 1 & 2 & 3 \\
+1 & 0 & 3 & 2 \\
+2 & 3 & 0 & 1 \\
+3 & 2 & 1 & 0
+\end{bmatrix}$$
 
-Since xor is its own inverse, for OTP we have `D = E`.
+Since xor is its own inverse, for OTP we have $D = E$.
 
 More generally, the operation table of any finite group is a Latin square, with
-`E(k,m) = k·m`. OTP is the xor on `n`-bit strings, and the `3⨯3` example above
-is the addition mod 3, up to the numbering of the keys: every row is a cyclic
-shift of the first one. With the addition mod 26 we get the Caesar cipher. With
-a uniform key, used for a single letter, it is perfect too. The Caesar cipher is
-weak only because the same key encrypts all the letters of a message.
+$E(k, m) = k \cdot m$. OTP is the xor on $n$-bit strings, and the $3 \times 3$
+example above is the addition mod 3. With the addition mod 26 we get the Caesar
+cipher. With a uniform key, used for a single letter, it is perfect too. The
+Caesar cipher is weak only because the same key encrypts all the letters of a
+message.
 
-A general Latin square doesn't give a better cipher. For `n`-bit messages the
-table has `2ⁿ⨯2ⁿ` entries, both parties must store it, and the key must still
-be random and used only once. The xor gives the same security without any
+A general Latin square doesn't give a better cipher. For $n$-bit messages the
+table has $2^n \times 2^n$ entries, both parties must store it, and the key must
+still be random and used only once. The xor gives the same security without any
 table. The value of the generalization is in the understanding: perfect secrecy
 comes from the structure of the table, not from the xor.
 
 Latin squares are more than an example. Shannon proved that when
-`|M| = |C| = |K|`, a cipher is perfect if and only if every key has probability
-`1/|K|` and for every `m` and `c` there exists a unique key `k` such that
-`E(k,m) = c`. That is, every perfect cipher of this size is a Latin square with
+$|M| = |C| = |K|$, a cipher is perfect if and only if every key has probability
+$1/|K|$ and for every $m$ and $c$ there exists a unique key $k$ such that
+$E(k, m) = c$. That is, every perfect cipher of this size is a Latin square with
 a uniform key distribution.
