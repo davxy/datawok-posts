@@ -2,9 +2,8 @@
 title = "Introduction to Perfect Secrecy"
 date = "2023-08-30"
 modified = "2023-08-30"
-tags = ["cryptography", "draft"]
+tags = ["cryptography"]
 toc = true
-draft = true
 +++
 
 A cipher has perfect secrecy if the ciphertext gives no information about the
