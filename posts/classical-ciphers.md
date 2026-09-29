@@ -6,7 +6,7 @@ tags = [ "cryptography", "history" ]
 toc = true
 +++
 
-All modern ciphers are based on some kind of **substitution** operation.
+Most modern ciphers use some kind of **substitution** operation.
 
 A block of bits is substituted with another block of bits according to a given
 table or algorithm.
@@ -18,8 +18,8 @@ always encrypted to the same element in the ciphertext alphabet.
 be encrypted to different elements in the ciphertext alphabet.
 
 Polyalphabetic cipher algorithms typically depend on a key that is cyclically
-used to encrypt the single letters. Thus are equivalent to a set of
-monoalphabetic ciphers that are alternatively used.
+used to encrypt the single letters. Thus they are equivalent to a set of
+monoalphabetic ciphers that are alternately used.
 
 Note that given a key with finite length, at some point the same letters are
 encoded again to the same ciphertext (we loop through the key), thus in practice
@@ -34,9 +34,11 @@ alphabet then the polyalphabetic cipher is still a monoalphabetic cipher.
 Strictly speaking, a *true* polyalphabetic cipher has no cycles e.g. a stream
 cipher using a TRNG for the keystream.
 
-Modern block ciphers achieve a similar result using the so-called *counter
-modes* of operation. These allow to transform any block cipher into a stream
-cipher.
+Modern block ciphers achieve a similar result using the *stream modes* of
+operation (e.g. CTR, OFB, CFB). These make it possible to transform any block
+cipher into a stream cipher. The keystream is not truly cycle free: in CTR mode
+it repeats after at most $2^n$ blocks, with $n$ the block size. However, this
+period is much longer than any practical message.
 
 ## Conventions
 
@@ -82,7 +84,7 @@ the size of the alphabet grows.
 For example if our alphabet consists of 64-bit elements, then the key size is
 $64 \cdot 2^{64} = 2^{70} \approx 10^{21}$ bits, i.e. the table of all the substitutions that may be
 applied during the encryption procedure (**the codebook**). For comparison, the
-estimated total number of sand grains on all the beaches and deserts on Earth is
+total number of sand grains on all the beaches and deserts on Earth is
 estimated to be between $10^{18}$ and $10^{20}$.
 
 Instead of allowing an arbitrary plaintext-ciphertext association we may derive
@@ -93,7 +95,7 @@ keyspace size will be the number of different associations that are possible via
 such an algorithm.
 
 Substitution ciphers driven by very simple algorithms are, for example, shift,
-affine, atbash and Vigenere ciphers.
+affine, Atbash and Vigenère ciphers.
 
 ### Attack
 
@@ -107,15 +109,16 @@ Potential workarounds for frequency analysis:
 1. **Blocks substitution** ciphers: instead of replacing single letters we work
    on blocks of $m$ letters. Thus flattening the frequencies of the blocks.
 2. **Polyalphabetic** ciphers: use more than one monoalphabetic cipher by rotating
-   their usage (e.g. Vigenere and Enigma).
+   their usage (e.g. Vigenère and Enigma).
 
-As said before, a polyalphabetic cipher with a cycle is equivalent to a
-monoalphabetic block cipher with a bigger alphabet. Working with blocks of size
-$N$ is just like working with a bigger alphabet where each element has size $N$.
+The two workarounds are the same thing seen from two sides (see the
+introduction): working with blocks of size $N$ is just like working with a
+bigger alphabet where each element has size $N$.
 
 For instance, if the block length is $3$ there are $26^3$ elements in the
-alphabet and if the cipher is a *pure substitution*
-cipher then the keyspace size is $26^3!$. However, the key length is $26^3$.
+alphabet. If the cipher is a *pure substitution* cipher then the keyspace size
+is $(26^3)!$. The price is the key: a table of $26^3$ entries of
+$\log_2(26^3) \approx 14.1$ bits each.
 
 Polyalphabetic ciphers where the substitution of each element within the block
 is driven by a simple monoalphabetic cipher are a good compromise since the key
@@ -123,6 +126,11 @@ is very compact, and we still have a *big* enough keyspace.
 
 For instance, with a polyalphabetic shift cipher, if the block length is $3$ then
 the keyspace size is $26^3$ and the key length is $3$.
+
+In the same way, a Vigenère cipher over the binary alphabet $\{0, 1\}$ with key
+length $64$ (i.e. working on blocks of 64 bits) has a keyspace of $2^{64}$ and
+not $(2^{64})!$ as for a generic substitution cipher derived from a permutation
+table.
 
 
 ## Shift Cipher
@@ -152,8 +160,14 @@ When $k = 3$ the cipher is known as the *Caesar cipher*.
 The keyspace is trivially small (26), thus it can be easily brute forced without
 resorting to a frequency analysis.
 
+Frequency analysis also works, and the attacker does not need to read 26
+candidate plaintexts. The most frequent ciphertext letter $c$ is probably the
+encryption of 'e', thus $k = (c - 4) \bmod 26$. A more robust method compares the whole
+ciphertext frequency vector with the English one (see the key disclosure step
+of the Vigenère attack).
 
-## Vigenere Cipher
+
+## Vigenère Cipher
 
 A polyalphabetic cipher composed of several shift ciphers.
 
@@ -194,7 +208,7 @@ distance that is a multiple of the key length and thus end up being encrypted
 using the same elements of the key (i.e. the same monoalphabetic cipher).
 
 Finding a repetition in the ciphertext can thus suggest that the distance
-between the repeated sequence is equal to a multiple of the key length.
+between the repeated sequences is equal to a multiple of the key length.
 
 Steps:
 1. Compute the distances $d_1, \ldots, d_n$ between all the repetitions.
@@ -203,17 +217,17 @@ Steps:
 (Hint: consider only repetitions of 3+ letters.)
 
 Once that the key length has been guessed a frequency analysis attack can be
-carried over the subsets encrypted with the same $k_i$ (the same attack used for
-the trivial shift cipher).
+carried out over the subsequences encrypted with the same $k_i$ (the same attack
+used for the trivial shift cipher).
 
-Each of these subsets is a simple shift cipher. The subset $C_j$ contains the
-ciphertext letters at the positions encrypted with $k_j$.
+Each of these subsequences is a simple shift cipher. The subsequence $C_j$
+contains the ciphertext letters at the positions encrypted with $k_j$.
 
 $$
 \begin{aligned}
-C_1 &= \{ c_i \mid i \equiv 1 \pmod m \} \\
+C_1 &= (c_1, c_{1+m}, c_{1+2m}, \ldots) \\
 &\;\;\vdots \\
-C_m &= \{ c_i \mid i \equiv m \pmod m \}
+C_m &= (c_m, c_{2m}, c_{3m}, \ldots)
 \end{aligned}
 $$
 
@@ -274,7 +288,7 @@ Three interesting cases for $x$.
   - $\operatorname{Ic}(x) = 26 \cdot (1/26)^2 = 1/26 \approx 0.038$
 
 In short:
-- high value → no randomness  → $\operatorname{Ic}(x) \approx 0.065$
+- high value → low randomness → $\operatorname{Ic}(x) \approx 0.065$
 - low value  → max randomness → $\operatorname{Ic}(x) \approx 0.038$
 
 ##### Key Length disclosure
@@ -283,7 +297,20 @@ Given the ciphertext:
 
 $$y = (y_1, \ldots, y_n)$$
 
-We test a key length candidate $m$ by disposing the ciphertext in a matrix of
+The original Friedman test estimates $m$ directly from $\operatorname{Ic}(y)$.
+Two letters extracted from $y$ are encrypted with the same key value with
+probability about $1/m$. With $\kappa_p \approx 0.065$ (English) and
+$\kappa_r = 1/26 \approx 0.038$ (random), for a long ciphertext:
+
+$$
+\operatorname{Ic}(y) \approx \frac{\kappa_p}{m} + \left(1 - \frac{1}{m}\right) \kappa_r
+\quad \Rightarrow \quad
+m \approx \frac{\kappa_p - \kappa_r}{\operatorname{Ic}(y) - \kappa_r}
+$$
+
+The estimate is rough. A more precise method tests each candidate separately.
+
+We test a key length candidate $m$ by arranging the ciphertext in a matrix of
 $m$ rows (the first column contains the first $m$ characters of the ciphertext).
 
 $$
@@ -304,6 +331,9 @@ Compute the $\operatorname{Ic}$ for each row $R_i$.
   all encrypted with the same key value, thus $\operatorname{Ic}(R_i)$ should be high (close
   to $0.065$).
 - If the key length is incorrect then $\operatorname{Ic}(R_i)$ will be low (close to $0.038$).
+- If $m$ is a multiple of the correct key length then each row is still
+  encrypted with one key value, and $\operatorname{Ic}(R_i)$ is high too. Thus
+  choose the smallest candidate with high values.
 
 (Note: we could have used the entropy of $x$)
 
@@ -322,19 +352,31 @@ $$
 
 How encryption is done using $k_1$ on the single plaintext characters:
 
-  | Plaintext  | English prob. $P(i)$ | Ciphertext   |  Cipher frequencies $F(i+k_1)$ |
+  | Plaintext  | English prob. $p(i)$ | Ciphertext   |  Cipher frequencies            |
   |------------|----------------------|--------------|--------------------------------|
-  | $0$        |    $p(0)$            | $(0+k_1) \bmod 26$ |     $f(0+k_1)/N_1$             |
+  | $0$        |    $p(0)$            | $(0+k_1) \bmod 26$ |     $f((0+k_1) \bmod 26)/N_1$  |
   | ...        |    ...               |   ...        |     ...                        |
-  | $25$       |    $p(25)$           | $(25+k_1) \bmod 26$ |     $f(25+k_1)/N_1$            |
+  | $25$       |    $p(25)$           | $(25+k_1) \bmod 26$ |     $f((25+k_1) \bmod 26)/N_1$ |
 
 As the value of $k_1$ we need to choose the value that better approximates the
 English typical frequencies.
 
-In other words $k_1$ is equal to $j \in \mathbb{Z}_{26}$ if the distance between $F(j)$ and $P$
-vectors $\lVert F(j) - P \rVert$ is minimal. An **equivalent** technique often reported
-in literature is to get $j$ that maximize the scalar product between $F(j)$
-and $P$.
+For each candidate $j \in \mathbb{Z}_{26}$ we define the vector of the
+frequencies in $R_1$ shifted back by $j$, and the vector of the English
+probabilities:
+
+$$
+\begin{aligned}
+F_j &= \left( \frac{f(j)}{N_1}, \frac{f((1+j) \bmod 26)}{N_1}, \ldots, \frac{f((25+j) \bmod 26)}{N_1} \right) \\
+P &= (p(0), \ldots, p(25))
+\end{aligned}
+$$
+
+Then $k_1$ is equal to the $j$ for which the distance $\lVert F_j - P \rVert$ is
+minimal. An **equivalent** technique often reported in literature is to get the
+$j$ that maximizes the scalar product $F_j \cdot P$. The two are equivalent
+because $\lVert F_j - P \rVert^2 = \lVert F_j \rVert^2 + \lVert P \rVert^2 - 2 F_j \cdot P$,
+and $\lVert F_j \rVert$ does not depend on $j$ ($F_j$ is a cyclic shift of $F_0$).
 
 The procedure is repeated for every row $R_i$ to gain different parts of the key.
 
@@ -351,17 +393,21 @@ frequencies.
 A substitution cipher where substitution algorithm requires multiplication and
 addition.
 
-The key is defined as a couple of integers $(a, b)$ in $\mathbb{Z}_{26}$.
+The key is defined as a pair of integers $(a, b)$ in $\mathbb{Z}_{26}$.
 
 $$
 \begin{aligned}
-E_{(a,b)}[p] &= a \cdot p + b \bmod 26 = c \\
+E_{(a,b)}[p] &= (a \cdot p + b) \bmod 26 = c \\
 D_{(a,b)}[c] &= (c - b) \cdot a^{-1} \bmod 26 = p
 \end{aligned}
 $$
 
 Note that $a$ is required to be invertible modulo $|A| = 26$, thus is required
 that $\gcd(a, 26) = 1$. Because $26 = 13 \cdot 2$ then $a$ can't be even or 13.
+
+The shift cipher is the special case $a = 1$. The *Atbash* cipher, which maps
+$a \to z$, $b \to y$, ..., $z \to a$, is the special case $a = b = 25$:
+$c = (25 - p) \bmod 26 = (25 \cdot p + 25) \bmod 26$.
 
 ### Attacks
 
@@ -370,7 +416,7 @@ A brute force attack is trivial over such a small set.
 
 Frequency analysis can also be used like any other substitution cipher.
 
-The cipher is vulnerable to a known plaintext attack when two couples $(p_1, c_1)$
+The cipher is vulnerable to a known plaintext attack when two pairs $(p_1, c_1)$
 and $(p_2, c_2)$ are known:
 
 $$
@@ -429,7 +475,7 @@ A block cipher more explicitly derived from linear algebra.
 With a block size $m$, if we interpret the cipher as a monoalphabetic cipher,
 the alphabet can be also viewed as $\mathbb{Z}_{26}^m$.
 
-Each plaintext and ciphertext block is represented as a $m \times 1$ column vector:
+Each plaintext and ciphertext block is represented as an $m \times 1$ column vector:
 
 $$
 p = \begin{bmatrix} p_1 \\ \vdots \\ p_m \end{bmatrix}
@@ -437,7 +483,7 @@ p = \begin{bmatrix} p_1 \\ \vdots \\ p_m \end{bmatrix}
 c = \begin{bmatrix} c_1 \\ \vdots \\ c_m \end{bmatrix}
 $$
 
-The block transformation is driven by the key $K$, a $m \times m$ square matrix:
+The block transformation is driven by the key $K$, an $m \times m$ square matrix:
 
 $$
 K = \begin{bmatrix}
@@ -531,7 +577,7 @@ be invertible modulo 26. Alternatively, we can work modulo 2 and modulo 13 and
 combine the results via the Chinese remainder theorem.
 
 If $P$ is not invertible modulo $|A|$, then we should try with a different set
-of $(p_i, c_i)$. Follows that the first thing the attacker should do is to check if
+of $(p_i, c_i)$. It follows that the first thing the attacker should do is to check if
 $P$ is invertible by computing its determinant.
 
 
@@ -545,19 +591,19 @@ the classical ciphers viewed so far can be expressed using exactly the same
 
 $$
 \begin{aligned}
-E[p] &= A \cdot p + b = c \\
-D[c] &= A^{-1} \cdot (c - b) = p
+E[p] &= (M \cdot p + b) \bmod |A| = c \\
+D[c] &= M^{-1} \cdot (c - b) \bmod |A| = p
 \end{aligned}
 $$
 
-With $A$ a matrix providing diffusion and $b$ a vector providing polyalphabetic
+With $M$ a matrix providing diffusion and $b$ a vector providing polyalphabetic
 shift encryption.
 
-- Shift cipher: $A$ is a $1 \times 1$ identity matrix and $b$ a vector of length 1.
-- Vigenere cipher: $A$ is a $m \times m$ identity matrix and $b$ a $m \times 1$ vector.
-- Affine cipher: $A$ is a $1 \times 1$ invertible matrix and $b$ a vector of length 1.
-- Transposition cipher: $A$ is a $m \times m$ transposition matrix and $b$ is a zero vector.
-- Hill cipher: $A$ is a $m \times m$ invertible matrix and $b$ is a $m \times 1$ zero vector.
+- Shift cipher: $M$ is a $1 \times 1$ identity matrix and $b$ a vector of length 1.
+- Vigenère cipher: $M$ is an $m \times m$ identity matrix and $b$ an $m \times 1$ vector.
+- Affine cipher: $M$ is a $1 \times 1$ invertible matrix and $b$ a vector of length 1.
+- Transposition cipher: $M$ is an $m \times m$ permutation matrix and $b$ is a zero vector.
+- Hill cipher: $M$ is an $m \times m$ invertible matrix and $b$ is an $m \times 1$ zero vector.
 
 We can obviously extend the Hill cipher by using an arbitrary $m \times 1$ vector $b$.
 
@@ -575,29 +621,13 @@ and usually also chosen-ciphertext attacks.
 If we combine an operation providing **diffusion** (as Hill) with some elements
 of **confusion** (as a non-linear substitution) we can obtain a strong cipher.
 
-This naturally brings to the idea of product ciphers, proposed by Shannon, which
+This naturally leads to the idea of product ciphers, proposed by Shannon, which
 alternate confusion and diffusion layers. Modern designs of this kind are the
 Substitution-Permutation Network (SPN) and the Feistel network.
-
-### More on Polyalphabetic Ciphers
-
-Consider each block of a polyalphabetic cipher as a single word of a
-substitution cipher where the substitution is driven by some algorithm.
-
-Doing such substitution algorithmically we are not using the entire
-possibilities for the mapping between the plaintext and ciphertext
-($|K| < |A|!$).
-
-For example, with Vigenere cipher with blocks of 64 bits (key length = 64) we
-have a keyspace of $2^{64}$ and not $2^{64}!$ as for a generic substitution cipher
-derived from a permutation table.
-
-When using a particular key then such a key is reused over the whole plaintext
-set. With a *true* polyalphabetic cipher should not be possible to have a
-mapping where we apply to two different blocks the same key.
 
 
 ## References
 
 - [cry](https://github.com/davxy/cry/blob/master/src/crypt/affine.c) affine cipher
 - [Feistel ciphers](/posts/feistel-ciphers)
+- D. R. Stinson, *Cryptography: Theory and Practice*, CRC Press
