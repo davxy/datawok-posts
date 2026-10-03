@@ -97,12 +97,7 @@ Encryption is performed by applying to the plaintext a series of *rounds*.
 
 For each round a sub-key $k_i$ is derived from the main key $k$.
 
-         +-------+                     +-------+        +------+
-    L₀ → | Round | → L₁ → ... → Lₙ₋₁ → | Round | → Lₙ → | Swap | → Lₙ₊₁
-    R₀ → |       | → R₁ → ... → Rₙ₋₁ → |       | → Rₙ → |      | → Rₙ₊₁
-         +-------+                     +-------+        +------+
-             ↑                             ↑
-             k₁                            kₙ
+![Feistel network](/companions/feistel-ciphers/network.svg)
 
 The rounds' logic is identical to each other, what changes are the inputs.
 
@@ -173,12 +168,7 @@ sub keys are used in the opposite order (from $k_n$ to $k_1$).
 
 The requirement is the following property of round function:
 
-         +-------+
-    Rᵢ → | Round | → Rᵢ₋₁
-    Lᵢ → |       | → Lᵢ₋₁
-         +-------+
-             ↑
-             kᵢ
+![Decryption round](/companions/feistel-ciphers/decryption-round.svg)
 
 Note that the $R$ and $L$ components are wired in the opposite order with
 respect to the encryption procedure.
