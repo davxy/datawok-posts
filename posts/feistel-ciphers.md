@@ -8,17 +8,16 @@ toc = true
 
 Feistel ciphers are a family of symmetric encryption algorithms that use
 repeated rounds of substitution and permutation operations on blocks of data to
-provide confidentiality and data integrity.
+provide confidentiality.
 
 Popular examples of Feistel ciphers include:
 - [DES](https://en.wikipedia.org/wiki/Data_Encryption_Standard)
 - [Twofish](https://en.wikipedia.org/wiki/Twofish)
 - [Blowfish](https://en.wikipedia.org/wiki/Blowfish_(cipher))
-- [IDEA](https://en.wikipedia.org/wiki/International_Data_Encryption_Algorithm)
 - [CAST-128](https://en.wikipedia.org/wiki/CAST-128)
 - [GOST](https://en.wikipedia.org/wiki/GOST_(block_cipher))
 - [Camellia](https://en.wikipedia.org/wiki/Camellia_(cipher))
-- [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) (not really a Feistel cipher, but follows some of the SPN design principles)
+- [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) (not a Feistel cipher: AES is an SPN)
 
 In this post I'll mostly go through the basics of Feistel ciphers principles and
 analyze DES design with a rough evaluation of some of its security aspects.
@@ -30,7 +29,7 @@ In a *generic* block substitution cipher the plaintext is associated to the
 ciphertext using an arbitrary **permutation** table.
 
 Consider an alphabet with size $M$ and block length $n$, then the number of
-possible plaintext and ciphertext blocks is $|P| = |C| = M^n$ (key length) and
+possible plaintext and ciphertext blocks is $|P| = |C| = M^n$ and
 there are $|K| = M^n!$ possible ways to define the encryption function from $P$
 to $C$ (keyspace).
 
@@ -87,9 +86,11 @@ originally borrowed from DES.
 
 ## Feistel Cipher
 
-Feistel (IBM engineer ~1960/70) provided a pragmatic description of a SPN
-in order to allow a practical implementation. Its design is the foundation of
-almost every modern symmetric block cipher.
+Horst Feistel (IBM, early 1970s) proposed a structure that is different from an
+SPN, but follows the same idea of a product cipher: many rounds that alternate
+confusion and diffusion. The round function $F$ does not need to be invertible,
+and this makes the implementation practical. Many block ciphers use this
+structure, for example DES, Blowfish, Twofish and Camellia. AES uses an SPN.
 
 A plaintext block is divided into two halves $L_0$ and $R_0$.
 
@@ -235,8 +236,10 @@ attempt.
 
 For example, by reducing the number of rounds the cipher would be vulnerable to
 differential cryptanalysis (a kind of chosen plaintext attack). With 16
-rounds differential cryptanalysis requires $2^{55}$ operations, computationally
-comparable to a brute-force attack.
+rounds the attack of Biham and Shamir needs $2^{47}$ chosen plaintexts, and its
+known plaintext version needs $2^{55}$ known plaintexts. A brute-force attack
+tries $2^{55}$ keys on average and needs only a few known plaintext-ciphertext
+pairs. Thus in practice brute force is still the best attack.
 
 ### Key schedule
 
@@ -249,29 +252,30 @@ Transform a 56 bit key into 16 48-bit sub keys, one for each round.
 
 ### F Function
 
-$$F(R_{i-1}, k_i)$$
+$$F(k_i, R_{i-1})$$
 
 
 - $R_{i-1}$: right input half (32 bits)
 - $k_i$: i-th subkey (48 bits)
 
 Details of $F$ procedure:
-1. A constant **permutation** is applied to $R_{i-1}$.
-2. An **expansion** is applied by duplicating some of the 32 bits to obtain a 48
-   bit output.
-3. The result is **xor**ed with the round subkey $k_i$.
-4. The result is partitioned in 8 blocks of 6 bits each.
-5. Each of these 8 blocks of 6 bits are replaced by 8 blocks of 4 bits using 8
+1. An **expansion** is applied to $R_{i-1}$ by duplicating some of the 32 bits
+   to obtain a 48 bit output.
+2. The result is **xor**ed with the round subkey $k_i$.
+3. The result is partitioned in 8 blocks of 6 bits each.
+4. Each of these 8 blocks of 6 bits are replaced by 8 blocks of 4 bits using 8
    substitution tables (**s-box**).
-6. These 8 blocks are finally concatenated to get a 32 bit output.
+5. These 8 blocks are concatenated to get a 32 bit output.
+6. A constant **permutation** is applied to the 32 bit output.
 
 #### S-Box
 
 An s-box is a lookup table taking as input $m$ bits and yielding as output $n$
 bits. For example in DES $m = 6$ and $n = 4$.
 
-The criteria used to construct the s-box for DES has never been completely
-clarified by their designers but in practice has withstood the test of time.
+IBM kept the design criteria of the DES s-boxes secret for about 20 years.
+Coppersmith published them in 1994: one of the goals was resistance to
+differential cryptanalysis, which IBM knew in 1974 and kept secret.
 
 Each DES s-box is a constant table of 64 elements divided in 4 rows and 16
 columns. Each row contains a permutation of the numbers between 0 and 15.
@@ -280,7 +284,9 @@ The 6 input bits are used to choose one element from the table:
 - first and last bits are used to choose the row
 - middle four bits are used to choose the column
 
-The s-box are constructed such that the SAC and BIC properties hold.
+Two properties often used to evaluate an s-box are SAC and BIC, defined by
+Webster and Tavares in 1985. They are more recent than DES, and the DES s-boxes
+satisfy them only approximately.
 
 **Strict Avalanche Criterion** (SAC). If the i-th input bit changes then the
 j-th output bit changes with probability 1/2.
@@ -324,9 +330,10 @@ the input changes (independent events).
 
 ### DES Undesired properties
 
-- Reciprocal property: $D(E(m)) = m$ and $E(D(m)) = m$
 - Complementation property: $E(\lnot k, \lnot m) = \lnot E(k, m)$
-- Zero key: if $k = 0$ then $E(k, m) = D(k, m)$
+- Weak keys: for 4 keys (e.g. $k = 0$) all the sub-keys are equal, thus
+  $E(k, m) = D(k, m)$
+- Semi-weak keys: for 6 pairs of keys $(k, k')$, $E(k', E(k, m)) = m$
 
 These properties allow a *distinguished attack*, a kind of (mostly theoretical)
 attack that allows to distinguish the cipher from the "*perfect cipher*" when
@@ -338,3 +345,7 @@ the cipher functions are given as black boxes.
 - DES sbox SAC property evaluation [here](https://github.com/davxy/crypto-hacks/tree/main/des-sbox-eval)
 - DES sbox BIC property evaluation (TODO...)
 - [Classical ciphers](/posts/classical-ciphers)
+- E. Biham, A. Shamir, *Differential Cryptanalysis of the Full 16-round DES*, CRYPTO '92
+- D. Coppersmith, *The Data Encryption Standard (DES) and its strength against attacks*,
+  IBM Journal of Research and Development, 38(3), 1994
+- A. F. Webster, S. E. Tavares, *On the Design of S-Boxes*, CRYPTO '85
