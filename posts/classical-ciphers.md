@@ -115,23 +115,6 @@ The two workarounds are the same thing seen from two sides (see the
 introduction): working with blocks of size $N$ is just like working with a
 bigger alphabet where each element has size $N$.
 
-For instance, if the block length is $3$ there are $26^3$ elements in the
-alphabet. If the cipher is a *pure substitution* cipher then the keyspace size
-is $(26^3)!$. The price is the key: a table of $26^3$ entries of
-$\log_2(26^3) \approx 14.1$ bits each.
-
-Polyalphabetic ciphers where the substitution of each element within the block
-is driven by a simple monoalphabetic cipher are a good compromise since the key
-is very compact, and we still have a *big* enough keyspace.
-
-For instance, with a polyalphabetic shift cipher, if the block length is $3$ then
-the keyspace size is $26^3$ and the key length is $3$.
-
-In the same way, a Vigenère cipher over the binary alphabet $\{0, 1\}$ with key
-length $64$ (i.e. working on blocks of 64 bits) has a keyspace of $2^{64}$ and
-not $(2^{64})!$ as for a generic substitution cipher derived from a permutation
-table.
-
 
 ## Shift Cipher
 
@@ -181,8 +164,8 @@ ciphertext:
 
 $$
 \begin{aligned}
-E_k[p_i] &= [p_i + k_{(i-1) \bmod m + 1}] \bmod |A| = c_i \\
-D_k[c_i] &= [c_i - k_{(i-1) \bmod m + 1}] \bmod |A| = p_i
+E_k[p_i] &= [p_i + k_{i \bmod m}] \bmod |A| = c_i \\
+D_k[c_i] &= [c_i - k_{i \bmod m}] \bmod |A| = p_i
 \end{aligned}
 $$
 
@@ -190,7 +173,7 @@ $$
 
 The cipher is trivially vulnerable to a known plaintext attack:
 
-$$k_{(i-1) \bmod m + 1} = (c_i - p_i) \bmod |A|$$
+$$k_{i \bmod m} = (c_i - p_i) \bmod |A|$$
 
 The cipher is also vulnerable to statistical analysis. In this case the
 vulnerability stems from the key repetition. The shorter the key, the more
@@ -225,9 +208,9 @@ contains the ciphertext letters at the positions encrypted with $k_j$.
 
 $$
 \begin{aligned}
-C_1 &= (c_1, c_{1+m}, c_{1+2m}, \ldots) \\
+C_0 &= (c_0, c_m, c_{2m}, \ldots) \\
 &\;\;\vdots \\
-C_m &= (c_m, c_{2m}, c_{3m}, \ldots)
+C_{m-1} &= (c_{m-1}, c_{2m-1}, c_{3m-1}, \ldots)
 \end{aligned}
 $$
 
@@ -238,7 +221,7 @@ Friedman Test.
 
 ##### Index of Coincidence
 
-Given a vector of characters $x = (x_1, \ldots, x_n)$ in $A^*$ then $\operatorname{Ic}(x)$ is the
+Given a vector of characters $x = (x_0, \ldots, x_{n-1})$ in $A^*$ then $\operatorname{Ic}(x)$ is the
 probability to extract, without reinsertion, two elements from $x$ with the
 same value.
 
@@ -295,7 +278,7 @@ In short:
 
 Given the ciphertext:
 
-$$y = (y_1, \ldots, y_n)$$
+$$y = (y_0, \ldots, y_{n-1})$$
 
 The original Friedman test estimates $m$ directly from $\operatorname{Ic}(y)$.
 Two letters extracted from $y$ are encrypted with the same key value with
@@ -315,13 +298,13 @@ $m$ rows (the first column contains the first $m$ characters of the ciphertext).
 
 $$
 \begin{bmatrix}
-y_1 & y_{m+1} & \cdots \\
+y_0 & y_m & \cdots \\
 \vdots & \vdots & \ddots \\
-y_m & y_{2m} & \cdots
+y_{m-1} & y_{2m-1} & \cdots
 \end{bmatrix}
 =
 \begin{bmatrix}
-R_1 \\ \vdots \\ R_m
+R_0 \\ \vdots \\ R_{m-1}
 \end{bmatrix}
 $$
 
@@ -340,39 +323,39 @@ Compute the $\operatorname{Ic}$ for each row $R_i$.
 ##### Key disclosure
 
 Once that the key length $m$ is disclosed, we proceed determining the single
-letters of the key $k = (k_1, \ldots, k_m)$.
+letters of the key $k = (k_0, \ldots, k_{m-1})$.
 
 $$
 \begin{aligned}
-&R_1 \text{ has been encrypted with } k_1 \\
-&N_1 = \operatorname{length}(R_1) \\
+&R_0 \text{ has been encrypted with } k_0 \\
+&N_0 = \operatorname{length}(R_0) \\
 &p(i) = \text{prob for the } i\text{-th char when using English language}
 \end{aligned}
 $$
 
-How encryption is done using $k_1$ on the single plaintext characters:
+How encryption is done using $k_0$ on the single plaintext characters:
 
   | Plaintext  | English prob. $p(i)$ | Ciphertext   |  Cipher frequencies            |
   |------------|----------------------|--------------|--------------------------------|
-  | $0$        |    $p(0)$            | $(0+k_1) \bmod 26$ |     $f((0+k_1) \bmod 26)/N_1$  |
+  | $0$        |    $p(0)$            | $(0+k_0) \bmod 26$ |     $f((0+k_0) \bmod 26)/N_0$  |
   | ...        |    ...               |   ...        |     ...                        |
-  | $25$       |    $p(25)$           | $(25+k_1) \bmod 26$ |     $f((25+k_1) \bmod 26)/N_1$ |
+  | $25$       |    $p(25)$           | $(25+k_0) \bmod 26$ |     $f((25+k_0) \bmod 26)/N_0$ |
 
-As the value of $k_1$ we need to choose the value that better approximates the
+As the value of $k_0$ we need to choose the value that better approximates the
 English typical frequencies.
 
 For each candidate $j \in \mathbb{Z}_{26}$ we define the vector of the
-frequencies in $R_1$ shifted back by $j$, and the vector of the English
+frequencies in $R_0$ shifted back by $j$, and the vector of the English
 probabilities:
 
 $$
 \begin{aligned}
-F_j &= \left( \frac{f(j)}{N_1}, \frac{f((1+j) \bmod 26)}{N_1}, \ldots, \frac{f((25+j) \bmod 26)}{N_1} \right) \\
+F_j &= \left( \frac{f(j)}{N_0}, \frac{f((1+j) \bmod 26)}{N_0}, \ldots, \frac{f((25+j) \bmod 26)}{N_0} \right) \\
 P &= (p(0), \ldots, p(25))
 \end{aligned}
 $$
 
-Then $k_1$ is equal to the $j$ for which the distance $\lVert F_j - P \rVert$ is
+Then $k_0$ is equal to the $j$ for which the distance $\lVert F_j - P \rVert$ is
 minimal. An **equivalent** technique often reported in literature is to get the
 $j$ that maximizes the scalar product $F_j \cdot P$. The two are equivalent
 because $\lVert F_j - P \rVert^2 = \lVert F_j \rVert^2 + \lVert P \rVert^2 - 2 F_j \cdot P$,

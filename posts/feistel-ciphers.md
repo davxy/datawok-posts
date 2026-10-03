@@ -29,12 +29,12 @@ analyze DES design with a rough evaluation of some of its security aspects.
 In a *generic* block substitution cipher the plaintext is associated to the
 ciphertext using an arbitrary **permutation** table.
 
-Consider an alphabet with size `M` and block length `n`, then the number of
-possible plaintext and ciphertext blocks is `|P| = |C| = Mⁿ` (key length) and
-there are `|K| = Mⁿ!` possible ways to define the encryption function from `P`
-to `C` (keyspace).
+Consider an alphabet with size $M$ and block length $n$, then the number of
+possible plaintext and ciphertext blocks is $|P| = |C| = M^n$ (key length) and
+there are $|K| = M^n!$ possible ways to define the encryption function from $P$
+to $C$ (keyspace).
 
-For instance, with 64 bit blocks `|P| = |C| = 2⁶⁴`, `|K| = 2⁶⁴!`.
+For instance, with 64 bit blocks $|P| = |C| = 2^{64}$, $|K| = 2^{64}!$.
 
 This kind of cipher is generally very secure as
 - big blocks defeat statistical analysis;
@@ -46,14 +46,14 @@ Unfortunately the **key size** is impractical.
 For each possible plaintext block we have to explicitly share what is the
 corresponding ciphertext block (there is no compact key derivation algorithm).
 
-At best, if we consider the plaintext as a numeric sequence from `0` to
-`Mⁿ-1`, we can eventually just share the sorted list of associated ciphertext
+At best, if we consider the plaintext as a numeric sequence from $0$ to
+$M^n - 1$, we can eventually just share the sorted list of associated ciphertext
 blocks (the plaintext block is implicit).
 
 For instance, if each block length is 64 bits the key consists of the explicit
-enumeration of `2⁶⁴` encrypted blocks. The key length is thus:
+enumeration of $2^{64}$ encrypted blocks. The key length is thus:
 
-    keylen = len(block)·|C| = 64·2⁶⁴ = 2⁷⁰ ≈ 10²¹ bits
+$$\operatorname{keylen} = \operatorname{len}(\text{block}) \cdot |C| = 64 \cdot 2^{64} = 2^{70} \approx 10^{21} \text{ bits}$$
 
 
 ## Substitution Permutation Network (SPN)
@@ -91,11 +91,11 @@ Feistel (IBM engineer ~1960/70) provided a pragmatic description of a SPN
 in order to allow a practical implementation. Its design is the foundation of
 almost every modern symmetric block cipher.
 
-A plaintext block is divided into two halves `L₀` and `R₀`.
+A plaintext block is divided into two halves $L_0$ and $R_0$.
 
 Encryption is performed by applying to the plaintext a series of *rounds*.
 
-For each round a sub-key `kᵢ` is derived from the main key `k`.
+For each round a sub-key $k_i$ is derived from the main key $k$.
 
          +-------+                     +-------+        +------+
     L₀ → | Round | → L₁ → ... → Lₙ₋₁ → | Round | → Lₙ → | Swap | → Lₙ₊₁
@@ -106,14 +106,18 @@ For each round a sub-key `kᵢ` is derived from the main key `k`.
 
 The rounds' logic is identical to each other, what changes are the inputs.
 
-In the final step `Lₙ` and `Rₙ` are swapped and marked as `Lₙ₊₁` and `Rₙ₊₁`.
+In the final step $L_n$ and $R_n$ are swapped and marked as $L_{n+1}$ and $R_{n+1}$.
 
 ### Round
 
 Compact formulas:
 
-    Lᵢ = Rᵢ₋₁
-    Rᵢ = Lᵢ₋₁ ⊕ F(kᵢ, Rᵢ₋₁)
+$$
+\begin{aligned}
+L_i &= R_{i-1} \\
+R_i &= L_{i-1} \oplus F(k_i, R_{i-1})
+\end{aligned}
+$$
 
 Round actions:
 - Swap of the two halves applies the **permutation** (diffusion) principle.
@@ -124,32 +128,48 @@ Round actions:
 
 ### Encryption
 
-Assuming blocks with length `2·w`.
+Assuming blocks with length $2 \cdot w$.
 
 Split:
 
-    L₀ = Plaintext[..w]
-    R₀ = Plaintext[w..]
+$$
+\begin{aligned}
+L_0 &= \text{Plaintext}[..w] \\
+R_0 &= \text{Plaintext}[w..]
+\end{aligned}
+$$
 
-Repeat for `n` rounds:
+Repeat for $n$ rounds:
 
-    Lᵢ = Rᵢ₋₁
-    Rᵢ = Lᵢ₋₁ ⊕ F(kᵢ, Rᵢ₋₁)
+$$
+\begin{aligned}
+L_i &= R_{i-1} \\
+R_i &= L_{i-1} \oplus F(k_i, R_{i-1})
+\end{aligned}
+$$
 
 Final swap:
 
-    Lₙ₊₁ = Rₙ
-    Rₙ₊₁ = Lₙ
+$$
+\begin{aligned}
+L_{n+1} &= R_n \\
+R_{n+1} &= L_n
+\end{aligned}
+$$
 
 Merge:
 
-    Ciphertext[..w] = Lₙ₊₁
-    Ciphertext[w..] = Rₙ₊₁
+$$
+\begin{aligned}
+\text{Ciphertext}[..w] &= L_{n+1} \\
+\text{Ciphertext}[w..] &= R_{n+1}
+\end{aligned}
+$$
 
 ### Decryption
 
 Decryption algorithm is equal to encryption, the only difference is that the
-sub keys are used in the opposite order (from `kₙ` to `k₁`).
+sub keys are used in the opposite order (from $k_n$ to $k_1$).
 
 The requirement is the following property of round function:
 
@@ -160,37 +180,48 @@ The requirement is the following property of round function:
              ↑
              kᵢ
 
-Note that the `R` and `L` components are wired in the opposite order with
+Note that the $R$ and $L$ components are wired in the opposite order with
 respect to the encryption procedure.
 
 Given the round definition (used by encryption):
 
-    Lᵢ = Rᵢ₋₁
-    Rᵢ = Lᵢ₋₁ ⊕ F(kᵢ, Rᵢ₋₁)
+$$
+\begin{aligned}
+L_i &= R_{i-1} \\
+R_i &= L_{i-1} \oplus F(k_i, R_{i-1})
+\end{aligned}
+$$
 
 Note that one side is always recoverable as it is forwarded untouched.
-Thus, given `k` and applying `F` to it, we can recover the other side as well.
+Thus, given $k$ and applying $F$ to it, we can recover the other side as well.
 
 When applied to the decryption inputs we have that:
 
-    Rᵢ₋₁ = Lᵢ
-    Lᵢ₋₁ = Rᵢ ⊕ F(kᵢ, Lᵢ)
+$$
+\begin{aligned}
+R_{i-1} &= L_i \\
+L_{i-1} &= R_i \oplus F(k_i, L_i)
+\end{aligned}
+$$
 
 By the definition of the encryption routine we can indeed see that:
 
-    Lᵢ = Rᵢ₋₁ , we inverted correctly one half
+$$L_i = R_{i-1} \quad \text{(we inverted correctly one half)}$$
 
 For second half, given that the encryption function is defined as:
 
-    Rᵢ = Lᵢ₋₁ ⊕ F(kᵢ, Rᵢ₋₁)
+$$R_i = L_{i-1} \oplus F(k_i, R_{i-1})$$
 
-Replacing `Rᵢ` in the defined decryption procedure:
+Replacing $R_i$ in the defined decryption procedure:
 
-    Lᵢ₋₁ = Rᵢ ⊕ F(kᵢ, Lᵢ) =
-           = [Lᵢ₋₁ ⊕ F(kᵢ, Rᵢ₋₁)] ⊕ F(kᵢ, Lᵢ) =
-           (given that Lᵢ = Rᵢ₋₁)
-           = [Lᵢ₋₁ ⊕ F(kᵢ, Lᵢ)] ⊕ F(kᵢ, Lᵢ) =
-           = Lᵢ₋₁
+$$
+\begin{aligned}
+L_{i-1} &= R_i \oplus F(k_i, L_i) \\
+&= [L_{i-1} \oplus F(k_i, R_{i-1})] \oplus F(k_i, L_i) \\
+&= [L_{i-1} \oplus F(k_i, L_i)] \oplus F(k_i, L_i) && \text{(given that } L_i = R_{i-1} \text{)} \\
+&= L_{i-1}
+\end{aligned}
+$$
 
 The identity holds, thus the decryption correctly reverts the encryption
 procedure.
@@ -201,20 +232,20 @@ procedure.
 In DES the blocks are 64 bits and key size 56 bits.
 
 The three elements defining the security of the cipher are:
-- the number of rounds `n`
-- the sub-keys generation function `G` (key schedule algorithm)
-- the function `F`
+- the number of rounds $n$
+- the sub-keys generation function $G$ (key schedule algorithm)
+- the function $F$
 
 The more rounds we apply the more secure is the cipher.
 
-For DES the number of rounds (`n = 16`) has been chosen to contrast the attacks
+For DES the number of rounds ($n = 16$) has been chosen to contrast the attacks
 known at the time. In particular, it has been chosen a number such that the best
 known cryptanalytic attacks have the same order of complexity as a brute force
 attempt.
 
 For example, by reducing the number of rounds the cipher would be vulnerable to
 differential cryptanalysis (a kind of chosen plaintext attack). With 16
-rounds differential cryptanalysis requires `2⁵⁵` operations, computationally
+rounds differential cryptanalysis requires $2^{55}$ operations, computationally
 comparable to a brute-force attack.
 
 ### Key schedule
@@ -222,23 +253,23 @@ comparable to a brute-force attack.
 Transform a 56 bit key into 16 48-bit sub keys, one for each round.
 
 1. Initial permutation according to a fixed table.
-2. Split in two 28-bit halves `(C₀, D₀)`.
-3. Key iterations: `(Cᵢ, Dᵢ)` are rotated to the left by 1 or 2 positions.
-4. Round key generation: `(Cᵢ, Dᵢ)` are combined, permuted and 48-bits are fetched.
+2. Split in two 28-bit halves $(C_0, D_0)$.
+3. Key iterations: $(C_i, D_i)$ are rotated to the left by 1 or 2 positions.
+4. Round key generation: $(C_i, D_i)$ are combined, permuted and 48-bits are fetched.
 
 ### F Function
 
-    F(Rᵢ₋₁, kᵢ)
+$$F(R_{i-1}, k_i)$$
 
 
-- `Rᵢ₋₁`: right input half (32 bits)
-- `kᵢ`: i-th subkey (48 bits)
+- $R_{i-1}$: right input half (32 bits)
+- $k_i$: i-th subkey (48 bits)
 
-Details of `F` procedure:
-1. A constant **permutation** is applied to `Rᵢ₋₁`.
+Details of $F$ procedure:
+1. A constant **permutation** is applied to $R_{i-1}$.
 2. An **expansion** is applied by duplicating some of the 32 bits to obtain a 48
    bit output.
-3. The result is **xor**ed with the round subkey `kᵢ`.
+3. The result is **xor**ed with the round subkey $k_i$.
 4. The result is partitioned in 8 blocks of 6 bits each.
 5. Each of these 8 blocks of 6 bits are replaced by 8 blocks of 4 bits using 8
    substitution tables (**s-box**).
@@ -246,8 +277,8 @@ Details of `F` procedure:
 
 #### S-Box
 
-An s-box is a lookup table taking as input `m` bits and yielding as output `n`
-bits. For example in DES `m = 6` and `n = 4`.
+An s-box is a lookup table taking as input $m$ bits and yielding as output $n$
+bits. For example in DES $m = 6$ and $n = 4$.
 
 The criteria used to construct the s-box for DES has never been completely
 clarified by their designers but in practice has withstood the test of time.
@@ -271,26 +302,26 @@ In other words, the properties say that a small change in the input influences
 all the output bits (SAC) and that the changes are independent for each bit
 (BIC).
 
-We can analyze the s-box as if it is a function `S` taking as input an aleatory
-variable `X` (m-bits) and returning an aleatory variable `Y` (n-bits):
+We can analyze the s-box as if it is a function $S$ taking as input an aleatory
+variable $X$ ($m$ bits) and returning an aleatory variable $Y$ ($n$ bits):
 
-    Y = S(X)
+$$Y = S(X)$$
 
- - `X[i]`: the i-th bit of `X`
- - `Xⁱ`: `X` with the i-th bit flipped
+ - $X[i]$: the i-th bit of $X$
+ - $X^i$: $X$ with the i-th bit flipped
 
 ##### SAC Check
 
-For an arbitrary input bit `i`:
+For an arbitrary input bit $i$:
 
-    Y₁ = S(X), Y₂ = S(Xⁱ)
+$$Y_1 = S(X), \quad Y_2 = S(X^i)$$
 
-Then for any output bit `j ∈ {1..n}`
+Then for any output bit $j \in \{1, \ldots, n\}$
 
-    Pr[ Y₁[j] ≠ Y₂[j] ] = 1/2
+$$\Pr[Y_1[j] \ne Y_2[j]] = \frac{1}{2}$$
 
-That is, by complementing the `i`-th input bit the probability to change an
-arbitrary output bit `j` is `1/2`.
+That is, by complementing the $i$-th input bit the probability to change an
+arbitrary output bit $j$ is $1/2$.
 
 To evaluate this probability for a particular s-box for all possible inputs we
 need to (empirically) check how many output bits are changing when we change an
@@ -298,14 +329,14 @@ input bit.
 
 ##### BIC Check
 
-For each input bit `i` and output bit `j`, the output changes independently when
+For each input bit $i$ and output bit $j$, the output changes independently when
 the input changes (independent events).
 
 ### DES Undesired properties
 
-- Reciprocal property: `D(E(m)) = m` and `E(D(m)) = m`
-- Complementation property: `E(¬k,¬m) = ¬E(k,m)`
-- Zero key: if `k = 0` then `E(k,m) = D(k,m)`
+- Reciprocal property: $D(E(m)) = m$ and $E(D(m)) = m$
+- Complementation property: $E(\lnot k, \lnot m) = \lnot E(k, m)$
+- Zero key: if $k = 0$ then $E(k, m) = D(k, m)$
 
 These properties allow a *distinguished attack*, a kind of (mostly theoretical)
 attack that allows to distinguish the cipher from the "*perfect cipher*" when
